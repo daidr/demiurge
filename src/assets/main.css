@@ -1,4 +1,8 @@
 @import './base.css';
 
 #app {
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }

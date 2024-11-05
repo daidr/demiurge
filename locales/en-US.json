@@ -2,5 +2,10 @@
   "sidebar": {
     "profiles": "Profiles",
     "default_profile": "Default Profile"
+  },
+  "editor": {
+    "json-schema": {
+      "placeholder": "Enter JSON Schema here"
+    }
   }
 }

@@ -10,7 +10,7 @@ importers:
     dependencies:
       '@guolao/vue-monaco-editor':
         specifier: ^1.5.2
-        version: 1.5.2(monaco-editor@0.51.0)(vue@3.5.1(typescript@5.4.5))
+        version: 1.5.2(monaco-editor@0.52.0)(vue@3.5.1(typescript@5.4.5))
       '@iconify-json/mingcute':
         specifier: ^1.2.0
         version: 1.2.0
@@ -23,6 +23,9 @@ importers:
       idb:
         specifier: ^8.0.0
         version: 8.0.0
+      monaco-editor:
+        specifier: 0.52.0
+        version: 0.52.0
       pinia:
         specifier: ^2.1.7
         version: 2.2.2(typescript@5.4.5)(vue@3.5.1(typescript@5.4.5))
@@ -3475,8 +3478,8 @@ packages:
   mlly@1.7.1:
     resolution: {integrity: sha512-rrVRZRELyQzrIUAVMHxP97kv+G786pHmOKzuFII8zDYahFBS7qnHh2AlYSl1GAHhaMPCz6/oHjVMcfFYgFYHgA==}
 
-  monaco-editor@0.51.0:
-    resolution: {integrity: sha512-xaGwVV1fq343cM7aOYB6lVE4Ugf0UyimdD/x5PWcWBMKENwectaEu77FAN7c5sFiyumqeJdX1RPTh1ocioyDjw==}
+  monaco-editor@0.52.0:
+    resolution: {integrity: sha512-OeWhNpABLCeTqubfqLMXGsqf6OmPU6pHM85kF3dhy6kq5hnhuVS1p3VrEW/XhWHc71P2tHyS5JFySD8mgs1crw==}
 
   mrmime@2.0.0:
     resolution: {integrity: sha512-eu38+hdgojoyq63s+yTpN4XMBdt5l8HhMhc4VKLO9KM5caLIBvUm4thi7fFaxyTmCKeNnXZ5pAlBwCUnhA09uw==}
@@ -6001,10 +6004,10 @@ snapshots:
 
   '@eslint/js@8.57.0': {}
 
-  '@guolao/vue-monaco-editor@1.5.2(monaco-editor@0.51.0)(vue@3.5.1(typescript@5.4.5))':
+  '@guolao/vue-monaco-editor@1.5.2(monaco-editor@0.52.0)(vue@3.5.1(typescript@5.4.5))':
     dependencies:
-      '@monaco-editor/loader': 1.4.0(monaco-editor@0.51.0)
-      monaco-editor: 0.51.0
+      '@monaco-editor/loader': 1.4.0(monaco-editor@0.52.0)
+      monaco-editor: 0.52.0
       vue: 3.5.1(typescript@5.4.5)
       vue-demi: 0.14.10(vue@3.5.1(typescript@5.4.5))
 
@@ -6126,9 +6129,9 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@monaco-editor/loader@1.4.0(monaco-editor@0.51.0)':
+  '@monaco-editor/loader@1.4.0(monaco-editor@0.52.0)':
     dependencies:
-      monaco-editor: 0.51.0
+      monaco-editor: 0.52.0
       state-local: 1.0.7
 
   '@nodelib/fs.scandir@2.1.5':
@@ -8740,7 +8743,7 @@ snapshots:
       pkg-types: 1.2.0
       ufo: 1.5.4
 
-  monaco-editor@0.51.0: {}
+  monaco-editor@0.52.0: {}
 
   mrmime@2.0.0: {}
 

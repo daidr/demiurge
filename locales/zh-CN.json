@@ -2,5 +2,10 @@
   "sidebar": {
     "profiles": "配置文件",
     "default_profile": "默认配置文件"
+  },
+  "editor": {
+    "json-schema": {
+      "placeholder": "在此输入 JSON Schema"
+    }
   }
 }
