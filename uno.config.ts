@@ -2,20 +2,44 @@ import fs from 'node:fs/promises'
 import {
   defineConfig,
   presetIcons,
-  presetUno,
+  presetWind3,
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
+import presetAnimations from "unocss-preset-animations";
+import { presetShadcn } from "unocss-preset-shadcn";
 
 export default defineConfig({
   shortcuts: [
+    {
+      'animate-accordion-up': 'accordion-up',
+      'animate-accordion-down': 'accordion-down',
+    },
   ],
+  content: {
+    pipeline: {
+      include: [
+        // the default
+        /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
+        // include js/ts files
+        "(components|src)/**/*.{js,ts}",
+      ],
+    },
+  },
   theme: {
     colors: {
     },
   },
   presets: [
-    presetUno(),
+    presetAnimations(),
+    presetShadcn(
+      {
+        color: "red",
+        // With default setting for SolidUI, you need to set the darkSelector option.
+        darkSelector: '[data-kb-theme="dark"]',
+      },
+    ),
+    presetWind3(),
     presetIcons({
       collections: {
         mingcute: () => import('@iconify-json/mingcute/icons.json').then(i => i.default),

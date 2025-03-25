@@ -8,7 +8,7 @@ import LangSwitch from './LangSwitch.vue'
       <div class="i-custom-json-baker text-lg" />
       JSON Baker
     </div>
-    <div class="flex gap-2 p-1">
+    <div class="flex gap-1 p-1">
       <a class="header-link" href="https://github.com/daidr/json-baker" target="_blank" rel="noopener noreferrer">
         <div class="i-mingcute-github-line" />
       </a>
