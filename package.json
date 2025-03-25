@@ -20,20 +20,11 @@
     "@unocss/reset": "^66.0.0",
     "@vueuse/core": "^13.0.0",
     "idb": "^8.0.2",
+    "monaco-editor": "0.52.0",
     "pinia": "^3.0.1",
     "splitpanes": "^4.0.3",
     "vue": "^3.5.13",
     "vue-i18n": "^11.1.2"
-    "@guolao/vue-monaco-editor": "^1.5.2",
-    "@iconify-json/mingcute": "^1.2.0",
-    "@unocss/reset": "^0.62.3",
-    "@vueuse/core": "^11.0.3",
-    "idb": "^8.0.0",
-    "monaco-editor": "0.52.0",
-    "pinia": "^2.1.7",
-    "splitpanes": "^3.1.5",
-    "vue": "^3.4.29",
-    "vue-i18n": "^9.14.0"
   },
   "devDependencies": {
     "@antfu/eslint-config": "^4.11.0",
