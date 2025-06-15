@@ -1,11 +1,11 @@
-import { URL, fileURLToPath } from 'node:url'
 import { dirname, resolve } from 'node:path'
-import { defineConfig } from 'vite'
-import UnoCSS from 'unocss/vite'
-import vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+import { fileURLToPath, URL } from 'node:url'
 import VueI18nPlugin from '@intlify/unplugin-vue-i18n/vite'
+import vue from '@vitejs/plugin-vue'
+import UnoCSS from 'unocss/vite'
+import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
+import vueDevTools from 'vite-plugin-vue-devtools'
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -14,7 +14,7 @@ export default defineConfig({
     vueDevTools(),
     UnoCSS(),
     VueI18nPlugin({
-      include: resolve(dirname(fileURLToPath(import.meta.url)), './locales/**'),
+      include: resolve(dirname(fileURLToPath(import.meta.url)), './locales/[^_]*.json'),
     }),
     VitePWA({ registerType: 'autoUpdate' }),
   ],

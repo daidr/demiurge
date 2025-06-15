@@ -1,7 +1,21 @@
 {
+  "general": {
+    "browser_not_supported_tips": "当前浏览器不支持使用JSON Baker, 请升级浏览器版本或使用Chrome、Firefox、Safari等现代浏览器"
+  },
+  "locales": {
+    "en-US": "英语 (美国)",
+    "zh-CN": "简体中文"
+  },
   "sidebar": {
-    "profiles": "配置文件",
-    "default_profile": "默认配置文件"
+    "workspaces": "工作区",
+    "draft_workspace": "草稿工作区",
+    "please_select_workspace": "请选择工作区"
+  },
+  "workspace": {
+    "create_workspace": "创建工作区",
+    "edit_workspace": "编辑工作区",
+    "icon": "图标",
+    "label": "标签"
   },
   "editor": {
     "json-schema": {

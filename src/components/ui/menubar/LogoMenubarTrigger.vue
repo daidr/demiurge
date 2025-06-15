@@ -1,0 +1,36 @@
+<script setup lang="ts">
+import type { MenubarTriggerProps } from 'reka-ui'
+import type { HTMLAttributes } from 'vue'
+import { cn } from '@/lib/utils'
+import { MenubarTrigger, useForwardProps } from 'reka-ui'
+import { computed } from 'vue'
+
+const props = defineProps<MenubarTriggerProps & { class?: HTMLAttributes['class'] }>()
+
+const delegatedProps = computed(() => {
+  const { class: _, ...delegated } = props
+
+  return delegated
+})
+
+const forwardedProps = useForwardProps(delegatedProps)
+</script>
+
+<template>
+  <MenubarTrigger
+    v-bind="forwardedProps" :class="cn(
+      'logo flex cursor-default select-none items-center outline-none focus:(bg-black text-white shadow-md shadow-black/20) data-[state=open]:(bg-black text-white shadow-md shadow-black/20)',
+      props.class,
+    )
+    "
+  >
+    <div class="i-custom-json-baker text-lg" />
+    JSON Baker
+  </MenubarTrigger>
+</template>
+
+<style scoped lang="scss">
+.logo {
+  @apply flex items-center gap-2 rounded-sm px-1 py-0.5 font-bold;
+}
+</style>

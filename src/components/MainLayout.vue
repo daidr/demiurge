@@ -1,9 +1,15 @@
 <script setup lang="ts">
+// import 'splitpanes/dist/splitpanes.css'
+import {
+  ResizableHandle,
+  ResizablePanel,
+  ResizablePanelGroup,
+} from '@/components/ui/resizable'
+import { useLayoutStore } from '@/stores/layout'
 import { storeToRefs } from 'pinia'
+import LayoutSchemaEditor from './LayoutSchemaEditor.vue'
 import { Pane, Splitpanes } from 'splitpanes'
 import LayoutSidebar from './LayoutSidebar.vue'
-import LayoutSchemaEditor from './LayoutSchemaEditor.vue'
-import { useLayoutStore } from '@/stores/layout'
 import 'splitpanes/dist/splitpanes.css'
 
 const layoutStore = useLayoutStore()
@@ -13,24 +19,49 @@ const { showSidebar, showSchemaPanel } = storeToRefs(layoutStore)
 <template>
   <div class="flex-grow">
     <Splitpanes>
-      <Pane v-if="showSidebar" min-size="5" max-size="20">
+      <Pane v-if="showSidebar" min-size="15" max-size="30">
         <LayoutSidebar />
       </Pane>
       <Pane min-size="30">
         <Splitpanes horizontal>
-          <Pane v-if="!showSchemaPanel" min-size="5">
+          <Pane v-if="!showSchemaPanel" min-size="10">
             <LayoutSchemaEditor />
           </Pane>
-          <Pane min-size="5">
+          <Pane min-size="10">
             <span>3</span>
           </Pane>
         </Splitpanes>
       </Pane>
-      <Pane v-if="showSidebar" min-size="30">
+      <Pane min-size="30">
         <span>4</span>
       </Pane>
     </Splitpanes>
   </div>
+  <!-- <ResizablePanelGroup id="global-group" direction="horizontal">
+    <ResizablePanel v-if="showSidebar" id="sidebar-panel" :min-size="10" :max-size="30" :default-size="15">
+      <LayoutSidebar />
+    </ResizablePanel>
+    <ResizableHandle v-if="showSidebar" id="handle-1" />
+    <ResizablePanel id="main-panel">
+      <ResizablePanelGroup id="editor-group" direction="horizontal">
+        <ResizablePanel id="left-panel" :min-size="20" :max-size="80">
+          <ResizablePanelGroup id="editor-group-2" direction="vertical">
+            <ResizablePanel id="top-panel" :min-size="20" :max-size="80">
+              <LayoutSchemaEditor />
+            </ResizablePanel>
+            <ResizableHandle id="handle-3" />
+            <ResizablePanel id="bottom-panel">
+              3
+            </ResizablePanel>
+          </ResizablePanelGroup>
+        </ResizablePanel>
+        <ResizableHandle id="handle-2" />
+        <ResizablePanel id="right-panel">
+          4
+        </ResizablePanel>
+      </ResizablePanelGroup>
+    </ResizablePanel>
+  </ResizablePanelGroup> -->
 </template>
 
 <style scoped lang="scss">

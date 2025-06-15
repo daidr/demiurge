@@ -6,8 +6,8 @@ import {
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
-import presetAnimations from "unocss-preset-animations";
-import { presetShadcn } from "unocss-preset-shadcn";
+import presetAnimations from 'unocss-preset-animations'
+import { presetShadcn } from 'unocss-preset-shadcn'
 
 export default defineConfig({
   shortcuts: [
@@ -22,7 +22,7 @@ export default defineConfig({
         // the default
         /\.(vue|svelte|[jt]sx|mdx?|astro|elm|php|phtml|html)($|\?)/,
         // include js/ts files
-        "(components|src)/**/*.{js,ts}",
+        '(components|src)/**/*.{js,ts}',
       ],
     },
   },
@@ -31,15 +31,18 @@ export default defineConfig({
     },
   },
   presets: [
+    presetWind3(),
     presetAnimations(),
     presetShadcn(
       {
-        color: "red",
+        color: 'slate',
         // With default setting for SolidUI, you need to set the darkSelector option.
         darkSelector: '[data-kb-theme="dark"]',
       },
+      {
+        componentLibrary: 'reka',
+      },
     ),
-    presetWind3(),
     presetIcons({
       collections: {
         mingcute: () => import('@iconify-json/mingcute/icons.json').then(i => i.default),

@@ -1,17 +1,15 @@
 <script setup lang="ts">
-import { Uri, editor, languages } from 'monaco-editor'
-import {
-  ref,
-  shallowRef,
-  watch,
-} from 'vue'
+import { editor, languages, Uri } from 'monaco-editor'
+import { ref, shallowRef, watch } from 'vue'
 import MonacoEditor from './base/MonacoEditor.vue'
 
 languages.json.jsonDefaults.setDiagnosticsOptions({
-  schemas: [{
-    uri: 'http://json-schema.org/draft-07/schema',
-    fileMatch: ['json-schema.json'],
-  }],
+  schemas: [
+    {
+      uri: 'http://json-schema.org/draft-07/schema',
+      fileMatch: ['json-schema.json'],
+    },
+  ],
   enableSchemaRequest: true,
   allowComments: true,
   schemaValidation: 'error',
@@ -30,7 +28,11 @@ watch(code, (newCode) => {
 
 function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
   EditorRef.value = _editor
-  model = editor.createModel(code.value, 'json', Uri.parse('internal://json-baker/json-schema.json'))
+  model = editor.createModel(
+    code.value,
+    'json',
+    Uri.parse('internal://json-baker/json-schema.json'),
+  )
   _editor.setModel(model)
   _editor.onDidChangeModelContent(() => {
     code.value = _editor.getValue()
@@ -53,7 +55,9 @@ function onEditorUnmounted() {
       formatOnType: true,
       formatOnPaste: true,
       placeholder: $t('editor.json-schema.placeholder'),
-    }" @mounted="onEditorMounted" @unmounted="onEditorUnmounted"
+    }"
+    @mounted="onEditorMounted"
+    @unmounted="onEditorUnmounted"
   />
 </template>
 

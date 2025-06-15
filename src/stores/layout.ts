@@ -1,7 +1,11 @@
+import { acceptHMRUpdate, defineStore } from 'pinia'
 import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
 
 export const useLayoutStore = defineStore('layout', () => {
+  const isBrowserSupported = computed(() => {
+    const opfs = !!navigator?.storage?.getDirectory
+    return opfs
+  })
   const showSidebar = ref(true)
   const showSchemaPanel = ref(false)
 
@@ -13,5 +17,9 @@ export const useLayoutStore = defineStore('layout', () => {
     showSchemaPanel.value = !showSchemaPanel.value
   }
 
-  return { showSidebar, showSchemaPanel, toggleSchemaPanel, toggleSidebar }
+  return { isBrowserSupported, showSidebar, showSchemaPanel, toggleSchemaPanel, toggleSidebar }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useLayoutStore, import.meta.hot))
+}

@@ -1,7 +1,7 @@
-import { useI18n } from 'vue-i18n'
-import { useLocalStorage } from '@vueuse/core'
-import { computed, watch } from 'vue'
 import { matchLanguages } from '@/utils/lang'
+import { useLocalStorage } from '@vueuse/core'
+import { watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 
 export type ColorMode = 'light' | 'dark' | 'system'
 
