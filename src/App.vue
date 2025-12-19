@@ -1,8 +1,8 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import {
   TooltipProvider,
 } from '@/components/ui/tooltip'
-import { storeToRefs } from 'pinia'
 import MainHeader from './components/MainHeader.vue'
 import MainLayout from './components/MainLayout.vue'
 import { useInitI18n } from './composables/useInitI18n'

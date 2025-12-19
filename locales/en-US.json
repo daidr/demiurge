@@ -1,6 +1,6 @@
 {
   "general": {
-    "browser_not_supported_tips": "Current browser does not support JSON Baker, please upgrade browser version or use modern browsers such as Chrome, Firefox, Safari, etc."
+    "browser_not_supported_tips": "Current browser does not support Demiurge, please upgrade browser version or use modern browsers such as Chrome, Firefox, Safari, etc."
   },
   "locales": {
     "en-US": "English (US)",

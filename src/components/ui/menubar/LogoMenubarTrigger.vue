@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { MenubarTriggerProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { MenubarTrigger, useForwardProps } from 'reka-ui'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<MenubarTriggerProps & { class?: HTMLAttributes['class'] }>()
 
@@ -25,7 +25,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     "
   >
     <div class="i-custom-json-baker text-lg" />
-    JSON Baker
+    Demiurge
   </MenubarTrigger>
 </template>
 

@@ -1,6 +1,6 @@
 {
   "general": {
-    "browser_not_supported_tips": "当前浏览器不支持使用JSON Baker, 请升级浏览器版本或使用Chrome、Firefox、Safari等现代浏览器"
+    "browser_not_supported_tips": "当前浏览器不支持使用德谬歌, 请升级浏览器版本或使用Chrome、Firefox、Safari等现代浏览器"
   },
   "locales": {
     "en-US": "英语 (美国)",

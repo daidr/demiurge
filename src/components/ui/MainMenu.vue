@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import hotkeys from 'hotkeys-js'
+import { onMounted, onUnmounted } from 'vue'
 import {
   Menubar,
   MenubarCheckboxItem,
@@ -15,9 +17,11 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar'
 import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
-import { useLayoutStore } from '@/stores/layout';
-import hotkeys from 'hotkeys-js';
-import { onMounted, onUnmounted } from 'vue';
+import { useLayoutStore } from '@/stores/layout'
+
+defineProps<{
+  disabled?: boolean
+}>()
 
 const layoutStore = useLayoutStore()
 
@@ -33,7 +37,7 @@ onMounted(() => {
   hotkeys('command+b, ctrl+b', (e) => {
     e.preventDefault()
     toggleSidePanel()
-  });
+  })
   hotkeys('command+s, ctrl+s', (e) => {
     e.preventDefault()
     toggleSchemaPanel()
@@ -44,10 +48,6 @@ onUnmounted(() => {
   hotkeys.unbind('command+b, ctrl+b')
   hotkeys.unbind('command+s, ctrl+s')
 })
-
-defineProps<{
-  disabled?: boolean
-}>()
 </script>
 
 <template>
@@ -97,7 +97,9 @@ defineProps<{
       </MenubarContent>
     </MenubarMenu>
     <MenubarMenu v-if="!disabled">
-      <MenubarTrigger :disabled="disabled">View</MenubarTrigger>
+      <MenubarTrigger :disabled="disabled">
+        View
+      </MenubarTrigger>
       <MenubarContent>
         <MenubarItem>
           Toggle Fullscreen <MenubarShortcut>⌘⌥F</MenubarShortcut>
