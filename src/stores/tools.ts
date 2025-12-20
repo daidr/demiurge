@@ -69,9 +69,11 @@ export const useToolsStore = defineStore('tools', () => {
   }
 
   // Collect all paths from a tree node (for expanding all)
+  // Uses same key logic as JsonTree component: empty path becomes 'root'
   function collectAllPaths(node: JsonSizeNode, paths: Set<string> = new Set()): Set<string> {
     if (node.children && node.children.length > 0) {
-      paths.add(node.path)
+      const key = node.path || 'root'
+      paths.add(key)
       for (const child of node.children) {
         collectAllPaths(child, paths)
       }

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ISunburstChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
 import VChart from '@visactor/vchart'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
@@ -93,7 +94,6 @@ function createChart() {
     drillField: 'name',
     label: {
       visible: true,
-      autoRotate: true,
       style: {
         fontSize: 12,
         fill: '#333',
@@ -174,9 +174,9 @@ function createChart() {
       easing: 'cubicInOut',
       duration: 1000,
     },
-  }
+  } satisfies ISunburstChartSpec
 
-  chartInstance.value = new VChart(spec as any, { dom: containerRef.value })
+  chartInstance.value = new VChart(spec, { dom: containerRef.value })
   chartInstance.value.renderSync()
 }
 
