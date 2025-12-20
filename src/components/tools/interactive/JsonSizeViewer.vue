@@ -3,6 +3,7 @@ import type { AcceptableValue } from 'reka-ui'
 import type { SizeViewerMode } from '@/stores/tools'
 import { storeToRefs } from 'pinia'
 import { JsonTree } from '@/components/base/JsonTree'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Sunburst } from '@/components/ui/sunburst'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -22,9 +23,8 @@ function handleModeChange(value: AcceptableValue) {
   }
 }
 
-function handleFlattenChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  toolsStore.setFlattenEnabled(target.checked)
+function handleFlattenChange(checked: boolean) {
+  toolsStore.setFlattenEnabled(checked)
 }
 </script>
 
@@ -52,12 +52,10 @@ function handleFlattenChange(event: Event) {
       </ToggleGroup>
 
       <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
-        <input
-          type="checkbox"
+        <Checkbox
           :checked="flattenEnabled"
-          class="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer"
-          @change="handleFlattenChange"
-        >
+          @update:checked="handleFlattenChange"
+        />
         Flatten
       </Label>
     </div>

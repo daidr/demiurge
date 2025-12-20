@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { StringOrNumber } from '@visactor/vchart'
 import { storeToRefs } from 'pinia'
 import PanelHeader from '@/components/base/PanelHeader.vue'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
@@ -9,7 +10,7 @@ import JsonSizeViewer from './interactive/JsonSizeViewer.vue'
 const toolsStore = useToolsStore()
 const { activeTab } = storeToRefs(toolsStore)
 
-function handleTabChange(value: string) {
+function handleTabChange(value: StringOrNumber) {
   toolsStore.setActiveTab(value as 'size-viewer' | 'playground')
 }
 </script>

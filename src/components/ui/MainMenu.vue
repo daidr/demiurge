@@ -32,8 +32,8 @@ function toggleToolPanel() {
   layoutStore.toggleToolPanel()
 }
 
-function sortJson() {
-  const sorted = toolsStore.sortCurrentJson()
+async function sortJson() {
+  const sorted = await toolsStore.sortCurrentJson()
   if (sorted !== null) {
     toolsStore.setCurrentJsonContent(sorted)
   }

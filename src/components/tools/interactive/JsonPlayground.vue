@@ -6,6 +6,7 @@ import { storeToRefs } from 'pinia'
 import { onUnmounted, shallowRef, watch } from 'vue'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
@@ -21,9 +22,8 @@ const { playground, currentJsonContent } = storeToRefs(toolsStore)
 // Track the extra lib disposable for cleanup
 let extraLibDisposable: IDisposable | null = null
 
-function handleAutoRunChange(event: Event) {
-  const target = event.target as HTMLInputElement
-  toolsStore.setPlaygroundAutoRun(target.checked)
+function handleAutoRunChange(checked: boolean) {
+  toolsStore.setPlaygroundAutoRun(checked)
 }
 
 const expressionEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
@@ -126,10 +126,10 @@ onUnmounted(() => {
       </Button>
 
       <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none ml-auto">
-        <input
-          type="checkbox" :checked="playground.autoRun"
-          class="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer" @change="handleAutoRunChange"
-        >
+        <Checkbox
+          :checked="playground.autoRun"
+          @update:checked="handleAutoRunChange"
+        />
         Auto Run
       </Label>
     </div>
