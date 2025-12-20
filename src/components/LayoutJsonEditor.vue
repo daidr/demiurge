@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { editor, json, Uri } from 'monaco-editor'
-import { shallowRef, watch } from 'vue'
+import { onUnmounted, shallowRef, watch } from 'vue'
 import { useToolsStore } from '@/stores/tools'
 import MonacoEditor from './base/MonacoEditor.vue'
 import PanelHeader from './base/PanelHeader.vue'
@@ -59,6 +59,7 @@ function updateJsonSchemaValidation(schemaString: string) {
 
 function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
   EditorRef.value = _editor
+  toolsStore.setEditorRef(_editor)
   model = editor.createModel(
     toolsStore.currentJsonContent,
     'json',
@@ -83,7 +84,13 @@ function onEditorUnmounted() {
   if (EditorRef.value) {
     EditorRef.value.dispose()
   }
+  toolsStore.setEditorRef(null)
 }
+
+// Cleanup on component unmount
+onUnmounted(() => {
+  toolsStore.setEditorRef(null)
+})
 </script>
 
 <template>

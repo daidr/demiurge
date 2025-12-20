@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   toggle: [path: string]
+  nodeClick: [path: string, event: MouseEvent]
 }>()
 
 // Wrap root node in array for TreeRoot items prop
@@ -76,6 +77,10 @@ function handleExpandedChange(keys: string[]) {
     }
   }
 }
+
+function handleNodeClick(node: JsonSizeNode, event: MouseEvent) {
+  emit('nodeClick', node.path, event)
+}
 </script>
 
 <template>
@@ -102,6 +107,7 @@ function handleExpandedChange(keys: string[]) {
           'focus:bg-accent',
           hasChildren(item.value as JsonSizeNode) && 'font-medium',
         )"
+        @click="handleNodeClick(item.value as JsonSizeNode, $event)"
       >
         <!-- Expand/collapse icon -->
         <span v-if="hasChildren(item.value as JsonSizeNode)" class="w-4 flex-shrink-0">

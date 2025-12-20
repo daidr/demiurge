@@ -28,6 +28,14 @@ function handleFlattenChange(checked: boolean | 'indeterminate') {
     return
   toolsStore.setFlattenEnabled(checked)
 }
+
+function handleNodeClick(path: string, event: MouseEvent) {
+  if (event.altKey) {
+    event.stopPropagation()
+    event.preventDefault()
+    toolsStore.navigateToJsonPath(path)
+  }
+}
 </script>
 
 <template>
@@ -83,6 +91,7 @@ function handleFlattenChange(checked: boolean | 'indeterminate') {
         :node="sizeTree"
         :expanded-paths="expandedPaths"
         @toggle="handleToggle"
+        @node-click="handleNodeClick"
       />
 
       <!-- Treemap mode -->
@@ -90,6 +99,7 @@ function handleFlattenChange(checked: boolean | 'indeterminate') {
         v-else-if="sizeViewerMode === 'treemap'"
         :node="sizeTree"
         class="h-full"
+        @node-click="handleNodeClick"
       />
 
       <!-- Sunburst mode -->
@@ -97,6 +107,7 @@ function handleFlattenChange(checked: boolean | 'indeterminate') {
         v-else
         :node="sizeTree"
         class="h-full"
+        @node-click="handleNodeClick"
       />
     </div>
   </div>

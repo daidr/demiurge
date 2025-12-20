@@ -1,6 +1,8 @@
+import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref } from 'vue'
+import { ref, shallowRef } from 'vue'
+import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
 
 export type InteractiveTool = 'size-viewer' | 'playground'
@@ -47,6 +49,9 @@ export const useToolsStore = defineStore('tools', () => {
 
   // Current JSON content (will be set from workspace)
   const currentJsonContent = ref<string>('')
+
+  // Editor reference (set by LayoutJsonEditor)
+  const editorRef = shallowRef<editor.IStandaloneCodeEditor | null>(null)
 
   // Debounce timer for content changes
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
@@ -220,6 +225,28 @@ export const useToolsStore = defineStore('tools', () => {
     currentJsonSchema.value = schema
   }
 
+  function setEditorRef(editor: editor.IStandaloneCodeEditor | null) {
+    editorRef.value = editor
+  }
+
+  function navigateToJsonPath(path: string) {
+    if (!editorRef.value)
+      return
+
+    const content = currentJsonContent.value
+    const position = findJsonPathPosition(content, path)
+    if (position) {
+      editorRef.value.revealLineInCenter(position.line)
+      editorRef.value.setSelection({
+        startLineNumber: position.line,
+        startColumn: position.column,
+        endLineNumber: position.endLine,
+        endColumn: position.endColumn,
+      })
+      editorRef.value.focus()
+    }
+  }
+
   return {
     activeTab,
     sizeTree,
@@ -240,6 +267,8 @@ export const useToolsStore = defineStore('tools', () => {
     setPlaygroundAutoRun,
     setCurrentJsonContent,
     setCurrentJsonSchema,
+    setEditorRef,
+    navigateToJsonPath,
     executePlayground,
     sortCurrentJson,
   }

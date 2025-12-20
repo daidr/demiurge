@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ITreemapChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
 import VChart from '@visactor/vchart'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
@@ -7,6 +8,10 @@ import { cn } from '@/lib/utils'
 const props = defineProps<{
   node: JsonSizeNode
   class?: string
+}>()
+
+const emit = defineEmits<{
+  nodeClick: [path: string, event: MouseEvent]
 }>()
 
 const containerRef = ref<HTMLDivElement | null>(null)
@@ -23,7 +28,7 @@ function formatSize(bytes: number): string {
 // Convert JsonSizeNode to VChart treemap data format
 function convertToTreemapData(node: JsonSizeNode): any {
   const result: any = {
-    name: node.key,
+    name: node.path,
     path: node.path,
     percentage: node.percentage,
     type: node.type,
@@ -89,7 +94,7 @@ function createChart() {
         textBaseline: 'middle',
         textAlign: 'center',
       },
-      formatMethod: (text: string, datum: any) => {
+      formatMethod: (text: string | string[], datum: any) => {
         if (datum?.percentage) {
           return `${text}\n${datum.percentage.toFixed(1)}%`
         }
@@ -101,6 +106,7 @@ function createChart() {
     },
     color: {
       type: 'ordinal',
+      domain: [],
       range: [
         '#5B8FF9',
         '#5AD8A6',
@@ -137,10 +143,10 @@ function createChart() {
         title: {
           value: (data: any) => {
             // datum property in treemap data shows all the data of nodes from root to current node
-            // Here we config tooltip title to show the path of a node
-            // 在treemap 中，datum 字段是一个数组，用于存储从根结点到当前结点的所有数据
-            // 这里配置 tooltip 标题显示当前结点的路径
-            return data?.datum?.map((item: any) => item.name).join('/')
+            // Use the stored full path for accurate display
+            // 使用存储的完整路径来显示
+            const current = Array.isArray(data?.datum) ? data.datum[data.datum.length - 1] : data?.datum
+            return current?.path || current?.name || ''
           },
         },
         content: [
@@ -170,10 +176,28 @@ function createChart() {
         ],
       },
     },
-  }
+  } satisfies ITreemapChartSpec
 
   chartInstance.value = new VChart(spec as any, { dom: containerRef.value })
   chartInstance.value.renderSync()
+
+  // Add click event listener for Alt+Click navigation
+  chartInstance.value.on('pointerdown', {
+    level: 'mark',
+    consume: true,
+    filter(params) {
+      return params.event?.altKey
+    },
+  }, (params: any) => {
+    const datum = Array.isArray(params.datum)
+      ? params.datum[params.datum.length - 1]
+      : params.datum
+    // Get the native event from VChart event object
+    const nativeEvent = params.event?.nativeEvent as MouseEvent | undefined
+    if (datum?.path !== undefined && nativeEvent) {
+      emit('nodeClick', datum.path, nativeEvent)
+    }
+  })
 }
 
 onMounted(() => {

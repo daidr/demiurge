@@ -10,6 +10,10 @@ const props = defineProps<{
   class?: string
 }>()
 
+const emit = defineEmits<{
+  nodeClick: [path: string, event: MouseEvent]
+}>()
+
 const containerRef = ref<HTMLDivElement | null>(null)
 const chartInstance = shallowRef<VChart | null>(null)
 
@@ -24,7 +28,7 @@ function formatSize(bytes: number): string {
 // Convert JsonSizeNode to VChart sunburst data format
 function convertToSunburstData(node: JsonSizeNode): any {
   const result: any = {
-    name: node.key,
+    name: node.path,
     path: node.path,
     percentage: node.percentage,
     type: node.type,
@@ -178,6 +182,24 @@ function createChart() {
 
   chartInstance.value = new VChart(spec, { dom: containerRef.value })
   chartInstance.value.renderSync()
+
+  // Add click event listener for Alt+Click navigation
+  chartInstance.value.on('pointerdown', {
+    level: 'mark',
+    consume: true,
+    filter(params) {
+      return params.event?.altKey
+    },
+  }, (params: any) => {
+    const datum = Array.isArray(params.datum)
+      ? params.datum[params.datum?.datum.length - 1]
+      : params.datum
+    // Get the native event from VChart event object
+    const nativeEvent = params.event?.nativeEvent as MouseEvent | undefined
+    if (datum?.path !== undefined && nativeEvent) {
+      emit('nodeClick', datum.path, nativeEvent)
+    }
+  })
 }
 
 onMounted(() => {
