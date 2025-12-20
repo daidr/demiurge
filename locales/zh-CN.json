@@ -9,7 +9,9 @@
   "sidebar": {
     "workspaces": "工作区",
     "draft_workspace": "草稿工作区",
-    "please_select_workspace": "请选择工作区"
+    "please_select_workspace": "请选择工作区",
+    "pin_sidebar": "固定侧边栏",
+    "unpin_sidebar": "取消固定侧边栏"
   },
   "workspace": {
     "create_workspace": "创建工作区",

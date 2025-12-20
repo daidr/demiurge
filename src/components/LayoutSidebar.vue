@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import {
   Popover,
   PopoverContent,
@@ -11,12 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useLayoutStore } from '@/stores/layout'
 import { DRAFT_WORKSPACE_ID, useWorkspaceStore, WorkspaceStatus } from '@/stores/workspace'
 import BaseTooltip from './BaseTooltip.vue'
 import { Button } from './ui/button'
 import WorkspaceEditPanel from './WorkspaceEditPanel.vue'
 
 const workspaceStore = useWorkspaceStore()
+const layoutStore = useLayoutStore()
+const { floatingSidebar } = storeToRefs(layoutStore)
 </script>
 
 <template>
@@ -68,6 +72,11 @@ const workspaceStore = useWorkspaceStore()
           <WorkspaceEditPanel />
         </PopoverContent>
       </Popover>
+      <BaseTooltip :text="floatingSidebar ? $t('sidebar.pin_sidebar') : $t('sidebar.unpin_sidebar')">
+        <Button size="xs" variant="outline" @click="layoutStore.toggleFloatingSidebar">
+          <span :class="floatingSidebar ? 'i-mingcute-pin-line' : 'i-mingcute-pin-fill'" />
+        </Button>
+      </BaseTooltip>
     </div>
   </div>
 </template>

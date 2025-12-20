@@ -9,7 +9,9 @@
   "sidebar": {
     "workspaces": "Workspaces",
     "draft_workspace": "Draft Workspace",
-    "please_select_workspace": "Please select a workspace"
+    "please_select_workspace": "Please select a workspace",
+    "pin_sidebar": "Pin sidebar",
+    "unpin_sidebar": "Unpin sidebar"
   },
   "editor": {
     "json-schema": {

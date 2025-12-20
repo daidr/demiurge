@@ -9,22 +9,32 @@ import ToolPanel from './tools/ToolPanel.vue'
 import 'splitpanes/dist/splitpanes.css'
 
 const layoutStore = useLayoutStore()
-const { showSidebar, showToolPanel } = storeToRefs(layoutStore)
+const { showSidebar, showToolPanel, floatingSidebar } = storeToRefs(layoutStore)
 </script>
 
 <template>
-  <div class="flex-grow h-0">
-    <Splitpanes>
-      <Pane v-if="showSidebar" min-size="15" max-size="30">
+  <div class="flex-grow h-0 flex">
+    <!-- Sidebar outside splitpanes -->
+    <aside
+      v-if="showSidebar" class="flex-shrink-0"
+      :class="floatingSidebar ? 'absolute left-2 top-11 bottom-2 z-50' : 'relative h-full'"
+    >
+      <div class=" bg-background" :class="floatingSidebar ? 'shadow-xl rounded-lg border-1.5 w-64' : 'w-64 border-r border-border h-full'">
         <LayoutSidebar />
-      </Pane>
-      <Pane min-size="30">
-        <LayoutJsonEditor />
-      </Pane>
-      <Pane v-if="showToolPanel" min-size="20" max-size="50">
-        <ToolPanel />
-      </Pane>
-    </Splitpanes>
+      </div>
+    </aside>
+
+    <!-- Main content area with splitpanes -->
+    <div class="flex-grow min-w-0">
+      <Splitpanes>
+        <Pane min-size="30">
+          <LayoutJsonEditor />
+        </Pane>
+        <Pane v-if="showToolPanel" min-size="20" max-size="50">
+          <ToolPanel />
+        </Pane>
+      </Splitpanes>
+    </div>
   </div>
 </template>
 

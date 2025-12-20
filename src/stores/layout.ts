@@ -8,6 +8,7 @@ export const useLayoutStore = defineStore('layout', () => {
   })
   const showSidebar = ref(true)
   const showToolPanel = ref(true)
+  const floatingSidebar = ref(false)
 
   function toggleSidebar() {
     showSidebar.value = !showSidebar.value
@@ -17,12 +18,23 @@ export const useLayoutStore = defineStore('layout', () => {
     showToolPanel.value = !showToolPanel.value
   }
 
+  function toggleFloatingSidebar() {
+    floatingSidebar.value = !floatingSidebar.value
+  }
+
+  function setFloatingSidebar(value: boolean) {
+    floatingSidebar.value = value
+  }
+
   return {
     isBrowserSupported,
     showSidebar,
     showToolPanel,
+    floatingSidebar,
     toggleSidebar,
     toggleToolPanel,
+    toggleFloatingSidebar,
+    setFloatingSidebar,
   }
 })
 
