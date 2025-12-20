@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { editor, Uri } from 'monaco-editor'
+import { editor, languages, Uri } from 'monaco-editor'
 import { shallowRef, watch } from 'vue'
 import { useToolsStore } from '@/stores/tools'
 import MonacoEditor from './base/MonacoEditor.vue'
@@ -16,6 +16,44 @@ watch(() => toolsStore.currentJsonContent, (newContent) => {
   }
 })
 
+// Watch for schema changes and apply to Monaco JSON validation
+watch(() => toolsStore.currentJsonSchema, (newSchema) => {
+  updateJsonSchemaValidation(newSchema)
+})
+
+function updateJsonSchemaValidation(schemaString: string) {
+  try {
+    // Try to parse the schema to validate it's valid JSON
+    if (schemaString.trim()) {
+      const schema = JSON.parse(schemaString)
+      languages.json.jsonDefaults.setDiagnosticsOptions({
+        validate: true,
+        schemas: [
+          {
+            uri: 'internal://demiurge/user-schema.json',
+            fileMatch: ['workspace.json'],
+            schema,
+          },
+        ],
+      })
+    }
+    else {
+      // No schema provided, use default validation
+      languages.json.jsonDefaults.setDiagnosticsOptions({
+        validate: true,
+        schemas: [],
+      })
+    }
+  }
+  catch {
+    // Invalid JSON schema, fall back to default validation
+    languages.json.jsonDefaults.setDiagnosticsOptions({
+      validate: true,
+      schemas: [],
+    })
+  }
+}
+
 function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
   EditorRef.value = _editor
   model = editor.createModel(
@@ -28,6 +66,11 @@ function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
     const value = _editor.getValue()
     toolsStore.setCurrentJsonContent(value)
   })
+
+  // Apply schema if already set
+  if (toolsStore.currentJsonSchema) {
+    updateJsonSchemaValidation(toolsStore.currentJsonSchema)
+  }
 }
 
 function onEditorUnmounted() {

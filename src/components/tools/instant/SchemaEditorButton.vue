@@ -1,11 +1,13 @@
 <script setup lang="ts">
 import type { editor as monacoEditor } from 'monaco-editor'
 import { editor, languages, Uri } from 'monaco-editor'
+import { storeToRefs } from 'pinia'
 import { ref, shallowRef, watch } from 'vue'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { FloatingWindow } from '@/components/ui/floating-window'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
+import { useToolsStore } from '@/stores/tools'
 
 // Configure JSON schema validation for the schema editor
 languages.json.jsonDefaults.setDiagnosticsOptions({
@@ -21,14 +23,17 @@ languages.json.jsonDefaults.setDiagnosticsOptions({
   validate: true,
 })
 
+const toolsStore = useToolsStore()
+const { currentJsonSchema } = storeToRefs(toolsStore)
+
 const isOpen = ref(false)
 const EditorRef = shallowRef<monacoEditor.IStandaloneCodeEditor>()
 let model: monacoEditor.ITextModel | null = null
-const code = ref('')
 
-watch(code, (newCode) => {
-  if (model && model.getValue() !== newCode) {
-    model.setValue(newCode)
+// Sync store schema to editor
+watch(currentJsonSchema, (newSchema) => {
+  if (model && model.getValue() !== newSchema) {
+    model.setValue(newSchema)
   }
 })
 
@@ -39,13 +44,13 @@ function openModal() {
 function onEditorMounted(_editor: monacoEditor.IStandaloneCodeEditor) {
   EditorRef.value = _editor
   model = editor.createModel(
-    code.value,
+    currentJsonSchema.value,
     'json',
     Uri.parse('internal://json-baker/json-schema.json'),
   )
   _editor.setModel(model)
   _editor.onDidChangeModelContent(() => {
-    code.value = _editor.getValue()
+    toolsStore.setCurrentJsonSchema(_editor.getValue())
   })
 }
 

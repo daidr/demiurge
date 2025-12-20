@@ -31,6 +31,9 @@ export const useToolsStore = defineStore('tools', () => {
   // Sort JSON state
   const isSorting = ref<boolean>(false)
 
+  // JSON Schema state
+  const currentJsonSchema = ref<string>('')
+
   // Playground state
   const playground = ref<PlaygroundState>({
     mode: 'javascript',
@@ -213,6 +216,10 @@ export const useToolsStore = defineStore('tools', () => {
     }
   }
 
+  function setCurrentJsonSchema(schema: string) {
+    currentJsonSchema.value = schema
+  }
+
   return {
     activeTab,
     sizeTree,
@@ -223,6 +230,7 @@ export const useToolsStore = defineStore('tools', () => {
     isSorting,
     playground,
     currentJsonContent,
+    currentJsonSchema,
     setActiveTab,
     toggleSizeTreeNode,
     setSizeViewerMode,
@@ -231,6 +239,7 @@ export const useToolsStore = defineStore('tools', () => {
     setPlaygroundExpression,
     setPlaygroundAutoRun,
     setCurrentJsonContent,
+    setCurrentJsonSchema,
     executePlayground,
     sortCurrentJson,
   }
