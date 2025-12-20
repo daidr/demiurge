@@ -1,15 +1,20 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
+import * as monaco from 'monaco-editor'
 import { storeToRefs } from 'pinia'
-import { shallowRef, watch } from 'vue'
+import { onUnmounted, shallowRef, watch } from 'vue'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
+import { generateThisTypeDeclaration } from '@/utils/jsonToType'
 
 const toolsStore = useToolsStore()
-const { playground } = storeToRefs(toolsStore)
+const { playground, currentJsonContent } = storeToRefs(toolsStore)
+
+// Track the extra lib disposable for cleanup
+let extraLibDisposable: monaco.IDisposable | null = null
 
 function handleAutoRunChange(event: Event) {
   const target = event.target as HTMLInputElement
@@ -19,7 +24,7 @@ function handleAutoRunChange(event: Event) {
 const expressionEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 const resultEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 
-function handleModeChange(value: string | string[]) {
+function handleModeChange(value: string | string[] | null) {
   if (typeof value === 'string' && (value === 'javascript' || value === 'jsonpath')) {
     toolsStore.setPlaygroundMode(value)
   }
@@ -29,12 +34,42 @@ function handleExecute() {
   toolsStore.executePlayground()
 }
 
+// Update TypeScript type definitions for `this` based on current JSON
+function updateTypeDefinitions() {
+  if (playground.value.mode !== 'javascript') {
+    return
+  }
+
+  // Dispose previous extra lib
+  if (extraLibDisposable) {
+    extraLibDisposable.dispose()
+    extraLibDisposable = null
+  }
+
+  const jsonContent = currentJsonContent.value
+  if (!jsonContent.trim()) {
+    return
+  }
+
+  const typeDeclaration = generateThisTypeDeclaration(jsonContent)
+  if (typeDeclaration) {
+    // Add type definitions for TypeScript/JavaScript language service
+    extraLibDisposable = monaco.languages.typescript.javascriptDefaults.addExtraLib(
+      typeDeclaration,
+      'ts:json-context.d.ts',
+    )
+  }
+}
+
 function onExpressionEditorMounted(_editor: editor.IStandaloneCodeEditor) {
   expressionEditorRef.value = _editor
   _editor.setValue(playground.value.expression)
   _editor.onDidChangeModelContent(() => {
     toolsStore.setPlaygroundExpression(_editor.getValue())
   })
+
+  // Initial type definitions update
+  updateTypeDefinitions()
 }
 
 function onResultEditorMounted(_editor: editor.IStandaloneCodeEditor) {
@@ -50,6 +85,20 @@ function updateResultEditor() {
 }
 
 watch(() => [playground.value.result, playground.value.error], updateResultEditor)
+
+// Watch for JSON content changes to update type definitions
+watch(currentJsonContent, updateTypeDefinitions)
+
+// Watch for mode changes to update type definitions
+watch(() => playground.value.mode, updateTypeDefinitions)
+
+// Cleanup on unmount
+onUnmounted(() => {
+  if (extraLibDisposable) {
+    extraLibDisposable.dispose()
+    extraLibDisposable = null
+  }
+})
 </script>
 
 <template>
@@ -94,7 +143,7 @@ watch(() => [playground.value.result, playground.value.error], updateResultEdito
     <div class="flex-1 min-h-0 border rounded-md overflow-hidden">
       <div class="text-xs text-muted-foreground px-2 py-1 border-b bg-muted/50">
         <template v-if="playground.mode === 'javascript'">
-          Expression (use <code class="font-mono bg-muted px-1 rounded">this</code> to access JSON)
+          Expression (use <code class="font-mono bg-muted px-1 rounded">$</code> or <code class="font-mono bg-muted px-1 rounded">data</code> to access JSON)
         </template>
         <template v-else>
           JSONPath (e.g., <code class="font-mono bg-muted px-1 rounded">$.store.book[*].author</code>)
@@ -106,7 +155,7 @@ watch(() => [playground.value.result, playground.value.error], updateResultEdito
             language: playground.mode === 'javascript' ? 'javascript' : 'plaintext',
             minimap: { enabled: false },
             lineNumbers: 'off',
-            scrollBeyondLastLine: false,
+            scrollBeyondLastLine: true,
             wordWrap: 'on',
             fontSize: 13,
           }"

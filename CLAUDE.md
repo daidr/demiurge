@@ -145,5 +145,7 @@ Requires modern browser with OPFS support (FileSystemDirectoryHandle API).
 ### Interactive Tools
 - **Size Viewer**: TreeView showing JSON structure with size (bytes) and percentage for each node
 - **Playground**: Expression evaluator supporting:
-  - **JavaScript mode**: Use `this` to reference the JSON object (e.g., `this.users.filter(u => u.age > 18)`)
+  - **JavaScript mode**: Use `$` or `data` to reference the JSON object (e.g., `$.users.filter(u => u.age > 18)`). Both variables provide IDE type hints based on the current JSON structure.
   - **JSONPath mode**: Standard JSONPath syntax (e.g., `$.store.book[*].author`) using `jsonpath-plus` library
+  - **Auto Run**: Automatically execute expression when JSON or expression changes
+  - **Execution Time**: Shows execution duration in milliseconds

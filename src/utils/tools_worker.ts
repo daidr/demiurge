@@ -186,11 +186,12 @@ class ToolsWorker {
       const parsed = JSON.parse(jsonString)
 
       if (mode === 'javascript') {
-        // Execute as JavaScript with `this` bound to JSON
+        // Execute as JavaScript with $ and data as JSON aliases
+        // Using strict mode ensures `this` is undefined inside the expression
 
         // oxlint-disable-next-line no-new-func
-        const fn = new Function(`return (${expression})`)
-        const result = fn.call(parsed)
+        const fn = new Function('$', 'data', `"use strict"; return (${expression})`)
+        const result = fn(parsed, parsed)
         return { result: JSON.stringify(result, null, 2), error: null }
       }
       else {
