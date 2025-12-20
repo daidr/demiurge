@@ -1,5 +1,4 @@
 import type { Ref } from 'vue'
-import { randomEmoji } from '@/utils/emoji'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { uuidv7 } from 'uuidv7'
 import { ref, shallowRef } from 'vue'

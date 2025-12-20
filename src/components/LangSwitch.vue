@@ -1,14 +1,13 @@
 <script setup lang="ts">
+import { useI18n } from 'vue-i18n'
 import {
   Select,
   SelectContent,
   SelectItem,
-  SelectItemText,
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
 import { useLocale } from '@/composables/useInitI18n'
-import { useI18n } from 'vue-i18n'
 import locales from '../../locales/_locales.json'
 
 const lang = useLocale()

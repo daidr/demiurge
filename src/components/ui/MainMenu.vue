@@ -3,12 +3,9 @@ import hotkeys from 'hotkeys-js'
 import { onMounted, onUnmounted } from 'vue'
 import {
   Menubar,
-  MenubarCheckboxItem,
   MenubarContent,
   MenubarItem,
   MenubarMenu,
-  MenubarRadioGroup,
-  MenubarRadioItem,
   MenubarSeparator,
   MenubarShortcut,
   MenubarSub,
@@ -18,12 +15,14 @@ import {
 } from '@/components/ui/menubar'
 import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
 import { useLayoutStore } from '@/stores/layout'
+import { useToolsStore } from '@/stores/tools'
 
 defineProps<{
   disabled?: boolean
 }>()
 
 const layoutStore = useLayoutStore()
+const toolsStore = useToolsStore()
 
 function toggleSidePanel() {
   layoutStore.toggleSidebar()
@@ -31,6 +30,17 @@ function toggleSidePanel() {
 
 function toggleSchemaPanel() {
   layoutStore.toggleSchemaPanel()
+}
+
+function toggleToolPanel() {
+  layoutStore.toggleToolPanel()
+}
+
+function sortJson() {
+  const sorted = toolsStore.sortCurrentJson()
+  if (sorted !== null) {
+    toolsStore.setCurrentJsonContent(sorted)
+  }
 }
 
 onMounted(() => {
@@ -42,11 +52,21 @@ onMounted(() => {
     e.preventDefault()
     toggleSchemaPanel()
   })
+  hotkeys('command+t, ctrl+t', (e) => {
+    e.preventDefault()
+    toggleToolPanel()
+  })
+  hotkeys('command+shift+s, ctrl+shift+s', (e) => {
+    e.preventDefault()
+    sortJson()
+  })
 })
 
 onUnmounted(() => {
   hotkeys.unbind('command+b, ctrl+b')
   hotkeys.unbind('command+s, ctrl+s')
+  hotkeys.unbind('command+t, ctrl+t')
+  hotkeys.unbind('command+shift+s, ctrl+shift+s')
 })
 </script>
 
@@ -109,6 +129,19 @@ onUnmounted(() => {
         </MenubarItem>
         <MenubarItem @click="toggleSchemaPanel">
           Toggle Schema Panel <MenubarShortcut>⌘S</MenubarShortcut>
+        </MenubarItem>
+        <MenubarItem @click="toggleToolPanel">
+          Toggle Tool Panel <MenubarShortcut>⌘T</MenubarShortcut>
+        </MenubarItem>
+      </MenubarContent>
+    </MenubarMenu>
+    <MenubarMenu v-if="!disabled">
+      <MenubarTrigger :disabled="disabled">
+        Tools
+      </MenubarTrigger>
+      <MenubarContent>
+        <MenubarItem @click="sortJson">
+          Sort JSON Keys <MenubarShortcut>⇧⌘S</MenubarShortcut>
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>

@@ -1,9 +1,9 @@
 <script setup lang="ts">
+import { storeToRefs } from 'pinia'
 import { Button } from '@/components/ui/button'
+import { useLayoutStore } from '@/stores/layout'
 import LangSwitch from './LangSwitch.vue'
 import MainMenu from './ui/MainMenu.vue'
-import { storeToRefs } from 'pinia';
-import { useLayoutStore } from '@/stores/layout';
 
 const layoutStore = useLayoutStore()
 const { isBrowserSupported } = storeToRefs(layoutStore)

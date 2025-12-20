@@ -1,23 +1,21 @@
 <script setup lang="ts">
-// import 'splitpanes/dist/splitpanes.css'
-import {
-  ResizableHandle,
-  ResizablePanel,
-  ResizablePanelGroup,
-} from '@/components/ui/resizable'
-import { useLayoutStore } from '@/stores/layout'
 import { storeToRefs } from 'pinia'
-import LayoutSchemaEditor from './LayoutSchemaEditor.vue'
 import { Pane, Splitpanes } from 'splitpanes'
+// import 'splitpanes/dist/splitpanes.css'
+
+import { useLayoutStore } from '@/stores/layout'
+import LayoutJsonEditor from './LayoutJsonEditor.vue'
+import LayoutSchemaEditor from './LayoutSchemaEditor.vue'
 import LayoutSidebar from './LayoutSidebar.vue'
+import ToolPanel from './tools/ToolPanel.vue'
 import 'splitpanes/dist/splitpanes.css'
 
 const layoutStore = useLayoutStore()
-const { showSidebar, showSchemaPanel } = storeToRefs(layoutStore)
+const { showSidebar, showSchemaPanel, showToolPanel } = storeToRefs(layoutStore)
 </script>
 
 <template>
-  <div class="flex-grow">
+  <div class="flex-grow h-0">
     <Splitpanes>
       <Pane v-if="showSidebar" min-size="15" max-size="30">
         <LayoutSidebar />
@@ -28,12 +26,12 @@ const { showSidebar, showSchemaPanel } = storeToRefs(layoutStore)
             <LayoutSchemaEditor />
           </Pane>
           <Pane min-size="10">
-            <span>3</span>
+            <LayoutJsonEditor />
           </Pane>
         </Splitpanes>
       </Pane>
-      <Pane min-size="30">
-        <span>4</span>
+      <Pane v-if="showToolPanel" min-size="20" max-size="50">
+        <ToolPanel />
       </Pane>
     </Splitpanes>
   </div>

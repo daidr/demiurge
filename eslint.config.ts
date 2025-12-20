@@ -7,6 +7,7 @@ export default antfu(
       'no-console': ['warn', { allow: ['warn', 'error'] }],
       'no-labels': 'off',
       'node/prefer-global/process': 'off',
+      'no-unused-vars': 'warn',
     },
   },
   {

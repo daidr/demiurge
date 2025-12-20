@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { MenubarSubTriggerProps } from 'reka-ui'
 import type { HTMLAttributes } from 'vue'
-import { cn } from '@/lib/utils'
 import { ChevronRight } from 'lucide-vue-next'
 import { MenubarSubTrigger, useForwardProps } from 'reka-ui'
 import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<MenubarSubTriggerProps & { class?: HTMLAttributes['class'], inset?: boolean }>()
 

@@ -8,6 +8,7 @@ export const useLayoutStore = defineStore('layout', () => {
   })
   const showSidebar = ref(true)
   const showSchemaPanel = ref(false)
+  const showToolPanel = ref(true)
 
   function toggleSidebar() {
     showSidebar.value = !showSidebar.value
@@ -17,7 +18,19 @@ export const useLayoutStore = defineStore('layout', () => {
     showSchemaPanel.value = !showSchemaPanel.value
   }
 
-  return { isBrowserSupported, showSidebar, showSchemaPanel, toggleSchemaPanel, toggleSidebar }
+  function toggleToolPanel() {
+    showToolPanel.value = !showToolPanel.value
+  }
+
+  return {
+    isBrowserSupported,
+    showSidebar,
+    showSchemaPanel,
+    showToolPanel,
+    toggleSchemaPanel,
+    toggleSidebar,
+    toggleToolPanel,
+  }
 })
 
 if (import.meta.hot) {

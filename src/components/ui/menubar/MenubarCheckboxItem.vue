@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils'
+import type { MenubarCheckboxItemEmits, MenubarCheckboxItemProps } from 'reka-ui'
+import type { HTMLAttributes } from 'vue'
 import { Check } from 'lucide-vue-next'
-import {
-  MenubarCheckboxItem,
-  type MenubarCheckboxItemEmits,
-  type MenubarCheckboxItemProps,
-  MenubarItemIndicator,
-  useForwardPropsEmits,
-} from 'reka-ui'
-import { computed, type HTMLAttributes } from 'vue'
+import { MenubarCheckboxItem, MenubarItemIndicator, useForwardPropsEmits } from 'reka-ui'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<MenubarCheckboxItemProps & { class?: HTMLAttributes['class'] }>()
 const emits = defineEmits<MenubarCheckboxItemEmits>()

@@ -3,10 +3,10 @@ const EMOJI_CATEGORIES = {
   sad: ['😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬'],
   love: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🤎', '🖤', '🤍', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝'],
   animals: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🐔', '🐧', '🐦', '🐤', '🦆'],
-  food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦']
-};
+  food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', '🥑', '🥦'],
+}
 
-const EMOJIS = ([] as string[]).concat(...Object.values(EMOJI_CATEGORIES));
+const EMOJIS = ([] as string[]).concat(...Object.values(EMOJI_CATEGORIES))
 
 /**
  * 返回一个随机的表情符号
@@ -15,18 +15,20 @@ const EMOJIS = ([] as string[]).concat(...Object.values(EMOJI_CATEGORIES));
  */
 export function randomEmoji(category = 'all') {
   // 确定使用哪个表情符号集合
-  let emojis: string[];
+  let emojis: string[]
   if (category === 'all') {
     // 合并所有类别
-    emojis = EMOJIS;
-  } else if (category in EMOJI_CATEGORIES) {
-    emojis = EMOJI_CATEGORIES[category as keyof typeof EMOJI_CATEGORIES];
-  } else {
-    // 如果类别不存在，使用所有表情符号
-    emojis = EMOJIS;
-    console.warn(`类别 "${category}" 不存在`);
+    emojis = EMOJIS
   }
-  
-  const randomIndex = Math.floor(Math.random() * emojis.length);
-  return emojis[randomIndex];
+  else if (category in EMOJI_CATEGORIES) {
+    emojis = EMOJI_CATEGORIES[category as keyof typeof EMOJI_CATEGORIES]
+  }
+  else {
+    // 如果类别不存在，使用所有表情符号
+    emojis = EMOJIS
+    console.warn(`类别 "${category}" 不存在`)
+  }
+
+  const randomIndex = Math.floor(Math.random() * emojis.length)
+  return emojis[randomIndex]
 }
