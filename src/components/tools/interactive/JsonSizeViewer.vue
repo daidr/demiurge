@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import type { SizeViewerMode } from '@/stores/tools'
 import { storeToRefs } from 'pinia'
+import { JsonTree } from '@/components/base/JsonTree'
 import { Label } from '@/components/ui/label'
 import { Sunburst } from '@/components/ui/sunburst'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Tree, TreeItem } from '@/components/ui/tree'
 import { Treemap } from '@/components/ui/treemap'
 import { useToolsStore } from '@/stores/tools'
 
@@ -77,13 +77,12 @@ function handleFlattenChange(event: Event) {
       </div>
 
       <!-- Tree mode -->
-      <Tree v-else-if="sizeViewerMode === 'tree'">
-        <TreeItem
-          :node="sizeTree"
-          :expanded-paths="expandedPaths"
-          @toggle="handleToggle"
-        />
-      </Tree>
+      <JsonTree
+        v-else-if="sizeViewerMode === 'tree'"
+        :node="sizeTree"
+        :expanded-paths="expandedPaths"
+        @toggle="handleToggle"
+      />
 
       <!-- Treemap mode -->
       <Treemap

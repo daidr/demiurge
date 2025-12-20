@@ -1,4 +1,4 @@
-import type { JsonSizeNode } from '@/components/ui/tree'
+import type { JsonSizeNode } from '@/components/base/JsonTree'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getToolsWorker } from '@/utils/tools_service'

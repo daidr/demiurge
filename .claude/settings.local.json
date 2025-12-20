@@ -5,7 +5,8 @@
       "Bash(cat:*)",
       "Bash(bun run lint:fix:*)",
       "WebFetch",
-      "WebSearch"
+      "WebSearch",
+      "Bash(bun run type-check:*)"
     ]
   }
 }

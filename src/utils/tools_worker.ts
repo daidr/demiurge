@@ -1,4 +1,4 @@
-import type { JsonSizeNode } from '@/components/ui/tree/types'
+import type { JsonSizeNode } from '@/components/base/JsonTree/types'
 import * as Comlink from 'comlink'
 
 // TextEncoder for accurate byte size calculation

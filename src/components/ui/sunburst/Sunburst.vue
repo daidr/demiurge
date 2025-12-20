@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { JsonSizeNode } from '@/components/ui/tree'
+import type { JsonSizeNode } from '@/components/base/JsonTree'
 import VChart from '@visactor/vchart'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { cn } from '@/lib/utils'
