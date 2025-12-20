@@ -32,3 +32,5 @@ coverage
 
 # backup files
 *.bak
+
+.claude

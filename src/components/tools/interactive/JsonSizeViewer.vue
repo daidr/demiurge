@@ -9,7 +9,7 @@ import { Treemap } from '@/components/ui/treemap'
 import { useToolsStore } from '@/stores/tools'
 
 const toolsStore = useToolsStore()
-const { sizeTree, expandedPaths, sizeViewerMode, flattenEnabled } = storeToRefs(toolsStore)
+const { sizeTree, expandedPaths, sizeViewerMode, flattenEnabled, isCalculating } = storeToRefs(toolsStore)
 
 function handleToggle(path: string) {
   toolsStore.toggleSizeTreeNode(path)
@@ -63,7 +63,13 @@ function handleFlattenChange(event: Event) {
 
     <!-- Content -->
     <div class="flex-grow overflow-auto min-h-0">
-      <div v-if="!sizeTree" class="flex items-center justify-center h-full text-muted-foreground text-sm">
+      <!-- Loading state -->
+      <div v-if="isCalculating" class="flex items-center justify-center h-full text-muted-foreground">
+        <span class="i-mingcute-loading-3-fill animate-spin text-2xl" />
+      </div>
+
+      <!-- No data state -->
+      <div v-else-if="!sizeTree" class="flex items-center justify-center h-full text-muted-foreground text-sm">
         <div class="text-center">
           <span class="i-mingcute-file-unknown-line text-3xl mb-2 block opacity-50" />
           <p>No valid JSON to analyze</p>

@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(tree:*)"
+      "Bash(tree:*)",
+      "Bash(cat:*)",
+      "Bash(bun run lint:fix:*)",
+      "WebFetch",
+      "WebSearch"
     ]
   }
 }
