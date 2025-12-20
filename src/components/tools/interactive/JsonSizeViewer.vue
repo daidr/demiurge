@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from 'reka-ui'
 import type { SizeViewerMode } from '@/stores/tools'
 import { storeToRefs } from 'pinia'
 import { JsonTree } from '@/components/base/JsonTree'
@@ -15,7 +16,7 @@ function handleToggle(path: string) {
   toolsStore.toggleSizeTreeNode(path)
 }
 
-function handleModeChange(value: string | string[]) {
+function handleModeChange(value: AcceptableValue) {
   if (typeof value === 'string' && (value === 'tree' || value === 'treemap' || value === 'sunburst')) {
     toolsStore.setSizeViewerMode(value as SizeViewerMode)
   }

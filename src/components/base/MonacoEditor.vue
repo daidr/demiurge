@@ -40,6 +40,15 @@ onUnmounted(() => {
 watch(() => props.options, (newOptions) => {
   if (EditorRef.value && newOptions) {
     EditorRef.value.updateOptions(newOptions)
+
+    if (!newOptions.language) {
+      return
+    }
+    const model = EditorRef.value.getModel()
+    if (!model) {
+      return
+    }
+    editor.setModelLanguage(model, newOptions.language)
   }
 })
 </script>

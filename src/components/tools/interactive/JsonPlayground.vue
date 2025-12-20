@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import type { editor } from 'monaco-editor'
-import * as monaco from 'monaco-editor'
+import type { editor, IDisposable } from 'monaco-editor'
+import type { AcceptableValue } from 'reka-ui'
+import { typescript } from 'monaco-editor'
 import { storeToRefs } from 'pinia'
 import { onUnmounted, shallowRef, watch } from 'vue'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
@@ -9,12 +10,16 @@ import { Label } from '@/components/ui/label'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
 import { generateThisTypeDeclaration } from '@/utils/jsonToType'
+import { registerJsonPathLanguage } from '@/utils/monaco-jsonpath'
+
+// Register JSONPath language for syntax highlighting
+registerJsonPathLanguage()
 
 const toolsStore = useToolsStore()
 const { playground, currentJsonContent } = storeToRefs(toolsStore)
 
 // Track the extra lib disposable for cleanup
-let extraLibDisposable: monaco.IDisposable | null = null
+let extraLibDisposable: IDisposable | null = null
 
 function handleAutoRunChange(event: Event) {
   const target = event.target as HTMLInputElement
@@ -24,7 +29,7 @@ function handleAutoRunChange(event: Event) {
 const expressionEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 const resultEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 
-function handleModeChange(value: string | string[] | null) {
+function handleModeChange(value: AcceptableValue) {
   if (typeof value === 'string' && (value === 'javascript' || value === 'jsonpath')) {
     toolsStore.setPlaygroundMode(value)
   }
@@ -54,7 +59,7 @@ function updateTypeDefinitions() {
   const typeDeclaration = generateThisTypeDeclaration(jsonContent)
   if (typeDeclaration) {
     // Add type definitions for TypeScript/JavaScript language service
-    extraLibDisposable = monaco.languages.typescript.javascriptDefaults.addExtraLib(
+    extraLibDisposable = typescript.javascriptDefaults.addExtraLib(
       typeDeclaration,
       'ts:json-context.d.ts',
     )
@@ -105,11 +110,7 @@ onUnmounted(() => {
   <div class="h-full flex flex-col gap-2">
     <!-- Mode Toggle + Execute Button -->
     <div class="flex items-center gap-2 flex-shrink-0">
-      <ToggleGroup
-        type="single"
-        :model-value="playground.mode"
-        @update:model-value="handleModeChange"
-      >
+      <ToggleGroup type="single" :model-value="playground.mode" @update:model-value="handleModeChange">
         <ToggleGroupItem value="javascript" class="text-xs px-2">
           JavaScript
         </ToggleGroupItem>
@@ -118,11 +119,7 @@ onUnmounted(() => {
         </ToggleGroupItem>
       </ToggleGroup>
 
-      <Button
-        size="sm"
-        :disabled="playground.isExecuting || !playground.expression.trim()"
-        @click="handleExecute"
-      >
+      <Button size="sm" :disabled="playground.isExecuting || !playground.expression.trim()" @click="handleExecute">
         <span v-if="playground.isExecuting" class="i-mingcute-loading-3-line animate-spin mr-1" />
         <span v-else class="i-mingcute-play-fill mr-1" />
         Run
@@ -130,10 +127,8 @@ onUnmounted(() => {
 
       <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none ml-auto">
         <input
-          type="checkbox"
-          :checked="playground.autoRun"
-          class="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer"
-          @change="handleAutoRunChange"
+          type="checkbox" :checked="playground.autoRun"
+          class="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer" @change="handleAutoRunChange"
         >
         Auto Run
       </Label>
@@ -143,7 +138,9 @@ onUnmounted(() => {
     <div class="flex-1 min-h-0 border rounded-md overflow-hidden">
       <div class="text-xs text-muted-foreground px-2 py-1 border-b bg-muted/50">
         <template v-if="playground.mode === 'javascript'">
-          Expression (use <code class="font-mono bg-muted px-1 rounded">$</code> or <code class="font-mono bg-muted px-1 rounded">data</code> to access JSON)
+          Expression (use <code class="font-mono bg-muted px-1 rounded">$</code> or <code
+            class="font-mono bg-muted px-1 rounded"
+          >data</code> to access JSON)
         </template>
         <template v-else>
           JSONPath (e.g., <code class="font-mono bg-muted px-1 rounded">$.store.book[*].author</code>)
@@ -152,14 +149,13 @@ onUnmounted(() => {
       <div class="h-[calc(100%-28px)]">
         <MonacoEditor
           :options="{
-            language: playground.mode === 'javascript' ? 'javascript' : 'plaintext',
+            language: playground.mode === 'javascript' ? 'javascript' : 'jsonpath',
             minimap: { enabled: false },
             lineNumbers: 'off',
             scrollBeyondLastLine: true,
             wordWrap: 'on',
             fontSize: 13,
-          }"
-          @mounted="onExpressionEditorMounted"
+          }" @mounted="onExpressionEditorMounted"
         />
       </div>
     </div>
@@ -184,8 +180,7 @@ onUnmounted(() => {
             scrollBeyondLastLine: false,
             wordWrap: 'on',
             fontSize: 13,
-          }"
-          @mounted="onResultEditorMounted"
+          }" @mounted="onResultEditorMounted"
         />
       </div>
     </div>
