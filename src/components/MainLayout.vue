@@ -1,17 +1,15 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { Pane, Splitpanes } from 'splitpanes'
-// import 'splitpanes/dist/splitpanes.css'
 
 import { useLayoutStore } from '@/stores/layout'
 import LayoutJsonEditor from './LayoutJsonEditor.vue'
-import LayoutSchemaEditor from './LayoutSchemaEditor.vue'
 import LayoutSidebar from './LayoutSidebar.vue'
 import ToolPanel from './tools/ToolPanel.vue'
 import 'splitpanes/dist/splitpanes.css'
 
 const layoutStore = useLayoutStore()
-const { showSidebar, showSchemaPanel, showToolPanel } = storeToRefs(layoutStore)
+const { showSidebar, showToolPanel } = storeToRefs(layoutStore)
 </script>
 
 <template>
@@ -21,45 +19,13 @@ const { showSidebar, showSchemaPanel, showToolPanel } = storeToRefs(layoutStore)
         <LayoutSidebar />
       </Pane>
       <Pane min-size="30">
-        <Splitpanes horizontal>
-          <Pane v-if="!showSchemaPanel" min-size="10">
-            <LayoutSchemaEditor />
-          </Pane>
-          <Pane min-size="10">
-            <LayoutJsonEditor />
-          </Pane>
-        </Splitpanes>
+        <LayoutJsonEditor />
       </Pane>
       <Pane v-if="showToolPanel" min-size="20" max-size="50">
         <ToolPanel />
       </Pane>
     </Splitpanes>
   </div>
-  <!-- <ResizablePanelGroup id="global-group" direction="horizontal">
-    <ResizablePanel v-if="showSidebar" id="sidebar-panel" :min-size="10" :max-size="30" :default-size="15">
-      <LayoutSidebar />
-    </ResizablePanel>
-    <ResizableHandle v-if="showSidebar" id="handle-1" />
-    <ResizablePanel id="main-panel">
-      <ResizablePanelGroup id="editor-group" direction="horizontal">
-        <ResizablePanel id="left-panel" :min-size="20" :max-size="80">
-          <ResizablePanelGroup id="editor-group-2" direction="vertical">
-            <ResizablePanel id="top-panel" :min-size="20" :max-size="80">
-              <LayoutSchemaEditor />
-            </ResizablePanel>
-            <ResizableHandle id="handle-3" />
-            <ResizablePanel id="bottom-panel">
-              3
-            </ResizablePanel>
-          </ResizablePanelGroup>
-        </ResizablePanel>
-        <ResizableHandle id="handle-2" />
-        <ResizablePanel id="right-panel">
-          4
-        </ResizablePanel>
-      </ResizablePanelGroup>
-    </ResizablePanel>
-  </ResizablePanelGroup> -->
 </template>
 
 <style scoped lang="scss">

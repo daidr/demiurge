@@ -7,15 +7,10 @@ export const useLayoutStore = defineStore('layout', () => {
     return opfs
   })
   const showSidebar = ref(true)
-  const showSchemaPanel = ref(false)
   const showToolPanel = ref(true)
 
   function toggleSidebar() {
     showSidebar.value = !showSidebar.value
-  }
-
-  function toggleSchemaPanel() {
-    showSchemaPanel.value = !showSchemaPanel.value
   }
 
   function toggleToolPanel() {
@@ -25,9 +20,7 @@ export const useLayoutStore = defineStore('layout', () => {
   return {
     isBrowserSupported,
     showSidebar,
-    showSchemaPanel,
     showToolPanel,
-    toggleSchemaPanel,
     toggleSidebar,
     toggleToolPanel,
   }

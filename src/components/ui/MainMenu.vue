@@ -28,10 +28,6 @@ function toggleSidePanel() {
   layoutStore.toggleSidebar()
 }
 
-function toggleSchemaPanel() {
-  layoutStore.toggleSchemaPanel()
-}
-
 function toggleToolPanel() {
   layoutStore.toggleToolPanel()
 }
@@ -48,10 +44,6 @@ onMounted(() => {
     e.preventDefault()
     toggleSidePanel()
   })
-  hotkeys('command+s, ctrl+s', (e) => {
-    e.preventDefault()
-    toggleSchemaPanel()
-  })
   hotkeys('command+t, ctrl+t', (e) => {
     e.preventDefault()
     toggleToolPanel()
@@ -64,7 +56,6 @@ onMounted(() => {
 
 onUnmounted(() => {
   hotkeys.unbind('command+b, ctrl+b')
-  hotkeys.unbind('command+s, ctrl+s')
   hotkeys.unbind('command+t, ctrl+t')
   hotkeys.unbind('command+shift+s, ctrl+shift+s')
 })
@@ -126,9 +117,6 @@ onUnmounted(() => {
         </MenubarItem>
         <MenubarItem @click="toggleSidePanel">
           Toggle Sidebar <MenubarShortcut>⌘B</MenubarShortcut>
-        </MenubarItem>
-        <MenubarItem @click="toggleSchemaPanel">
-          Toggle Schema Panel <MenubarShortcut>⌘S</MenubarShortcut>
         </MenubarItem>
         <MenubarItem @click="toggleToolPanel">
           Toggle Tool Panel <MenubarShortcut>⌘T</MenubarShortcut>
