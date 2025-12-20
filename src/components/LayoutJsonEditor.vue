@@ -1,8 +1,11 @@
 <script setup lang="ts">
-import { editor, languages, Uri } from 'monaco-editor'
+import { editor, json, Uri } from 'monaco-editor'
 import { shallowRef, watch } from 'vue'
 import { useToolsStore } from '@/stores/tools'
 import MonacoEditor from './base/MonacoEditor.vue'
+import PanelHeader from './base/PanelHeader.vue'
+import SchemaEditorButton from './tools/instant/SchemaEditorButton.vue'
+import SortJsonButton from './tools/instant/SortJsonButton.vue'
 
 const toolsStore = useToolsStore()
 
@@ -26,7 +29,7 @@ function updateJsonSchemaValidation(schemaString: string) {
     // Try to parse the schema to validate it's valid JSON
     if (schemaString.trim()) {
       const schema = JSON.parse(schemaString)
-      languages.json.jsonDefaults.setDiagnosticsOptions({
+      json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
         schemas: [
           {
@@ -39,7 +42,7 @@ function updateJsonSchemaValidation(schemaString: string) {
     }
     else {
       // No schema provided, use default validation
-      languages.json.jsonDefaults.setDiagnosticsOptions({
+      json.jsonDefaults.setDiagnosticsOptions({
         validate: true,
         schemas: [],
       })
@@ -47,7 +50,7 @@ function updateJsonSchemaValidation(schemaString: string) {
   }
   catch {
     // Invalid JSON schema, fall back to default validation
-    languages.json.jsonDefaults.setDiagnosticsOptions({
+    json.jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemas: [],
     })
@@ -84,16 +87,24 @@ function onEditorUnmounted() {
 </script>
 
 <template>
-  <MonacoEditor
-    :options="{
-      formatOnType: true,
-      formatOnPaste: true,
-      tabSize: 2,
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      fontSize: 14,
-    }"
-    @mounted="onEditorMounted"
-    @unmounted="onEditorUnmounted"
-  />
+  <div class="h-full flex flex-col">
+    <PanelHeader title="JSON">
+      <SchemaEditorButton />
+      <SortJsonButton />
+    </PanelHeader>
+    <div class="flex-1 min-h-0">
+      <MonacoEditor
+        :options="{
+          formatOnType: true,
+          formatOnPaste: true,
+          tabSize: 2,
+          minimap: { enabled: true },
+          scrollBeyondLastLine: true,
+          fontSize: 14,
+        }"
+        @mounted="onEditorMounted"
+        @unmounted="onEditorUnmounted"
+      />
+    </div>
+  </div>
 </template>
