@@ -4,11 +4,17 @@ import { storeToRefs } from 'pinia'
 import { shallowRef, watch } from 'vue'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
+import { Label } from '@/components/ui/label'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
 
 const toolsStore = useToolsStore()
 const { playground } = storeToRefs(toolsStore)
+
+function handleAutoRunChange(event: Event) {
+  const target = event.target as HTMLInputElement
+  toolsStore.setPlaygroundAutoRun(target.checked)
+}
 
 const expressionEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 const resultEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
@@ -72,6 +78,16 @@ watch(() => [playground.value.result, playground.value.error], updateResultEdito
         <span v-else class="i-mingcute-play-fill mr-1" />
         Run
       </Button>
+
+      <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none ml-auto">
+        <input
+          type="checkbox"
+          :checked="playground.autoRun"
+          class="w-3.5 h-3.5 rounded border-border accent-primary cursor-pointer"
+          @change="handleAutoRunChange"
+        >
+        Auto Run
+      </Label>
     </div>
 
     <!-- Expression Editor (top half) -->
@@ -105,6 +121,9 @@ watch(() => [playground.value.result, playground.value.error], updateResultEdito
         <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
         <span v-else class="i-mingcute-check-circle-line text-green-600" />
         Result
+        <span v-if="playground.executionTime !== null" class="ml-auto text-muted-foreground/70">
+          {{ playground.executionTime.toFixed(1) }} ms
+        </span>
       </div>
       <div class="h-[calc(100%-28px)]">
         <MonacoEditor

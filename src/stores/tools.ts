@@ -13,6 +13,8 @@ export interface PlaygroundState {
   result: string | null
   error: string | null
   isExecuting: boolean
+  autoRun: boolean
+  executionTime: number | null
 }
 
 export const useToolsStore = defineStore('tools', () => {
@@ -36,6 +38,8 @@ export const useToolsStore = defineStore('tools', () => {
     result: null,
     error: null,
     isExecuting: false,
+    autoRun: false,
+    executionTime: null,
   })
 
   // Current JSON content (will be set from workspace)
@@ -43,6 +47,8 @@ export const useToolsStore = defineStore('tools', () => {
 
   // Debounce timer for content changes
   let debounceTimer: ReturnType<typeof setTimeout> | null = null
+  // Debounce timer for playground auto-run
+  let playgroundDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
   function setActiveTab(tab: InteractiveTool) {
     activeTab.value = tab
@@ -89,6 +95,27 @@ export const useToolsStore = defineStore('tools', () => {
 
   function setPlaygroundExpression(expr: string) {
     playground.value.expression = expr
+    triggerAutoRun()
+  }
+
+  function setPlaygroundAutoRun(enabled: boolean) {
+    playground.value.autoRun = enabled
+    if (enabled && playground.value.expression.trim()) {
+      executePlayground()
+    }
+  }
+
+  function triggerAutoRun() {
+    if (!playground.value.autoRun || !playground.value.expression.trim()) {
+      return
+    }
+
+    if (playgroundDebounceTimer) {
+      clearTimeout(playgroundDebounceTimer)
+    }
+    playgroundDebounceTimer = setTimeout(() => {
+      executePlayground()
+    }, 300)
   }
 
   async function recalculateSizeTree() {
@@ -129,6 +156,7 @@ export const useToolsStore = defineStore('tools', () => {
     }
     debounceTimer = setTimeout(() => {
       recalculateSizeTree()
+      triggerAutoRun()
     }, 300)
   }
 
@@ -142,6 +170,9 @@ export const useToolsStore = defineStore('tools', () => {
     playground.value.isExecuting = true
     playground.value.error = null
     playground.value.result = null
+    playground.value.executionTime = null
+
+    const startTime = performance.now()
 
     try {
       const worker = await getToolsWorker()
@@ -157,6 +188,7 @@ export const useToolsStore = defineStore('tools', () => {
       playground.value.error = e instanceof Error ? e.message : String(e)
     }
     finally {
+      playground.value.executionTime = performance.now() - startTime
       playground.value.isExecuting = false
     }
   }
@@ -197,6 +229,7 @@ export const useToolsStore = defineStore('tools', () => {
     setFlattenEnabled,
     setPlaygroundMode,
     setPlaygroundExpression,
+    setPlaygroundAutoRun,
     setCurrentJsonContent,
     executePlayground,
     sortCurrentJson,
