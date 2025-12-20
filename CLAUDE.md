@@ -45,11 +45,12 @@ bun run preview   # Preview production build
 ```
 src/
 ├── components/
-│   ├── base/              # Low-level components (MonacoEditor)
-│   ├── ui/                # Shadcn-style UI components (40+)
+│   ├── base/              # Low-level components
+│   │   ├── MonacoEditor/  # Monaco code editor wrapper
+│   │   └── JsonTree/      # JSON size tree with virtualization (Reka UI Tree)
+│   ├── ui/                # Shadcn-style UI components (Reka UI based)
 │   │   ├── tabs/          # Tabs component
-│   │   ├── toggle-group/  # ToggleGroup component
-│   │   └── tree/          # Tree component for hierarchical data
+│   │   └── toggle-group/  # ToggleGroup component
 │   ├── tools/             # Tool panel components
 │   │   ├── ToolPanel.vue  # Main tool panel container
 │   │   ├── ToolHeader.vue # Tool header with instant tools
@@ -120,6 +121,10 @@ config/                    # PWA manifest config
 - Conventional commits (commitlint enforced via git hooks)
 - Vue Composition API with `<script setup lang="ts">`
 - Path alias: `@/` → `src/`
+
+## Verification
+
+When verifying code changes, use `bun run build` instead of `bun run dev`. The build command includes type-checking and will catch errors that the dev server might miss.
 
 ## Browser Requirements
 
