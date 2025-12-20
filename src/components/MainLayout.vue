@@ -14,7 +14,6 @@ const { showSidebar, showToolPanel, floatingSidebar } = storeToRefs(layoutStore)
 
 <template>
   <div class="flex-grow h-0 flex">
-    <!-- Sidebar outside splitpanes -->
     <aside
       v-if="showSidebar" class="flex-shrink-0"
       :class="floatingSidebar ? 'absolute left-2 top-11 bottom-2 z-50' : 'relative h-full'"
@@ -24,7 +23,6 @@ const { showSidebar, showToolPanel, floatingSidebar } = storeToRefs(layoutStore)
       </div>
     </aside>
 
-    <!-- Main content area with splitpanes -->
     <div class="flex-grow min-w-0">
       <Splitpanes>
         <Pane min-size="30">

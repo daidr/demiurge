@@ -22,7 +22,9 @@ const { playground, currentJsonContent } = storeToRefs(toolsStore)
 // Track the extra lib disposable for cleanup
 let extraLibDisposable: IDisposable | null = null
 
-function handleAutoRunChange(checked: boolean) {
+function handleAutoRunChange(checked: boolean | 'indeterminate') {
+  if (checked === 'indeterminate')
+    return
   toolsStore.setPlaygroundAutoRun(checked)
 }
 
@@ -126,10 +128,7 @@ onUnmounted(() => {
       </Button>
 
       <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none ml-auto">
-        <Checkbox
-          :checked="playground.autoRun"
-          @update:checked="handleAutoRunChange"
-        />
+        <Checkbox :model-value="playground.autoRun" @update:model-value="handleAutoRunChange" />
         Auto Run
       </Label>
     </div>

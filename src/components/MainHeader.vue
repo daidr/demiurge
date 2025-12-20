@@ -13,7 +13,7 @@ const { isBrowserSupported, showSidebar } = storeToRefs(layoutStore)
   <header class="flex select-none items-center justify-between border-b-1.5 border-gray-2">
     <div class="ml-1 flex items-center gap-1">
       <Button size="xs" variant="ghost" @click="layoutStore.toggleSidebar">
-        <span :class="showSidebar ? 'i-mingcute-layout-left-fill' : 'i-mingcute-layout-left-line'" />
+        <span class="text-lg" :class="showSidebar ? 'i-mingcute-layout-top-close-fill' : 'i-mingcute-layout-top-open-line'" />
       </Button>
       <MainMenu :disabled="!isBrowserSupported" />
     </div>

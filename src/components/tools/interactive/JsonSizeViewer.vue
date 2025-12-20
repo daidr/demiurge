@@ -23,7 +23,9 @@ function handleModeChange(value: AcceptableValue) {
   }
 }
 
-function handleFlattenChange(checked: boolean) {
+function handleFlattenChange(checked: boolean | 'indeterminate') {
+  if (checked === 'indeterminate')
+    return
   toolsStore.setFlattenEnabled(checked)
 }
 </script>
@@ -53,8 +55,8 @@ function handleFlattenChange(checked: boolean) {
 
       <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
         <Checkbox
-          :checked="flattenEnabled"
-          @update:checked="handleFlattenChange"
+          :model-value="flattenEnabled"
+          @update:model-value="handleFlattenChange"
         />
         Flatten
       </Label>
@@ -69,7 +71,7 @@ function handleFlattenChange(checked: boolean) {
 
       <!-- No data state -->
       <div v-else-if="!sizeTree" class="flex items-center justify-center h-full text-muted-foreground text-sm">
-        <div class="text-center">
+        <div class="text-center flex flex-col items-center justify-center">
           <span class="i-mingcute-file-unknown-line text-3xl mb-2 block opacity-50" />
           <p>No valid JSON to analyze</p>
         </div>

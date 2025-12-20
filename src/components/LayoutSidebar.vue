@@ -24,7 +24,7 @@ const { floatingSidebar } = storeToRefs(layoutStore)
 </script>
 
 <template>
-  <div>
+  <div class="flex flex-col h-full">
     <div class="flex gap-1 p-1">
       <Select>
         <SelectTrigger class="min-w-0 flex-shrink">
@@ -77,6 +77,13 @@ const { floatingSidebar } = storeToRefs(layoutStore)
           <span :class="floatingSidebar ? 'i-mingcute-pin-line' : 'i-mingcute-pin-fill'" />
         </Button>
       </BaseTooltip>
+    </div>
+    <div
+      class="py-8 flex flex-col items-center justify-center text-muted-foreground" :class="{
+        'flex-grow': !floatingSidebar,
+      }"
+    >
+      这里空空如也
     </div>
   </div>
 </template>

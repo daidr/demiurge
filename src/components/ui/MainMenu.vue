@@ -66,10 +66,10 @@ onUnmounted(() => {
     <MenubarMenu>
       <LogoMenubarTrigger />
       <MenubarContent>
-        <MenubarItem>
+        <!-- <MenubarItem>
           Preferences <MenubarShortcut>⌘,</MenubarShortcut>
-        </MenubarItem>
-        <MenubarSeparator />
+        </MenubarItem> -->
+        <!-- <MenubarSeparator /> -->
         <MenubarItem>
           About
         </MenubarItem>
@@ -88,7 +88,7 @@ onUnmounted(() => {
           New Tab from Clipboard <MenubarShortcut>⌥⌘N</MenubarShortcut>
         </MenubarItem>
         <MenubarItem>
-          New Snippet <MenubarShortcut>⇧⌘N</MenubarShortcut>
+          New Tab from File <MenubarShortcut>⌥⌘O</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
         <MenubarSub>
