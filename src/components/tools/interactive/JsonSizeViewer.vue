@@ -2,6 +2,7 @@
 import type { AcceptableValue } from 'reka-ui'
 import type { SizeViewerMode } from '@/stores/tools'
 import { storeToRefs } from 'pinia'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { JsonTree } from '@/components/base/JsonTree'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -13,6 +14,10 @@ import { useToolsStore } from '@/stores/tools'
 const { t } = useI18n()
 const toolsStore = useToolsStore()
 const { sizeTree, expandedPaths, sizeViewerMode, flattenEnabled, isCalculating } = storeToRefs(toolsStore)
+
+// Detect Mac platform for showing correct modifier key hint
+const isMac = computed(() => navigator.platform.toLowerCase().includes('mac'))
+const altClickHint = computed(() => isMac.value ? t('tools.option_click_hint') : t('tools.alt_click_hint'))
 
 function handleToggle(path: string) {
   toolsStore.toggleSizeTreeNode(path)
@@ -67,7 +72,7 @@ function handleNodeClick(path: string, event: MouseEvent) {
       </Label>
 
       <span v-if="!flattenEnabled" class="text-muted-foreground/60 text-xs ml-auto">
-        {{ t('tools.alt_click_hint') }}
+        {{ altClickHint }}
       </span>
     </div>
 

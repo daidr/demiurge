@@ -104,6 +104,7 @@
     "expression_hint_js": "use {dollar} or {data} to access JSON",
     "expression_hint_jsonpath": "e.g., {example}",
     "result": "Result",
-    "alt_click_hint": "Alt+Click to navigate"
+    "alt_click_hint": "Alt+Click to navigate",
+    "option_click_hint": "⌥+Click to navigate"
   }
 }
