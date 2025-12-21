@@ -89,6 +89,8 @@ export const useWorkspaceStore = defineStore('workspace', () => {
         id: 'singleton',
         activeWorkspaceId: null,
         activeTabId: null,
+        sidebarOpen: true,
+        sidebarFloating: false,
       })
     }
     isInitialized.value = true

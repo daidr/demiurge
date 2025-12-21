@@ -53,4 +53,7 @@ export interface AppState {
   id: 'singleton'
   activeWorkspaceId: string | null
   activeTabId: string | null
+  // Layout state
+  sidebarOpen: boolean
+  sidebarFloating: boolean
 }
