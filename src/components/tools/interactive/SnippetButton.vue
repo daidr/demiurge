@@ -57,7 +57,13 @@ function openSnippetWindow() {
 }
 
 function handleSelectSnippet(id: string) {
+  // Before switching, check if current snippet name is empty and fallback to default
+  if (selectedSnippetId.value && isEditMode.value && !localName.value.trim()) {
+    const defaultName = t('snippet.untitled')
+    snippetStore.updateSnippet(selectedSnippetId.value, { name: defaultName })
+  }
   snippetStore.setSelectedSnippet(id)
+  snippetStore.setEditMode(false)
 }
 
 function handleCreateSnippet() {
@@ -73,14 +79,20 @@ function handleDeleteSnippet() {
 }
 
 function handleEditModeChange(checked: boolean) {
+  // When exiting edit mode, check if name is empty and fallback to default
+  if (!checked && selectedSnippetId.value && !localName.value.trim()) {
+    const defaultName = t('snippet.untitled')
+    localName.value = defaultName
+    snippetStore.updateSnippet(selectedSnippetId.value, { name: defaultName })
+  }
   snippetStore.setEditMode(checked)
 }
 
-function handleNameChange(event: Event) {
-  const value = (event.target as HTMLInputElement).value
-  localName.value = value
+function handleNameBlur() {
   if (selectedSnippetId.value && isEditMode.value) {
-    snippetStore.updateSnippet(selectedSnippetId.value, { name: value })
+    const name = localName.value.trim() || t('snippet.untitled')
+    localName.value = name
+    snippetStore.updateSnippet(selectedSnippetId.value, { name })
   }
 }
 
@@ -130,7 +142,7 @@ function formatTime(timestamp: number): string {
   <!-- Snippet Button -->
   <BaseTooltip :text="t('snippet.title')">
     <Button size="xs" variant="ghost" @click="openSnippetWindow">
-      <span class="i-mingcute-code-line" />
+      <span class="i-mingcute-paper-line" />
     </Button>
   </BaseTooltip>
 
@@ -190,7 +202,7 @@ function formatTime(timestamp: number): string {
               {{ snippet.name }}
             </div>
             <div class="text-xs text-muted-foreground flex items-center gap-1 mt-0.5">
-              <span :class="snippet.mode === 'javascript' ? 'i-mingcute-javascript-line' : 'i-mingcute-route-line'" />
+              <span :class="snippet.mode === 'javascript' ? 'i-mingcute-code-line' : 'i-mingcute-route-line'" />
               <span>{{ formatTime(snippet.updatedTime) }}</span>
             </div>
           </div>
@@ -204,11 +216,11 @@ function formatTime(timestamp: number): string {
           <div class="flex items-center gap-2">
             <Label class="text-xs text-muted-foreground w-12">{{ t('snippet.name') }}</Label>
             <Input
-              :value="localName"
+              v-model="localName"
               :disabled="!isEditMode || !selectedSnippetId"
               :placeholder="t('snippet.untitled')"
               class="h-7 text-sm flex-1"
-              @input="handleNameChange"
+              @blur="handleNameBlur"
             />
           </div>
           <div class="flex items-center gap-2">
