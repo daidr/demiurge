@@ -116,6 +116,7 @@
     "apply": "Apply",
     "delete": "Delete",
     "edit_mode": "Edit",
-    "no_snippets": "No snippets yet"
+    "no_snippets": "No snippets yet",
+    "no_snippets_selected": "Select or create a snippet"
   }
 }

@@ -211,43 +211,53 @@ function formatTime(timestamp: number): string {
 
       <!-- Right side: editor area -->
       <div class="flex-1 flex flex-col min-w-0">
-        <!-- Editor header: name + mode -->
-        <div class="flex-shrink-0 p-3 border-b border-border space-y-2">
-          <div class="flex items-center gap-2">
-            <Label class="text-xs text-muted-foreground w-12">{{ t('snippet.name') }}</Label>
-            <Input
-              v-model="localName"
-              :disabled="!isEditMode || !selectedSnippetId"
-              :placeholder="t('snippet.untitled')"
-              class="h-7 text-sm flex-1"
-              @blur="handleNameBlur"
+        <template v-if="selectedSnippetId">
+          <!-- Editor header: name + mode -->
+          <div class="flex-shrink-0 p-3 border-b border-border space-y-2">
+            <div class="flex items-center gap-2">
+              <Label class="text-xs text-muted-foreground w-12">{{ t('snippet.name') }}</Label>
+              <Input
+                v-model="localName"
+                :disabled="!isEditMode"
+                :placeholder="t('snippet.untitled')"
+                class="h-7 text-sm flex-1"
+                @blur="handleNameBlur"
+              />
+            </div>
+            <div class="flex items-center gap-2">
+              <Label class="text-xs text-muted-foreground w-12">{{ t('snippet.mode') }}</Label>
+              <ToggleGroup
+                type="single"
+                :model-value="localMode"
+                :disabled="!isEditMode"
+                @update:model-value="handleModeChange"
+              >
+                <ToggleGroupItem value="javascript" class="px-2 text-xs h-7">
+                  JavaScript
+                </ToggleGroupItem>
+                <ToggleGroupItem value="jsonpath" class="px-2 text-xs h-7">
+                  JSONPath
+                </ToggleGroupItem>
+              </ToggleGroup>
+            </div>
+          </div>
+
+          <!-- Monaco editor -->
+          <div class="flex-1 min-h-0">
+            <MonacoEditor
+              :value="localContent"
+              :options="editorOptions"
+              @update:value="handleContentChange"
             />
           </div>
-          <div class="flex items-center gap-2">
-            <Label class="text-xs text-muted-foreground w-12">{{ t('snippet.mode') }}</Label>
-            <ToggleGroup
-              type="single"
-              :model-value="localMode"
-              :disabled="!isEditMode || !selectedSnippetId"
-              @update:model-value="handleModeChange"
-            >
-              <ToggleGroupItem value="javascript" class="px-2 text-xs h-7">
-                JavaScript
-              </ToggleGroupItem>
-              <ToggleGroupItem value="jsonpath" class="px-2 text-xs h-7">
-                JSONPath
-              </ToggleGroupItem>
-            </ToggleGroup>
-          </div>
-        </div>
+        </template>
 
-        <!-- Monaco editor -->
-        <div class="flex-1 min-h-0">
-          <MonacoEditor
-            :value="localContent"
-            :options="editorOptions"
-            @update:value="handleContentChange"
-          />
+        <!-- Empty state when no snippet selected -->
+        <div v-else class="flex-1 flex flex-col items-center justify-center">
+          <span class="i-mingcute-paper-line text-3xl mb-2 block opacity-50" />
+          <p class="text-sm">
+            {{ t('snippet.no_snippets_selected') }}
+          </p>
         </div>
       </div>
     </div>
