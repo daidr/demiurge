@@ -264,7 +264,7 @@ function openSchemaEditor() {
       <div class="flex items-center gap-1.5">
         <Switch
           id="edit-mode-switch"
-          :checked="isEditMode"
+          :model-value="isEditMode"
           :disabled="!currentSchemaId"
           size="sm"
           @update:model-value="handleEditModeChange"

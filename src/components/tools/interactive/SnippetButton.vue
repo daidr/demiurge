@@ -159,15 +159,13 @@ function formatTime(timestamp: number): string {
         <!-- Edit mode switch -->
         <Switch
           id="snippet-edit-mode"
-          :checked="isEditMode"
-          :disabled="!selectedSnippetId"
+          :model-value="isEditMode"
           size="sm"
           @update:model-value="handleEditModeChange"
         />
         <Label
           for="snippet-edit-mode"
           class="text-muted-foreground cursor-pointer text-xs"
-          :class="{ 'opacity-50': !selectedSnippetId }"
         >
           {{ t('snippet.edit_mode') }}
         </Label>
