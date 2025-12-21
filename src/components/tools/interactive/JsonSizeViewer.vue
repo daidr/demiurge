@@ -8,7 +8,6 @@ import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Sunburst } from '@/components/ui/sunburst'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Treemap } from '@/components/ui/treemap'
 import { useToolsStore } from '@/stores/tools'
 
 const { t } = useI18n()
@@ -20,7 +19,7 @@ function handleToggle(path: string) {
 }
 
 function handleModeChange(value: AcceptableValue) {
-  if (typeof value === 'string' && (value === 'tree' || value === 'treemap' || value === 'sunburst')) {
+  if (typeof value === 'string' && (value === 'tree' || value === 'sunburst')) {
     toolsStore.setSizeViewerMode(value as SizeViewerMode)
   }
 }
@@ -52,10 +51,6 @@ function handleNodeClick(path: string, event: MouseEvent) {
         <ToggleGroupItem value="tree" class="text-xs px-2 gap-1">
           <span class="i-mingcute-list-check-line" />
           {{ t('tools.tree') }}
-        </ToggleGroupItem>
-        <ToggleGroupItem value="treemap" class="text-xs px-2 gap-1">
-          <span class="i-mingcute-layout-grid-line" />
-          {{ t('tools.treemap') }}
         </ToggleGroupItem>
         <ToggleGroupItem value="sunburst" class="text-xs px-2 gap-1">
           <span class="i-mingcute-sun-line" />
@@ -93,14 +88,6 @@ function handleNodeClick(path: string, event: MouseEvent) {
         :node="sizeTree"
         :expanded-paths="expandedPaths"
         @toggle="handleToggle"
-        @node-click="handleNodeClick"
-      />
-
-      <!-- Treemap mode -->
-      <Treemap
-        v-else-if="sizeViewerMode === 'treemap'"
-        :node="sizeTree"
-        class="h-full"
         @node-click="handleNodeClick"
       />
 

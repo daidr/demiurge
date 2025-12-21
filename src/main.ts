@@ -1,3 +1,4 @@
+import { loader } from '@guolao/vue-monaco-editor'
 import messages from '@intlify/unplugin-vue-i18n/messages'
 
 import { createPinia } from 'pinia'
@@ -13,17 +14,33 @@ if (import.meta.env.DEV) {
   import('@signaldb/devtools')
 }
 
-window.MonacoEnvironment = {
-  getWorkerUrl(_, label) {
-    if (label === 'json') {
-      return new URL('monaco-editor/esm/vs/language/json/json.worker.js', import.meta.url).toString()
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return new URL('monaco-editor/esm/vs/language/typescript/ts.worker.js', import.meta.url).toString()
-    }
-    return new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url).toString()
-  },
+// 配置 Monaco Editor 使用 CDN 加载
+const MONACO_VERSION = '0.52.2'
+const CDN_BASE = `https://cdn.staticfile.net/monaco-editor/${MONACO_VERSION}`
+
+// 根据语言偏好设置 Monaco 的 locale
+function getMonacoLocale(): string | undefined {
+  const storedLocale = localStorage.getItem('demiurge-locale')
+  if (storedLocale === 'zh-CN') {
+    return 'zh-cn'
+  }
+  const defaultLanguage = getDefaultLanguage(Object.keys(messages as any))
+  if (defaultLanguage === 'zh-CN') {
+    return 'zh-cn'
+  }
+  return undefined
 }
+
+loader.config({
+  'paths': {
+    vs: `${CDN_BASE}/min/vs`,
+  },
+  'vs/nls': {
+    availableLanguages: {
+      '*': getMonacoLocale() || '',
+    },
+  },
+})
 
 const i18n = createI18n({
   locale: 'en',
@@ -31,27 +48,14 @@ const i18n = createI18n({
 })
 
 async function initApp() {
-  let nlsPromise: Promise<void> | null = null
   let dbPromise: Promise<void> | null = null
-  // 前置的 monaco 多语言判断
-  if (localStorage.getItem('demiurge-locale') === 'zh-CN') {
-    // @ts-expect-error 忽略 monaco 多语言类型错误
-    nlsPromise = import('monaco-editor/esm/nls.messages.zh-cn.js')
-  }
-  else {
-    const defaultLanguage = getDefaultLanguage(Object.keys(messages as any))
-    if (defaultLanguage === 'zh-CN') {
-      // @ts-expect-error 忽略 monaco 多语言类型错误
-      nlsPromise = import('monaco-editor/esm/nls.messages.zh-cn.js')
-    }
-  }
 
   try {
     if (!navigator?.storage?.getDirectory) {
       throw new Error('Browser does not support OPFS')
     }
     dbPromise = import('./db').then(({ waitForCollectionsReady }) => waitForCollectionsReady())
-    await Promise.all([nlsPromise, dbPromise])
+    await dbPromise
   }
   catch (error) {
     console.error('Failed to initialize database:', error)

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { editor, IDisposable } from 'monaco-editor'
 import type { AcceptableValue } from 'reka-ui'
-import { typescript } from 'monaco-editor'
+import { useMonaco } from '@guolao/vue-monaco-editor'
 import { storeToRefs } from 'pinia'
-import { onUnmounted, shallowRef, watch } from 'vue'
+import { computed, onUnmounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
@@ -14,9 +14,7 @@ import { useToolsStore } from '@/stores/tools'
 import { generateThisTypeDeclaration } from '@/utils/jsonToType'
 import { registerJsonPathLanguage } from '@/utils/monaco-jsonpath'
 
-// Register JSONPath language for syntax highlighting
-registerJsonPathLanguage()
-
+const { monacoRef } = useMonaco()
 const { t } = useI18n()
 const toolsStore = useToolsStore()
 const {
@@ -36,8 +34,8 @@ function handleAutoRunChange(checked: boolean | 'indeterminate') {
   toolsStore.setPlaygroundAutoRun(checked)
 }
 
-const expressionEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
-const resultEditorRef = shallowRef<editor.IStandaloneCodeEditor>()
+// Computed value for result editor
+const resultContent = computed(() => playground.value.error || playground.value.result || '')
 
 function handleModeChange(value: AcceptableValue) {
   if (typeof value === 'string' && (value === 'javascript' || value === 'jsonpath')) {
@@ -49,9 +47,14 @@ function handleExecute() {
   toolsStore.executePlayground()
 }
 
+function handleExpressionChange(value: string) {
+  toolsStore.setPlaygroundExpression(value)
+}
+
 // Update TypeScript type definitions for `this` based on current JSON
 function updateTypeDefinitions() {
-  if (playgroundMode.value !== 'javascript') {
+  const monaco = monacoRef.value
+  if (!monaco || playgroundMode.value !== 'javascript') {
     return
   }
 
@@ -69,7 +72,8 @@ function updateTypeDefinitions() {
   const typeDeclaration = generateThisTypeDeclaration(jsonContent)
   if (typeDeclaration) {
     // Add type definitions for TypeScript/JavaScript language service
-    extraLibDisposable = typescript.javascriptDefaults.addExtraLib(
+
+    extraLibDisposable = (monaco.languages as any).typescript?.javascriptDefaults?.addExtraLib(
       typeDeclaration,
       'ts:json-context.d.ts',
     )
@@ -77,36 +81,16 @@ function updateTypeDefinitions() {
 }
 
 function onExpressionEditorMounted(_editor: editor.IStandaloneCodeEditor) {
-  expressionEditorRef.value = _editor
-  _editor.setValue(playgroundExpression.value)
-  _editor.onDidChangeModelContent(() => {
-    toolsStore.setPlaygroundExpression(_editor.getValue())
-  })
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
+  // Register JSONPath language for syntax highlighting
+  registerJsonPathLanguage(monaco)
 
   // Initial type definitions update
   updateTypeDefinitions()
 }
-
-function onResultEditorMounted(_editor: editor.IStandaloneCodeEditor) {
-  resultEditorRef.value = _editor
-}
-
-// Update result editor when result changes
-function updateResultEditor() {
-  if (resultEditorRef.value) {
-    const content = playground.value.error || playground.value.result || ''
-    resultEditorRef.value.setValue(content)
-  }
-}
-
-// Watch expression changes to sync to editor
-watch(playgroundExpression, (newExpr) => {
-  if (expressionEditorRef.value && expressionEditorRef.value.getValue() !== newExpr) {
-    expressionEditorRef.value.setValue(newExpr)
-  }
-})
-
-watch(() => [playground.value.result, playground.value.error], updateResultEditor)
 
 // Watch for JSON content changes to update type definitions
 watch(currentJsonContent, updateTypeDefinitions)
@@ -171,6 +155,7 @@ onUnmounted(() => {
       </div>
       <div class="h-[calc(100%-28px)]">
         <MonacoEditor
+          :value="playgroundExpression"
           :options="{
             language: playgroundMode === 'javascript' ? 'javascript' : 'jsonpath',
             minimap: { enabled: false },
@@ -178,7 +163,9 @@ onUnmounted(() => {
             scrollBeyondLastLine: true,
             wordWrap: 'on',
             fontSize: 13,
-          }" @mounted="onExpressionEditorMounted"
+          }"
+          @update:value="handleExpressionChange"
+          @mounted="onExpressionEditorMounted"
         />
       </div>
     </div>
@@ -195,15 +182,15 @@ onUnmounted(() => {
       </div>
       <div class="h-[calc(100%-28px)]">
         <MonacoEditor
+          :value="resultContent"
           :options="{
             language: 'json',
             readOnly: true,
             minimap: { enabled: false },
-            lineNumbers: 'off',
             scrollBeyondLastLine: false,
             wordWrap: 'on',
             fontSize: 13,
-          }" @mounted="onResultEditorMounted"
+          }"
         />
       </div>
     </div>

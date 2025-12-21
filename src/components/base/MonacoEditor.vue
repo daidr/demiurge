@@ -1,15 +1,18 @@
 <script setup lang="ts">
+import type { editor } from 'monaco-editor'
+import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import { useElementBounding } from '@vueuse/core'
-import { editor } from 'monaco-editor'
-import { onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { ref, shallowRef } from 'vue'
 
 const props = defineProps<{
   options?: editor.IStandaloneEditorConstructionOptions
+  value?: string
 }>()
 
 const emit = defineEmits<{
-  mounted: [editor.IStandaloneCodeEditor]
-  unmounted: [editor.IStandaloneCodeEditor]
+  'mounted': [editor.IStandaloneCodeEditor]
+  'unmounted': [editor.IStandaloneCodeEditor]
+  'update:value': [string]
 }>()
 
 const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
@@ -17,40 +20,20 @@ const ContainerRef = ref<HTMLDivElement | null>(null)
 const OverflowRef = ref<HTMLDivElement | null>(null)
 const { x, y } = useElementBounding(ContainerRef)
 
-onMounted(() => {
-  if (ContainerRef.value) {
-    const MONACO_EDITOR_OPTIONS: editor.IStandaloneEditorConstructionOptions = {
-      ...props.options || {},
-      automaticLayout: true,
-      overflowWidgetsDomNode: OverflowRef.value!,
-    }
-    const _editor = editor.create(ContainerRef.value, MONACO_EDITOR_OPTIONS)
-    EditorRef.value = _editor
-    emit('mounted', _editor)
-  }
-})
+function handleEditorMount(editor: editor.IStandaloneCodeEditor) {
+  EditorRef.value = editor
+  emit('mounted', editor)
+}
 
-onUnmounted(() => {
+function handleEditorUnmount() {
   if (EditorRef.value) {
     emit('unmounted', EditorRef.value)
-    EditorRef.value.dispose()
   }
-})
+}
 
-watch(() => props.options, (newOptions) => {
-  if (EditorRef.value && newOptions) {
-    EditorRef.value.updateOptions(newOptions)
-
-    if (!newOptions.language) {
-      return
-    }
-    const model = EditorRef.value.getModel()
-    if (!model) {
-      return
-    }
-    editor.setModelLanguage(model, newOptions.language)
-  }
-})
+function handleValueChange(value: string | undefined) {
+  emit('update:value', value ?? '')
+}
 </script>
 
 <template>
@@ -61,7 +44,21 @@ watch(() => props.options, (newOptions) => {
       }"
     />
   </Teleport>
-  <div ref="ContainerRef" class="h-full w-full" />
+  <div ref="ContainerRef" class="h-full w-full">
+    <VueMonacoEditor
+      class="h-full w-full"
+      :value="props.value"
+      :language="options?.language"
+      :options="{
+        ...options,
+        automaticLayout: true,
+        overflowWidgetsDomNode: OverflowRef ?? undefined,
+      }"
+      @update:value="handleValueChange"
+      @mount="handleEditorMount"
+      @before-unmount="handleEditorUnmount"
+    />
+  </div>
 </template>
 
 <style scoped>

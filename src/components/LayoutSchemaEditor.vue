@@ -1,20 +1,10 @@
 <script setup lang="ts">
-import { editor, json, Uri } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
+import { useMonaco } from '@guolao/vue-monaco-editor'
 import { ref, shallowRef, watch } from 'vue'
 import MonacoEditor from './base/MonacoEditor.vue'
 
-json.jsonDefaults.setDiagnosticsOptions({
-  schemas: [
-    {
-      uri: 'http://json-schema.org/draft-07/schema',
-      fileMatch: ['json-schema.json'],
-    },
-  ],
-  enableSchemaRequest: true,
-  allowComments: true,
-  schemaValidation: 'error',
-  validate: true,
-})
+const { monacoRef } = useMonaco()
 
 const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 let model: editor.ITextModel | null = null
@@ -22,16 +12,45 @@ const code = ref('')
 
 watch(code, (newCode) => {
   if (model && model.getValue() !== newCode) {
-    model.setValue(newCode)
+    model.setValue(newCode || '')
   }
 })
 
+function configureJsonSchemaValidation() {
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
+  const jsonDefaults = (monaco.languages as any).json?.jsonDefaults
+  if (!jsonDefaults)
+    return
+
+  jsonDefaults.setDiagnosticsOptions({
+    schemas: [
+      {
+        uri: 'http://json-schema.org/draft-07/schema',
+        fileMatch: ['json-schema.json'],
+      },
+    ],
+    enableSchemaRequest: true,
+    allowComments: true,
+    schemaValidation: 'error',
+    validate: true,
+  })
+}
+
 function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
+  configureJsonSchemaValidation()
+
   EditorRef.value = _editor
-  model = editor.createModel(
+  model = monaco.editor.createModel(
     code.value,
     'json',
-    Uri.parse('internal://demiurge/json-schema.json'),
+    monaco.Uri.parse('internal://demiurge/json-schema.json'),
   )
   _editor.setModel(model)
   _editor.onDidChangeModelContent(() => {

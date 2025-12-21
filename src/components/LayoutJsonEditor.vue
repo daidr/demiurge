@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { editor, json, Uri } from 'monaco-editor'
+import type { editor } from 'monaco-editor'
+import { useMonaco } from '@guolao/vue-monaco-editor'
 import { onUnmounted, shallowRef, watch } from 'vue'
 import { useToolsStore } from '@/stores/tools'
 import MonacoEditor from './base/MonacoEditor.vue'
@@ -8,6 +9,7 @@ import SchemaEditorButton from './tools/instant/SchemaEditorButton.vue'
 import SortJsonButton from './tools/instant/SortJsonButton.vue'
 
 const toolsStore = useToolsStore()
+const { monacoRef } = useMonaco()
 
 const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 let model: editor.ITextModel | null = null
@@ -15,7 +17,7 @@ let model: editor.ITextModel | null = null
 // Watch for external content changes (e.g., from Sort JSON)
 watch(() => toolsStore.currentJsonContent, (newContent) => {
   if (model && model.getValue() !== newContent) {
-    model.setValue(newContent)
+    model.setValue(newContent || '')
   }
 })
 
@@ -25,11 +27,22 @@ watch(() => toolsStore.currentJsonSchema, (newSchema) => {
 })
 
 function updateJsonSchemaValidation(schemaString: string) {
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
+  // 获取 json 语言服务（使用 any 绕过类型问题，运行时 API 存在）
+
+  const jsonDefaults = (monaco.languages as any).json?.jsonDefaults
+  if (!jsonDefaults)
+    return
+
   try {
     // Try to parse the schema to validate it's valid JSON
     if (schemaString.trim()) {
       const schema = JSON.parse(schemaString)
-      json.jsonDefaults.setDiagnosticsOptions({
+
+      jsonDefaults.setDiagnosticsOptions({
         validate: true,
         schemas: [
           {
@@ -42,7 +55,8 @@ function updateJsonSchemaValidation(schemaString: string) {
     }
     else {
       // No schema provided, use default validation
-      json.jsonDefaults.setDiagnosticsOptions({
+
+      jsonDefaults.setDiagnosticsOptions({
         validate: true,
         schemas: [],
       })
@@ -50,7 +64,8 @@ function updateJsonSchemaValidation(schemaString: string) {
   }
   catch {
     // Invalid JSON schema, fall back to default validation
-    json.jsonDefaults.setDiagnosticsOptions({
+
+    jsonDefaults.setDiagnosticsOptions({
       validate: true,
       schemas: [],
     })
@@ -58,12 +73,16 @@ function updateJsonSchemaValidation(schemaString: string) {
 }
 
 function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
   EditorRef.value = _editor
   toolsStore.setEditorRef(_editor)
-  model = editor.createModel(
+  model = monaco.editor.createModel(
     toolsStore.currentJsonContent,
     'json',
-    Uri.parse('internal://demiurge/workspace.json'),
+    monaco.Uri.parse('internal://demiurge/workspace.json'),
   )
   _editor.setModel(model)
   _editor.onDidChangeModelContent(() => {

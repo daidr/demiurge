@@ -100,16 +100,22 @@ export const useToolsStore = defineStore('tools', () => {
     }
   })
 
-  // Watch for content changes
-  watch(currentJsonContent, () => {
+  // Watch for content changes (immediate: true ensures initial calculation from store)
+  watch(currentJsonContent, (newContent) => {
     if (debounceTimer) {
       clearTimeout(debounceTimer)
     }
+    // For initial load with existing content, calculate immediately
+    if (newContent && !sizeTree.value) {
+      recalculateSizeTree()
+      return
+    }
+    // For subsequent changes, debounce
     debounceTimer = setTimeout(() => {
       recalculateSizeTree()
       triggerAutoRun()
     }, 300)
-  })
+  }, { immediate: true })
 
   // Watch for flatten changes
   watch(flattenEnabled, () => {
@@ -136,7 +142,7 @@ export const useToolsStore = defineStore('tools', () => {
     expandedPaths.value = newPaths
   }
 
-  function setSizeViewerMode(mode: 'tree' | 'treemap' | 'sunburst') {
+  function setSizeViewerMode(mode: 'tree' | 'sunburst') {
     const tabId = activeTabId.value
     if (!tabId)
       return

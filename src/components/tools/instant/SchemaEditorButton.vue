@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { editor as monacoEditor } from 'monaco-editor'
-import { editor, json, Uri } from 'monaco-editor'
+import { useMonaco } from '@guolao/vue-monaco-editor'
 import { storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -26,19 +26,7 @@ import { Switch } from '@/components/ui/switch'
 import { useSchemaStore } from '@/stores/schema'
 import { useToolsStore } from '@/stores/tools'
 
-// Configure JSON schema validation for the schema editor
-json.jsonDefaults.setDiagnosticsOptions({
-  schemas: [
-    {
-      uri: 'http://json-schema.org/draft-07/schema',
-      fileMatch: ['json-schema.json'],
-    },
-  ],
-  enableSchemaRequest: true,
-  allowComments: true,
-  schemaValidation: 'error',
-  validate: true,
-})
+const { monacoRef } = useMonaco()
 
 const { t } = useI18n()
 const schemaStore = useSchemaStore()
@@ -83,7 +71,7 @@ watch([currentSchemaId, isEditMode], ([schemaId, editMode]) => {
 // Sync editing schema content to editor
 watch(editorContent, (newContent) => {
   if (model && model.getValue() !== newContent) {
-    model.setValue(newContent)
+    model.setValue(newContent || '')
   }
 })
 
@@ -94,12 +82,41 @@ const editorOptions = computed(() => ({
   readOnly: !isEditMode.value,
 }))
 
+function configureJsonSchemaValidation() {
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
+  const jsonDefaults = (monaco.languages as any).json?.jsonDefaults
+  if (!jsonDefaults)
+    return
+
+  jsonDefaults.setDiagnosticsOptions({
+    schemas: [
+      {
+        uri: 'http://json-schema.org/draft-07/schema',
+        fileMatch: ['json-schema.json'],
+      },
+    ],
+    enableSchemaRequest: true,
+    allowComments: true,
+    schemaValidation: 'error',
+    validate: true,
+  })
+}
+
 function onEditorMounted(_editor: monacoEditor.IStandaloneCodeEditor) {
+  const monaco = monacoRef.value
+  if (!monaco)
+    return
+
+  configureJsonSchemaValidation()
+
   EditorRef.value = _editor
-  model = editor.createModel(
+  model = monaco.editor.createModel(
     editorContent.value,
     'json',
-    Uri.parse('internal://demiurge/json-schema.json'),
+    monaco.Uri.parse('internal://demiurge/json-schema.json'),
   )
   _editor.setModel(model)
 
