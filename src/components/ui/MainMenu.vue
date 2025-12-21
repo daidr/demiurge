@@ -20,7 +20,6 @@ import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
 import WorkspaceCreateDialog from '@/components/WorkspaceCreateDialog.vue'
 import WorkspaceDeleteDialog from '@/components/WorkspaceDeleteDialog.vue'
 import { useLayoutStore } from '@/stores/layout'
-import { useToolsStore } from '@/stores/tools'
 import { useWorkspaceStore } from '@/stores/workspace'
 
 defineProps<{
@@ -29,7 +28,6 @@ defineProps<{
 
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
-const toolsStore = useToolsStore()
 const workspaceStore = useWorkspaceStore()
 const { activeWorkspaceId, activeTabId, activeWorkspace } = storeToRefs(workspaceStore)
 
@@ -61,13 +59,6 @@ function toggleSidePanel() {
 
 function toggleToolPanel() {
   layoutStore.toggleToolPanel()
-}
-
-async function sortJson() {
-  const sorted = await toolsStore.sortCurrentJson()
-  if (sorted !== null) {
-    toolsStore.setCurrentJsonContent(sorted)
-  }
 }
 
 function handleNewTab() {
@@ -155,10 +146,6 @@ onMounted(() => {
     e.preventDefault()
     toggleToolPanel()
   })
-  hotkeys('command+shift+s, ctrl+shift+s', (e) => {
-    e.preventDefault()
-    sortJson()
-  })
   hotkeys('command+shift+n, ctrl+shift+n', (e) => {
     e.preventDefault()
     showNewWorkspaceDialog.value = true
@@ -189,7 +176,6 @@ onUnmounted(() => {
     return
 
   hotkeys.unbind('command+t, ctrl+t')
-  hotkeys.unbind('command+shift+s, ctrl+shift+s')
   hotkeys.unbind('command+shift+n, ctrl+shift+n')
   hotkeys.unbind('command+n, ctrl+n')
   hotkeys.unbind('command+alt+n, ctrl+alt+n')
@@ -264,27 +250,15 @@ onUnmounted(() => {
     </MenubarMenu>
     <MenubarMenu v-if="!disabled">
       <MenubarTrigger :disabled="disabled">
-        View
+        {{ t('menu.view') }}
       </MenubarTrigger>
       <MenubarContent>
         <MenubarItem @click="toggleSidePanel">
-          Toggle Sidebar <MenubarShortcut>⌘B</MenubarShortcut>
+          {{ t('menu.toggle_sidebar') }} <MenubarShortcut>⌘B</MenubarShortcut>
         </MenubarItem>
         <MenubarItem @click="toggleToolPanel">
-          Toggle Tool Panel <MenubarShortcut v-if="isPWA">
+          {{ t('menu.toggle_tool_panel') }} <MenubarShortcut v-if="isPWA">
             ⌘T
-          </MenubarShortcut>
-        </MenubarItem>
-      </MenubarContent>
-    </MenubarMenu>
-    <MenubarMenu v-if="!disabled">
-      <MenubarTrigger :disabled="disabled">
-        Tools
-      </MenubarTrigger>
-      <MenubarContent>
-        <MenubarItem @click="sortJson">
-          Sort JSON Keys <MenubarShortcut v-if="isPWA">
-            ⇧⌘S
           </MenubarShortcut>
         </MenubarItem>
       </MenubarContent>

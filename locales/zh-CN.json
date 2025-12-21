@@ -68,6 +68,7 @@
   },
   "menu": {
     "file": "文件",
+    "view": "视图",
     "new_workspace": "新建工作区",
     "new_tab": "新建标签页",
     "new_tab_from_clipboard": "从剪贴板新建标签页",
@@ -76,7 +77,9 @@
     "export_current_workspace": "当前工作区",
     "export_all_workspaces": "所有工作区",
     "remove_tab": "移除标签页",
-    "remove_workspace": "移除工作区"
+    "remove_workspace": "移除工作区",
+    "toggle_sidebar": "切换侧边栏",
+    "toggle_tool_panel": "切换工具面板"
   },
   "tools": {
     "title": "工具",
