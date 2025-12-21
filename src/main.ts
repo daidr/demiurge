@@ -31,17 +31,38 @@ const i18n = createI18n({
 })
 
 async function initApp() {
+  let nlsPromise: Promise<void> | null = null
+  let dbPromise: Promise<void> | null = null
   // 前置的 monaco 多语言判断
   if (localStorage.getItem('demiurge-locale') === 'zh-CN') {
     // @ts-expect-error 忽略 monaco 多语言类型错误
-    await import('monaco-editor/esm/nls.messages.zh-cn.js')
+    nlsPromise = import('monaco-editor/esm/nls.messages.zh-cn.js')
   }
   else {
     const defaultLanguage = getDefaultLanguage(Object.keys(messages as any))
     if (defaultLanguage === 'zh-CN') {
       // @ts-expect-error 忽略 monaco 多语言类型错误
-      await import('monaco-editor/esm/nls.messages.zh-cn.js')
+      nlsPromise = import('monaco-editor/esm/nls.messages.zh-cn.js')
     }
+  }
+
+  try {
+    if (!navigator?.storage?.getDirectory) {
+      throw new Error('Browser does not support OPFS')
+    }
+    dbPromise = import('./db').then(({ waitForCollectionsReady }) => waitForCollectionsReady())
+    await Promise.all([nlsPromise, dbPromise])
+  }
+  catch (error) {
+    console.error('Failed to initialize database:', error)
+    const App = (await import('./NotSupportApp.vue')).default
+    const app = createApp(App)
+
+    app.use(i18n)
+    app.use(createPinia())
+
+    app.mount('#app')
+    return
   }
 
   const App = (await import('./App.vue')).default

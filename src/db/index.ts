@@ -27,5 +27,15 @@ export const appStateCollection = new Collection<AppState>({
   reactivity: reactivityAdapter,
 })
 
+// Wait for all collections to be ready
+export async function waitForCollectionsReady(): Promise<void> {
+  await Promise.all([
+    workspacesCollection.isReady(),
+    tabsCollection.isReady(),
+    schemasCollection.isReady(),
+    appStateCollection.isReady(),
+  ])
+}
+
 // Re-export types
 export * from './types'
