@@ -1,15 +1,10 @@
 import messages from '@intlify/unplugin-vue-i18n/messages'
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
 
-import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
 import { createPinia } from 'pinia'
-
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
-import App from './App.vue'
+
+import { getDefaultLanguage } from './composables/useInitI18n'
 import '@unocss/reset/tailwind.css'
 import './assets/main.css'
 import 'virtual:uno.css'
@@ -19,20 +14,14 @@ if (import.meta.env.DEV) {
 }
 
 window.MonacoEnvironment = {
-  getWorker(_, label) {
+  getWorkerUrl(_, label) {
     if (label === 'json') {
-      return new JsonWorker()
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return new CssWorker()
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return new HtmlWorker()
+      return new URL('monaco-editor/esm/vs/language/json/json.worker.js', import.meta.url).toString()
     }
     if (label === 'typescript' || label === 'javascript') {
-      return new TsWorker()
+      return new URL('monaco-editor/esm/vs/language/typescript/ts.worker.js', import.meta.url).toString()
     }
-    return new EditorWorker()
+    return new URL('monaco-editor/esm/vs/editor/editor.worker.js', import.meta.url).toString()
   },
 }
 
@@ -41,9 +30,27 @@ const i18n = createI18n({
   messages,
 })
 
-const app = createApp(App)
+async function initApp() {
+  // 前置的 monaco 多语言判断
+  if (localStorage.getItem('demiurge-locale') === 'zh-CN') {
+    // @ts-expect-error 忽略 monaco 多语言类型错误
+    await import('monaco-editor/esm/nls.messages.zh-cn.js')
+  }
+  else {
+    const defaultLanguage = getDefaultLanguage(Object.keys(messages as any))
+    if (defaultLanguage === 'zh-CN') {
+      // @ts-expect-error 忽略 monaco 多语言类型错误
+      await import('monaco-editor/esm/nls.messages.zh-cn.js')
+    }
+  }
 
-app.use(i18n)
-app.use(createPinia())
+  const App = (await import('./App.vue')).default
+  const app = createApp(App)
 
-app.mount('#app')
+  app.use(i18n)
+  app.use(createPinia())
+
+  app.mount('#app')
+}
+
+initApp()
