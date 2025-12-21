@@ -4,6 +4,7 @@ import type { AcceptableValue } from 'reka-ui'
 import { typescript } from 'monaco-editor'
 import { storeToRefs } from 'pinia'
 import { onUnmounted, shallowRef, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -16,6 +17,7 @@ import { registerJsonPathLanguage } from '@/utils/monaco-jsonpath'
 // Register JSONPath language for syntax highlighting
 registerJsonPathLanguage()
 
+const { t } = useI18n()
 const toolsStore = useToolsStore()
 const {
   playground,
@@ -134,15 +136,15 @@ onUnmounted(() => {
         </ToggleGroupItem>
       </ToggleGroup>
 
-      <Button size="sm" :disabled="playground.isExecuting || !playgroundExpression.trim()" @click="handleExecute">
+      <Button size="xs" :disabled="playground.isExecuting || !playgroundExpression.trim()" @click="handleExecute">
         <span v-if="playground.isExecuting" class="i-mingcute-loading-3-line mr-1 animate-spin" />
         <span v-else class="i-mingcute-play-fill mr-1" />
-        Run
+        {{ t('tools.run') }}
       </Button>
 
       <Label class="ml-auto flex cursor-pointer select-none items-center gap-1.5 text-xs">
         <Checkbox :model-value="playgroundAutoRun" @update:model-value="handleAutoRunChange" />
-        Auto Run
+        {{ t('tools.auto_run') }}
       </Label>
     </div>
 
@@ -150,12 +152,21 @@ onUnmounted(() => {
     <div class="min-h-0 flex-1 overflow-hidden rounded-md border">
       <div class="text-muted-foreground bg-muted/50 border-b px-2 py-1 text-xs">
         <template v-if="playgroundMode === 'javascript'">
-          Expression (use <code class="bg-muted rounded px-1 font-mono">$</code> or <code
-            class="bg-muted rounded px-1 font-mono"
-          >data</code> to access JSON)
+          <i18n-t keypath="tools.expression_hint_js" tag="span">
+            <template #dollar>
+              <code class="bg-muted rounded px-1 font-mono">$</code>
+            </template>
+            <template #data>
+              <code class="bg-muted rounded px-1 font-mono">data</code>
+            </template>
+          </i18n-t>
         </template>
         <template v-else>
-          JSONPath (e.g., <code class="bg-muted rounded px-1 font-mono">$.store.book[*].author</code>)
+          <i18n-t keypath="tools.expression_hint_jsonpath" tag="span">
+            <template #example>
+              <code class="bg-muted rounded px-1 font-mono">$.store.book[*].author</code>
+            </template>
+          </i18n-t>
         </template>
       </div>
       <div class="h-[calc(100%-28px)]">
@@ -177,7 +188,7 @@ onUnmounted(() => {
       <div class="text-muted-foreground bg-muted/50 flex items-center gap-1 border-b px-2 py-1 text-xs">
         <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
         <span v-else class="i-mingcute-check-circle-line text-green-600" />
-        Result
+        {{ t('tools.result') }}
         <span v-if="playground.executionTime !== null" class="text-muted-foreground/70 ml-auto">
           {{ playground.executionTime.toFixed(1) }} ms
         </span>

@@ -5,6 +5,7 @@ import { storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
+import BaseTooltip from '@/components/BaseTooltip.vue'
 import { Button } from '@/components/ui/button'
 import { FloatingWindow } from '@/components/ui/floating-window'
 import { Input } from '@/components/ui/input'
@@ -152,9 +153,11 @@ function openSchemaEditor() {
 
 <template>
   <!-- Schema Editor Button -->
-  <Button size="xs" variant="ghost" @click="openSchemaEditor">
-    <span class="i-mingcute-braces-line" />
-  </Button>
+  <BaseTooltip :text="t('schema.open_editor')">
+    <Button size="xs" variant="ghost" @click="openSchemaEditor">
+      <span class="i-mingcute-braces-line" />
+    </Button>
+  </BaseTooltip>
 
   <FloatingWindow
     v-model="isOpen"

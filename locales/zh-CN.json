@@ -41,6 +41,7 @@
   },
   "schema": {
     "editor_title": "JSON Schema 编辑器",
+    "open_editor": "打开 Schema 编辑器",
     "select_schema": "选择 Schema",
     "no_schema": "无 Schema",
     "edit_mode": "编辑模式",
@@ -76,5 +77,22 @@
     "export_all_workspaces": "所有工作区",
     "remove_tab": "移除标签页",
     "remove_workspace": "移除工作区"
+  },
+  "tools": {
+    "title": "工具",
+    "size_viewer": "Size Viewer",
+    "playground": "Playground",
+    "sort_json_keys": "排序 JSON 键",
+    "tree": "树形",
+    "treemap": "矩形树图",
+    "sunburst": "旭日图",
+    "flatten": "扁平化",
+    "no_valid_json": "没有可分析的有效 JSON",
+    "run": "运行",
+    "auto_run": "自动运行",
+    "expression": "表达式",
+    "expression_hint_js": "使用 {dollar} 或 {data} 访问 JSON",
+    "expression_hint_jsonpath": "例如 {example}",
+    "result": "结果"
   }
 }

@@ -41,6 +41,7 @@
   },
   "schema": {
     "editor_title": "JSON Schema Editor",
+    "open_editor": "Open Schema Editor",
     "select_schema": "Select Schema",
     "no_schema": "No Schema",
     "edit_mode": "Edit Mode",
@@ -76,5 +77,22 @@
     "export_all_workspaces": "All Workspaces",
     "remove_tab": "Remove Tab",
     "remove_workspace": "Remove Workspace"
+  },
+  "tools": {
+    "title": "Tools",
+    "size_viewer": "Size Viewer",
+    "playground": "Playground",
+    "sort_json_keys": "Sort JSON Keys",
+    "tree": "Tree",
+    "treemap": "Treemap",
+    "sunburst": "Sunburst",
+    "flatten": "Flatten",
+    "no_valid_json": "No valid JSON to analyze",
+    "run": "Run",
+    "auto_run": "Auto Run",
+    "expression": "Expression",
+    "expression_hint_js": "use {dollar} or {data} to access JSON",
+    "expression_hint_jsonpath": "e.g., {example}",
+    "result": "Result"
   }
 }

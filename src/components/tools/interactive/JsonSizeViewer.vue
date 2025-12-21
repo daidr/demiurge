@@ -2,6 +2,7 @@
 import type { AcceptableValue } from 'reka-ui'
 import type { SizeViewerMode } from '@/stores/tools'
 import { storeToRefs } from 'pinia'
+import { useI18n } from 'vue-i18n'
 import { JsonTree } from '@/components/base/JsonTree'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
@@ -10,6 +11,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { Treemap } from '@/components/ui/treemap'
 import { useToolsStore } from '@/stores/tools'
 
+const { t } = useI18n()
 const toolsStore = useToolsStore()
 const { sizeTree, expandedPaths, sizeViewerMode, flattenEnabled, isCalculating } = storeToRefs(toolsStore)
 
@@ -49,15 +51,15 @@ function handleNodeClick(path: string, event: MouseEvent) {
       >
         <ToggleGroupItem value="tree" class="text-xs px-2 gap-1">
           <span class="i-mingcute-list-check-line" />
-          Tree
+          {{ t('tools.tree') }}
         </ToggleGroupItem>
         <ToggleGroupItem value="treemap" class="text-xs px-2 gap-1">
           <span class="i-mingcute-layout-grid-line" />
-          Treemap
+          {{ t('tools.treemap') }}
         </ToggleGroupItem>
         <ToggleGroupItem value="sunburst" class="text-xs px-2 gap-1">
           <span class="i-mingcute-sun-line" />
-          Sunburst
+          {{ t('tools.sunburst') }}
         </ToggleGroupItem>
       </ToggleGroup>
 
@@ -66,7 +68,7 @@ function handleNodeClick(path: string, event: MouseEvent) {
           :model-value="flattenEnabled"
           @update:model-value="handleFlattenChange"
         />
-        Flatten
+        {{ t('tools.flatten') }}
       </Label>
     </div>
 
@@ -81,7 +83,7 @@ function handleNodeClick(path: string, event: MouseEvent) {
       <div v-else-if="!sizeTree" class="flex items-center justify-center h-full text-muted-foreground text-sm">
         <div class="text-center flex flex-col items-center justify-center">
           <span class="i-mingcute-file-unknown-line text-3xl mb-2 block opacity-50" />
-          <p>No valid JSON to analyze</p>
+          <p>{{ t('tools.no_valid_json') }}</p>
         </div>
       </div>
 
