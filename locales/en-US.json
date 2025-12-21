@@ -1,11 +1,122 @@
 {
+  "general": {
+    "browser_not_supported_tips": "Current browser does not support Demiurge, please upgrade browser version or use modern browsers such as Chrome, Firefox, Safari, etc."
+  },
+  "locales": {
+    "en-US": "English (US)",
+    "zh-CN": "Simplified Chinese"
+  },
+  "common": {
+    "create": "Create",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "confirm": "Confirm"
+  },
   "sidebar": {
-    "profiles": "Profiles",
-    "default_profile": "Default Profile"
+    "workspaces": "Workspaces",
+    "please_select_workspace": "Please select a workspace",
+    "no_workspaces": "No workspaces yet",
+    "pin_sidebar": "Pin sidebar",
+    "unpin_sidebar": "Unpin sidebar",
+    "tabs": "Tabs",
+    "no_tabs": "No tabs yet",
+    "storage_usage": "{used} / {total}",
+    "clear_all_data": "Clear All Data",
+    "clear_all_data_title": "Clear All Data",
+    "clear_all_data_description": "This will permanently delete all workspaces, tabs, and schemas. This action cannot be undone.",
+    "clear_all_data_confirm": "Clear All"
+  },
+  "workspace": {
+    "create_workspace": "Create Workspace",
+    "edit_workspace": "Edit Workspace",
+    "delete_workspace": "Delete Workspace",
+    "icon": "Icon",
+    "title": "Title",
+    "title_placeholder": "Enter workspace title",
+    "delete_confirm": "Are you sure you want to delete workspace \"{title}\"? This action cannot be undone.",
+    "delete_warning_has_tabs": "Workspace \"{title}\" contains {count} tab(s). All data will be lost.",
+    "delete_confirm_with_tabs": "Are you sure you want to delete workspace \"{title}\" and its {count} tab(s)? This action cannot be undone!",
+    "confirm_delete": "Confirm Delete"
+  },
+  "tab": {
+    "untitled": "Untitled",
+    "create_tab": "New Tab",
+    "from_clipboard": "Clipboard {timestamp}"
+  },
+  "schema": {
+    "editor_title": "JSON Schema Editor",
+    "open_editor": "Open Schema Editor",
+    "select_schema": "Select Schema",
+    "no_schema": "No Schema",
+    "edit_mode": "Edit Mode",
+    "create_schema": "Create Schema",
+    "name": "Name",
+    "name_placeholder": "Enter schema name"
+  },
+  "empty_state": {
+    "select_or_create_tab": "Select or create a tab to get started"
   },
   "editor": {
     "json-schema": {
       "placeholder": "Enter JSON Schema here"
     }
+  },
+  "about": {
+    "name": "Demiurge",
+    "description": "JSON Analysis Tool",
+    "version": "Version",
+    "author": "Author",
+    "license": "License",
+    "build_time": "Build Time",
+    "commit": "Commit",
+    "pull_request": "Pull Request"
+  },
+  "menu": {
+    "file": "File",
+    "view": "View",
+    "new_workspace": "New Workspace",
+    "new_tab": "New Tab",
+    "new_tab_from_clipboard": "New Tab from Clipboard",
+    "new_tab_from_file": "New Tab from File",
+    "export": "Export",
+    "export_current_workspace": "Current Workspace",
+    "export_all_workspaces": "All Workspaces",
+    "remove_tab": "Remove Tab",
+    "remove_workspace": "Remove Workspace",
+    "toggle_sidebar": "Toggle Sidebar",
+    "toggle_tool_panel": "Toggle Tool Panel"
+  },
+  "tools": {
+    "title": "Tools",
+    "size_viewer": "Size Viewer",
+    "playground": "Playground",
+    "sort_json_keys": "Sort JSON Keys",
+    "format_json": "Format JSON",
+    "tree": "Tree",
+    "treemap": "Treemap",
+    "sunburst": "Sunburst",
+    "flatten": "Flatten",
+    "no_valid_json": "No valid JSON to analyze",
+    "run": "Run",
+    "auto_run": "Auto Run",
+    "expression": "Expression",
+    "expression_hint_js": "use {dollar} or {data} to access JSON",
+    "expression_hint_jsonpath": "e.g., {example}",
+    "result": "Result",
+    "alt_click_hint": "Alt+Click to navigate",
+    "option_click_hint": "⌥+Click to navigate"
+  },
+  "snippet": {
+    "title": "Snippets",
+    "new": "New",
+    "untitled": "Untitled Snippet",
+    "name": "Name",
+    "mode": "Mode",
+    "apply": "Apply",
+    "delete": "Delete",
+    "edit_mode": "Edit",
+    "no_snippets": "No snippets yet",
+    "no_snippets_selected": "Select or create a snippet"
   }
 }

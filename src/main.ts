@@ -1,45 +1,81 @@
+import { loader } from '@guolao/vue-monaco-editor'
+import messages from '@intlify/unplugin-vue-i18n/messages'
+
+import { createPinia } from 'pinia'
+import { createApp } from 'vue'
+import { createI18n } from 'vue-i18n'
+
+import { getDefaultLanguage } from './composables/useInitI18n'
 import '@unocss/reset/tailwind.css'
 import './assets/main.css'
 import 'virtual:uno.css'
 
-import { createApp } from 'vue'
-import { createPinia } from 'pinia'
-import { createI18n } from 'vue-i18n'
-import messages from '@intlify/unplugin-vue-i18n/messages'
-
-import EditorWorker from 'monaco-editor/esm/vs/editor/editor.worker?worker'
-import JsonWorker from 'monaco-editor/esm/vs/language/json/json.worker?worker'
-import CssWorker from 'monaco-editor/esm/vs/language/css/css.worker?worker'
-import HtmlWorker from 'monaco-editor/esm/vs/language/html/html.worker?worker'
-import TsWorker from 'monaco-editor/esm/vs/language/typescript/ts.worker?worker'
-import App from './App.vue'
-
-window.MonacoEnvironment = {
-  getWorker(_, label) {
-    if (label === 'json') {
-      return new JsonWorker()
-    }
-    if (label === 'css' || label === 'scss' || label === 'less') {
-      return new CssWorker()
-    }
-    if (label === 'html' || label === 'handlebars' || label === 'razor') {
-      return new HtmlWorker()
-    }
-    if (label === 'typescript' || label === 'javascript') {
-      return new TsWorker()
-    }
-    return new EditorWorker()
-  },
+if (import.meta.env.DEV) {
+  import('@signaldb/devtools')
 }
+
+// 配置 Monaco Editor 使用 CDN 加载
+const MONACO_VERSION = '0.52.2'
+const CDN_BASE = `https://cdn.staticfile.net/monaco-editor/${MONACO_VERSION}`
+
+// 根据语言偏好设置 Monaco 的 locale
+function getMonacoLocale(): string | undefined {
+  const storedLocale = localStorage.getItem('demiurge-locale')
+  if (storedLocale === 'zh-CN') {
+    return 'zh-cn'
+  }
+  const defaultLanguage = getDefaultLanguage(Object.keys(messages as any))
+  if (defaultLanguage === 'zh-CN') {
+    return 'zh-cn'
+  }
+  return undefined
+}
+
+loader.config({
+  'paths': {
+    vs: `${CDN_BASE}/min/vs`,
+  },
+  'vs/nls': {
+    availableLanguages: {
+      '*': getMonacoLocale() || '',
+    },
+  },
+})
 
 const i18n = createI18n({
   locale: 'en',
   messages,
 })
 
-const app = createApp(App)
+async function initApp() {
+  let dbPromise: Promise<void> | null = null
 
-app.use(i18n)
-app.use(createPinia())
+  try {
+    if (!navigator?.storage?.getDirectory) {
+      throw new Error('Browser does not support OPFS')
+    }
+    dbPromise = import('./db').then(({ waitForCollectionsReady }) => waitForCollectionsReady())
+    await dbPromise
+  }
+  catch (error) {
+    console.error('Failed to initialize database:', error)
+    const App = (await import('./NotSupportApp.vue')).default
+    const app = createApp(App)
 
-app.mount('#app')
+    app.use(i18n)
+    app.use(createPinia())
+
+    app.mount('#app')
+    return
+  }
+
+  const App = (await import('./App.vue')).default
+  const app = createApp(App)
+
+  app.use(i18n)
+  app.use(createPinia())
+
+  app.mount('#app')
+}
+
+initApp()

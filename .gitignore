@@ -29,3 +29,9 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# backup files
+*.bak
+
+.claude
+.rolldown

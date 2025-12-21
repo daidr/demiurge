@@ -1,11 +1,122 @@
 {
+  "general": {
+    "browser_not_supported_tips": "当前浏览器不支持使用德谬歌, 请升级浏览器版本或使用Chrome、Firefox、Safari等现代浏览器"
+  },
+  "locales": {
+    "en-US": "英语 (美国)",
+    "zh-CN": "简体中文"
+  },
+  "common": {
+    "create": "创建",
+    "cancel": "取消",
+    "delete": "删除",
+    "save": "保存",
+    "confirm": "确认"
+  },
   "sidebar": {
-    "profiles": "配置文件",
-    "default_profile": "默认配置文件"
+    "workspaces": "工作区",
+    "please_select_workspace": "请选择工作区",
+    "no_workspaces": "暂无工作区",
+    "pin_sidebar": "固定侧边栏",
+    "unpin_sidebar": "取消固定侧边栏",
+    "tabs": "标签页",
+    "no_tabs": "暂无标签页",
+    "storage_usage": "{used} / {total}",
+    "clear_all_data": "清除全部数据",
+    "clear_all_data_title": "清除全部数据",
+    "clear_all_data_description": "这将永久删除所有工作区、标签页和 Schema。此操作无法撤销。",
+    "clear_all_data_confirm": "全部清除"
+  },
+  "workspace": {
+    "create_workspace": "创建工作区",
+    "edit_workspace": "编辑工作区",
+    "delete_workspace": "删除工作区",
+    "icon": "图标",
+    "title": "标题",
+    "title_placeholder": "请输入工作区标题",
+    "delete_confirm": "确定要删除工作区 \"{title}\" 吗？此操作无法撤销。",
+    "delete_warning_has_tabs": "工作区 \"{title}\" 包含 {count} 个标签页，删除后数据将无法恢复。",
+    "delete_confirm_with_tabs": "确定要删除工作区 \"{title}\" 及其 {count} 个标签页吗？此操作无法撤销！",
+    "confirm_delete": "确认删除"
+  },
+  "tab": {
+    "untitled": "未命名",
+    "create_tab": "新建标签页",
+    "from_clipboard": "自剪贴板 {timestamp}"
+  },
+  "schema": {
+    "editor_title": "JSON Schema 编辑器",
+    "open_editor": "打开 Schema 编辑器",
+    "select_schema": "选择 Schema",
+    "no_schema": "无 Schema",
+    "edit_mode": "编辑模式",
+    "create_schema": "创建 Schema",
+    "name": "名称",
+    "name_placeholder": "请输入 Schema 名称"
+  },
+  "empty_state": {
+    "select_or_create_tab": "请选择或创建一个标签页以开始"
   },
   "editor": {
     "json-schema": {
       "placeholder": "在此输入 JSON Schema"
     }
+  },
+  "about": {
+    "name": "德谬歌",
+    "description": "JSON分析工具",
+    "version": "版本",
+    "author": "作者",
+    "license": "许可证",
+    "build_time": "构建时间",
+    "commit": "提交",
+    "pull_request": "拉取请求"
+  },
+  "menu": {
+    "file": "文件",
+    "view": "视图",
+    "new_workspace": "新建工作区",
+    "new_tab": "新建标签页",
+    "new_tab_from_clipboard": "从剪贴板新建标签页",
+    "new_tab_from_file": "从文件新建标签页",
+    "export": "导出",
+    "export_current_workspace": "当前工作区",
+    "export_all_workspaces": "所有工作区",
+    "remove_tab": "移除标签页",
+    "remove_workspace": "移除工作区",
+    "toggle_sidebar": "切换侧边栏",
+    "toggle_tool_panel": "切换工具面板"
+  },
+  "tools": {
+    "title": "工具",
+    "size_viewer": "Size Viewer",
+    "playground": "Playground",
+    "sort_json_keys": "排序 JSON 键",
+    "format_json": "格式化 JSON",
+    "tree": "树形",
+    "treemap": "矩形树图",
+    "sunburst": "旭日图",
+    "flatten": "扁平化",
+    "no_valid_json": "没有可分析的有效 JSON",
+    "run": "运行",
+    "auto_run": "自动运行",
+    "expression": "表达式",
+    "expression_hint_js": "使用 {dollar} 或 {data} 访问 JSON",
+    "expression_hint_jsonpath": "例如 {example}",
+    "result": "结果",
+    "alt_click_hint": "Alt+点击以跳转",
+    "option_click_hint": "⌥+点击以跳转"
+  },
+  "snippet": {
+    "title": "代码片段",
+    "new": "新建",
+    "untitled": "未命名片段",
+    "name": "名称",
+    "mode": "类型",
+    "apply": "应用",
+    "delete": "删除",
+    "edit_mode": "编辑",
+    "no_snippets": "暂无代码片段",
+    "no_snippets_selected": "请选择或创建一个代码片段"
   }
 }

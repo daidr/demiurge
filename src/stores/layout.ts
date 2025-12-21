@@ -1,17 +1,82 @@
-import { computed, ref } from 'vue'
-import { defineStore } from 'pinia'
+import { acceptHMRUpdate, defineStore } from 'pinia'
+import { computed, ref, watchEffect } from 'vue'
+import { useCollectionQuery } from '@/composables/useCollection'
+import { appStateCollection } from '@/db'
 
 export const useLayoutStore = defineStore('layout', () => {
-  const showSidebar = ref(true)
-  const showSchemaPanel = ref(false)
+  const isBrowserSupported = computed(() => {
+    const opfs = !!navigator?.storage?.getDirectory
+    return opfs
+  })
+
+  // Tool panel is runtime-only (not persisted)
+  const showToolPanel = ref(true)
+
+  // App state (singleton) for persisted layout state
+  const appStateItems = useCollectionQuery(
+    appStateCollection,
+    () => ({ id: 'singleton' as const }),
+  )
+
+  // Sidebar open state (persisted)
+  const showSidebar = computed(() => appStateItems.value[0]?.sidebarOpen ?? true)
+
+  // Sidebar floating state (persisted)
+  const floatingSidebar = computed(() => appStateItems.value[0]?.sidebarFloating ?? false)
+
+  // Ensure app state has layout fields
+  watchEffect(() => {
+    const existing = appStateCollection.findOne({ id: 'singleton' })
+    if (existing && (existing.sidebarOpen === undefined || existing.sidebarFloating === undefined)) {
+      appStateCollection.updateOne(
+        { id: 'singleton' },
+        {
+          $set: {
+            sidebarOpen: existing.sidebarOpen ?? true,
+            sidebarFloating: existing.sidebarFloating ?? false,
+          },
+        },
+      )
+    }
+  })
 
   function toggleSidebar() {
-    showSidebar.value = !showSidebar.value
+    appStateCollection.updateOne(
+      { id: 'singleton' },
+      { $set: { sidebarOpen: !showSidebar.value } },
+    )
   }
 
-  function toggleSchemaPanel() {
-    showSchemaPanel.value = !showSchemaPanel.value
+  function toggleToolPanel() {
+    showToolPanel.value = !showToolPanel.value
   }
 
-  return { showSidebar, showSchemaPanel, toggleSchemaPanel, toggleSidebar }
+  function toggleFloatingSidebar() {
+    appStateCollection.updateOne(
+      { id: 'singleton' },
+      { $set: { sidebarFloating: !floatingSidebar.value } },
+    )
+  }
+
+  function setFloatingSidebar(value: boolean) {
+    appStateCollection.updateOne(
+      { id: 'singleton' },
+      { $set: { sidebarFloating: value } },
+    )
+  }
+
+  return {
+    isBrowserSupported,
+    showSidebar,
+    showToolPanel,
+    floatingSidebar,
+    toggleSidebar,
+    toggleToolPanel,
+    toggleFloatingSidebar,
+    setFloatingSidebar,
+  }
 })
+
+if (import.meta.hot) {
+  import.meta.hot.accept(acceptHMRUpdate(useLayoutStore, import.meta.hot))
+}

@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { cn } from '@/lib/utils'
+import type { SelectTriggerProps } from 'reka-ui'
+import type { HTMLAttributes } from 'vue'
 import { ChevronDown } from 'lucide-vue-next'
-import { SelectIcon, SelectTrigger, type SelectTriggerProps, useForwardProps } from 'reka-ui'
-import { computed, type HTMLAttributes } from 'vue'
+import { SelectIcon, SelectTrigger, useForwardProps } from 'reka-ui'
+import { computed } from 'vue'
+import { cn } from '@/lib/utils'
 
 const props = defineProps<SelectTriggerProps & { class?: HTMLAttributes['class'] }>()
 
@@ -19,7 +21,7 @@ const forwardedProps = useForwardProps(delegatedProps)
   <SelectTrigger
     v-bind="forwardedProps"
     :class="cn(
-      'flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
+      'flex h-7 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-2 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:truncate text-start',
       props.class,
     )"
   >

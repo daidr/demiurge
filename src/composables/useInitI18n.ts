@@ -1,6 +1,6 @@
-import { useI18n } from 'vue-i18n'
 import { useLocalStorage } from '@vueuse/core'
-import { computed, watch } from 'vue'
+import { watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { matchLanguages } from '@/utils/lang'
 
 export type ColorMode = 'light' | 'dark' | 'system'
@@ -16,7 +16,7 @@ export function getDefaultLanguage(languages: string[]) {
 export function useLocale() {
   const i18n = useI18n()
   const supportLanguages = i18n.availableLocales
-  const lang = useLocalStorage<string>('json-baker-locale', () => getDefaultLanguage(supportLanguages))
+  const lang = useLocalStorage<string>('demiurge-locale', () => getDefaultLanguage(supportLanguages))
   return lang
 }
 
