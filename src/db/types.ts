@@ -57,3 +57,13 @@ export interface AppState {
   sidebarOpen: boolean
   sidebarFloating: boolean
 }
+
+// Playground Snippet Collection Types
+export interface PlaygroundSnippet {
+  id: string // uuidv7
+  name: string
+  content: string
+  mode: PlaygroundMode
+  createdTime: number
+  updatedTime: number
+}

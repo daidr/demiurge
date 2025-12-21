@@ -13,6 +13,7 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
 import { generateThisTypeDeclaration } from '@/utils/jsonToType'
 import { registerJsonPathLanguage } from '@/utils/monaco-jsonpath'
+import SnippetButton from './SnippetButton.vue'
 
 const { monacoRef } = useMonaco()
 const { t } = useI18n()
@@ -111,6 +112,8 @@ onUnmounted(() => {
   <div class="h-full flex flex-col gap-2">
     <!-- Mode Toggle + Execute Button -->
     <div class="flex flex-shrink-0 items-center gap-2">
+      <SnippetButton />
+
       <ToggleGroup type="single" :model-value="playgroundMode" @update:model-value="handleModeChange">
         <ToggleGroupItem value="javascript" class="px-2 text-xs">
           JavaScript

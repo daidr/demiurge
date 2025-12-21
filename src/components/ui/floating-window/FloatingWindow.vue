@@ -237,6 +237,11 @@ onUnmounted(() => {
             <slot />
           </div>
 
+          <!-- Footer -->
+          <div v-if="$slots.footer" class="flex-shrink-0 flex items-center justify-end gap-2 px-3 py-2 border-t border-border bg-muted/30">
+            <slot name="footer" />
+          </div>
+
           <!-- Resize handles -->
           <!-- Edges -->
           <div

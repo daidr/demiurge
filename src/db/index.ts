@@ -1,4 +1,4 @@
-import type { AppState, Schema, Tab, Workspace } from './types'
+import type { AppState, PlaygroundSnippet, Schema, Tab, Workspace } from './types'
 import { Collection } from '@signaldb/core'
 import createOPFSAdapter from '@signaldb/opfs'
 import reactivityAdapter from '@signaldb/vue'
@@ -27,6 +27,12 @@ export const appStateCollection = new Collection<AppState>({
   reactivity: reactivityAdapter,
 })
 
+// Playground Snippets Collection
+export const snippetsCollection = new Collection<PlaygroundSnippet>({
+  persistence: createOPFSAdapter('demiurge-snippets.json'),
+  reactivity: reactivityAdapter,
+})
+
 // Wait for all collections to be ready
 export async function waitForCollectionsReady(): Promise<void> {
   await Promise.all([
@@ -34,6 +40,7 @@ export async function waitForCollectionsReady(): Promise<void> {
     tabsCollection.isReady(),
     schemasCollection.isReady(),
     appStateCollection.isReady(),
+    snippetsCollection.isReady(),
   ])
 }
 

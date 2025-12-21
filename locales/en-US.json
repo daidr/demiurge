@@ -106,5 +106,16 @@
     "result": "Result",
     "alt_click_hint": "Alt+Click to navigate",
     "option_click_hint": "⌥+Click to navigate"
+  },
+  "snippet": {
+    "title": "Snippets",
+    "new": "New",
+    "untitled": "Untitled Snippet",
+    "name": "Name",
+    "mode": "Mode",
+    "apply": "Apply",
+    "delete": "Delete",
+    "edit_mode": "Edit",
+    "no_snippets": "No snippets yet"
   }
 }

@@ -106,5 +106,16 @@
     "result": "结果",
     "alt_click_hint": "Alt+点击以跳转",
     "option_click_hint": "⌥+点击以跳转"
+  },
+  "snippet": {
+    "title": "代码片段",
+    "new": "新建",
+    "untitled": "未命名片段",
+    "name": "名称",
+    "mode": "类型",
+    "apply": "应用",
+    "delete": "删除",
+    "edit_mode": "编辑",
+    "no_snippets": "暂无代码片段"
   }
 }
