@@ -39,7 +39,7 @@ function handleOpenChange(value: boolean) {
       <DialogHeader>
         <DialogTitle class="flex items-center justify-center gap-2 text-xl">
           <div class="i-custom-demiurge text-2xl" />
-          Demiurge
+          {{ t('about.name') }}
         </DialogTitle>
         <DialogDescription class="text-center">
           {{ t('about.description') }}

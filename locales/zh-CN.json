@@ -58,7 +58,8 @@
     }
   },
   "about": {
-    "description": "一款前端 JSON 处理工具，支持工作区编辑、Schema 验证和交互式工具。",
+    "name": "德谬歌",
+    "description": "JSON分析工具",
     "version": "版本",
     "author": "作者",
     "license": "许可证",

@@ -29,13 +29,16 @@ defineProps<{
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const workspaceStore = useWorkspaceStore()
-const { activeWorkspaceId, activeTabId, activeWorkspace } = storeToRefs(workspaceStore)
+const { activeWorkspaceId, activeTabId, activeWorkspace, hasActiveTab } = storeToRefs(workspaceStore)
 
 // Whether tab-related menu items should be disabled (no workspace selected)
 const isTabMenuDisabled = computed(() => !activeWorkspaceId.value)
 
 // Whether remove tab should be disabled (no tab selected)
 const isRemoveTabDisabled = computed(() => !activeTabId.value)
+
+// Whether tool panel toggle should be disabled (no active tab)
+const isToolPanelDisabled = computed(() => !hasActiveTab.value)
 
 // Whether remove workspace should be disabled (no workspace selected)
 const isRemoveWorkspaceDisabled = computed(() => !activeWorkspaceId.value)
@@ -256,7 +259,7 @@ onUnmounted(() => {
         <MenubarItem @click="toggleSidePanel">
           {{ t('menu.toggle_sidebar') }} <MenubarShortcut>⌘B</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem @click="toggleToolPanel">
+        <MenubarItem :disabled="isToolPanelDisabled" @click="toggleToolPanel">
           {{ t('menu.toggle_tool_panel') }} <MenubarShortcut v-if="isPWA">
             ⌘T
           </MenubarShortcut>

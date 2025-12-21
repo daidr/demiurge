@@ -58,7 +58,8 @@
     }
   },
   "about": {
-    "description": "A frontend JSON processing tool with workspace-based editing, schema validation, and interactive tools.",
+    "name": "Demiurge",
+    "description": "JSON Analysis Tool",
     "version": "Version",
     "author": "Author",
     "license": "License",
