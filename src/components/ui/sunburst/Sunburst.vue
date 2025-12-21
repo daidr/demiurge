@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ISunburstChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import VChart from '@visactor/vchart'
+import { registerSunburstChart, registerTooltip, VChart } from '@visactor/vchart'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +13,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   nodeClick: [path: string, event: MouseEvent]
 }>()
+
+VChart.useRegisters([registerSunburstChart, registerTooltip])
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const chartInstance = shallowRef<VChart | null>(null)
@@ -28,7 +30,7 @@ function formatSize(bytes: number): string {
 // Convert JsonSizeNode to VChart sunburst data format
 function convertToSunburstData(node: JsonSizeNode): any {
   const result: any = {
-    name: node.path,
+    name: node.key,
     path: node.path,
     percentage: node.percentage,
     type: node.type,
@@ -95,7 +97,7 @@ function createChart() {
     seriesField: 'path',
     gap: 1,
     drill: true,
-    drillField: 'name',
+    drillField: 'path',
     label: {
       visible: true,
       style: {

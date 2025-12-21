@@ -30,5 +30,40 @@ export default defineConfig(async () => {
     define: {
       ...gitDefineValues,
     },
+    experimental: {
+      enableNativePlugin: true,
+    },
+    build: {
+      cssCodeSplit: false,
+      rolldownOptions: {
+        output: {
+          advancedChunks: {
+            groups: [
+              {
+                name: 'reka-ui',
+                test: /node_modules[\\/]reka-ui/,
+              },
+              {
+                name: 'locale',
+                test: /unplugin-vue-i18n[\\/]messages/,
+              },
+              {
+                name: 'vchart',
+                test: /node_modules[\\/]@visactor[\\/]vchart/,
+              },
+              {
+                name: 'vendor',
+                test: (path: string) => {
+                  return (
+                    path.startsWith('\0vite')
+                    || /node_modules[\\/]@vue/.test(path)
+                  )
+                },
+              },
+            ],
+          },
+        },
+      },
+    },
   }
 })

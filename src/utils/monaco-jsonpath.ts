@@ -1,4 +1,4 @@
-import * as monaco from 'monaco-editor'
+import { languages } from 'monaco-editor'
 
 /**
  * Register JSONPath language support for Monaco Editor
@@ -6,19 +6,19 @@ import * as monaco from 'monaco-editor'
  */
 export function registerJsonPathLanguage() {
   // Check if already registered
-  if (monaco.languages.getLanguages().some(lang => lang.id === 'jsonpath')) {
+  if (languages.getLanguages().some(lang => lang.id === 'jsonpath')) {
     return
   }
 
   // Register the language
-  monaco.languages.register({
+  languages.register({
     id: 'jsonpath',
     extensions: [],
     aliases: ['JSONPath', 'jsonpath'],
   })
 
   // Define tokenization rules
-  monaco.languages.setMonarchTokensProvider('jsonpath', {
+  languages.setMonarchTokensProvider('jsonpath', {
     defaultToken: '',
 
     // JSONPath operators and symbols
@@ -134,7 +134,7 @@ export function registerJsonPathLanguage() {
   })
 
   // Set language configuration for bracket matching and auto-closing
-  monaco.languages.setLanguageConfiguration('jsonpath', {
+  languages.setLanguageConfiguration('jsonpath', {
     brackets: [
       ['[', ']'],
       ['(', ')'],

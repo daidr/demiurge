@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { ITreemapChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import VChart from '@visactor/vchart'
+import { registerTooltip, registerTreemapChart, VChart } from '@visactor/vchart'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { cn } from '@/lib/utils'
 
@@ -13,6 +13,8 @@ const props = defineProps<{
 const emit = defineEmits<{
   nodeClick: [path: string, event: MouseEvent]
 }>()
+
+VChart.useRegisters([registerTreemapChart, registerTooltip])
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const chartInstance = shallowRef<VChart | null>(null)

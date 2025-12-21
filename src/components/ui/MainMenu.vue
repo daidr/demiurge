@@ -11,9 +11,6 @@ import {
   MenubarMenu,
   MenubarSeparator,
   MenubarShortcut,
-  MenubarSub,
-  MenubarSubContent,
-  MenubarSubTrigger,
   MenubarTrigger,
 } from '@/components/ui/menubar'
 import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
@@ -231,14 +228,14 @@ onUnmounted(() => {
           </MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
-        <MenubarSub>
+        <!-- <MenubarSub>
           <MenubarSubTrigger>{{ t('menu.export') }}</MenubarSubTrigger>
           <MenubarSubContent>
             <MenubarItem>{{ t('menu.export_current_workspace') }}</MenubarItem>
             <MenubarItem>{{ t('menu.export_all_workspaces') }}</MenubarItem>
           </MenubarSubContent>
         </MenubarSub>
-        <MenubarSeparator />
+        <MenubarSeparator /> -->
         <MenubarItem :disabled="isRemoveTabDisabled" @click="handleRemoveTab">
           {{ t('menu.remove_tab') }} <MenubarShortcut v-if="isPWA">
             ⌘W
