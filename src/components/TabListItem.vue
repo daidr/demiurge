@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Tab } from '@/db'
-import { nextTick, ref } from 'vue'
+import { nextTick, ref, useTemplateRef } from 'vue'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 
@@ -17,7 +17,7 @@ const emit = defineEmits<{
 
 const isEditing = ref(false)
 const editingTitle = ref('')
-const inputRef = ref<HTMLInputElement | null>(null)
+const inputRef = useTemplateRef('inputRef')
 
 function handleSelect() {
   if (!isEditing.value) {
@@ -34,8 +34,8 @@ function startEditing() {
   isEditing.value = true
   editingTitle.value = props.tab.title
   nextTick(() => {
-    inputRef.value?.focus()
-    inputRef.value?.select()
+    inputRef.value?.ref?.focus()
+    inputRef.value?.ref?.select()
   })
 }
 
@@ -72,7 +72,8 @@ function handleKeydown(e: KeyboardEvent) {
       v-if="isEditing"
       ref="inputRef"
       v-model="editingTitle"
-      class="h-6 min-w-0 flex-1 px-1 py-0 text-sm"
+      size="xs"
+      class="h-5 min-w-0 flex-1 px-1 py-0 text-sm"
       @blur="finishEditing"
       @keydown="handleKeydown"
       @click.stop

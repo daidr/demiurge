@@ -3,7 +3,6 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -11,6 +10,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
+import { Button } from '@/components/ui/button'
 import { useWorkspaceStore } from '@/stores/workspace'
 
 const props = defineProps<{
@@ -30,8 +30,9 @@ const workspaceStore = useWorkspaceStore()
 const tabCount = ref(0)
 const showSecondConfirm = ref(false)
 
-watch(() => props.workspaceId, (id) => {
-  if (id) {
+// Watch both open and workspaceId to refresh tab count
+watch([() => props.open, () => props.workspaceId], ([isOpen, id]) => {
+  if (isOpen && id) {
     tabCount.value = workspaceStore.getWorkspaceTabCount(id)
     showSecondConfirm.value = false
   }
@@ -82,12 +83,12 @@ function handleConfirm() {
       </AlertDialogHeader>
       <AlertDialogFooter>
         <AlertDialogCancel>{{ t('common.cancel') }}</AlertDialogCancel>
-        <AlertDialogAction
-          class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+        <Button
+          variant="destructive"
           @click="handleConfirm"
         >
           {{ showSecondConfirm ? t('workspace.confirm_delete') : t('common.delete') }}
-        </AlertDialogAction>
+        </Button>
       </AlertDialogFooter>
     </AlertDialogContent>
   </AlertDialog>
