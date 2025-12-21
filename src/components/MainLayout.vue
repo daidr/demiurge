@@ -36,10 +36,10 @@ const { hasActiveTab } = storeToRefs(workspaceStore)
       <!-- Show editor and tools when a tab is selected -->
       <template v-else>
         <Splitpanes>
-          <Pane min-size="30">
+          <Pane min-size="35">
             <LayoutJsonEditor />
           </Pane>
-          <Pane v-if="showToolPanel" min-size="20" max-size="50">
+          <Pane v-if="showToolPanel" min-size="35">
             <ToolPanel />
           </Pane>
         </Splitpanes>

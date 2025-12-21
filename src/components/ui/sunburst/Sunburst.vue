@@ -1,13 +1,8 @@
 <script setup lang="ts">
 import type { ISunburstChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import {
-  registerCustomAnimate,
-} from '@visactor/vchart/esm/animation'
-import { registerSunburstChart } from '@visactor/vchart/esm/chart'
-import { registerTooltip } from '@visactor/vchart/esm/component'
+import { registerAnimate, registerBrowserEnv, registerDomTooltipHandler, registerSunburstChart, registerTooltip } from '@visactor/vchart'
 import { VChart } from '@visactor/vchart/esm/core'
-import { registerDomTooltipHandler } from '@visactor/vchart/esm/plugin/components/tooltip-handler'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { cn } from '@/lib/utils'
 
@@ -20,7 +15,7 @@ const emit = defineEmits<{
   nodeClick: [path: string, event: MouseEvent]
 }>()
 
-VChart.useRegisters([registerSunburstChart, registerTooltip, registerDomTooltipHandler, registerCustomAnimate])
+VChart.useRegisters([registerSunburstChart, registerTooltip, registerDomTooltipHandler, registerBrowserEnv, registerAnimate])
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const chartInstance = shallowRef<VChart | null>(null)
