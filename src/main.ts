@@ -14,6 +14,10 @@ import '@unocss/reset/tailwind.css'
 import './assets/main.css'
 import 'virtual:uno.css'
 
+if (import.meta.env.DEV) {
+  import('@signaldb/devtools')
+}
+
 window.MonacoEnvironment = {
   getWorker(_, label) {
     if (label === 'json') {
