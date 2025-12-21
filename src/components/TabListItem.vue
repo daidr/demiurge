@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import type { Tab } from '@/db'
+import { nextTick, ref } from 'vue'
 import { Button } from '@/components/ui/button'
+import { Input } from '@/components/ui/input'
 
 const props = defineProps<{
   tab: Tab
@@ -10,15 +12,48 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [id: string]
   delete: [id: string]
+  rename: [id: string, title: string]
 }>()
 
+const isEditing = ref(false)
+const editingTitle = ref('')
+const inputRef = ref<HTMLInputElement | null>(null)
+
 function handleSelect() {
-  emit('select', props.tab.id)
+  if (!isEditing.value) {
+    emit('select', props.tab.id)
+  }
 }
 
 function handleDelete(e: MouseEvent) {
   e.stopPropagation()
   emit('delete', props.tab.id)
+}
+
+function startEditing() {
+  isEditing.value = true
+  editingTitle.value = props.tab.title
+  nextTick(() => {
+    inputRef.value?.focus()
+    inputRef.value?.select()
+  })
+}
+
+function finishEditing() {
+  const newTitle = editingTitle.value.trim()
+  if (newTitle && newTitle !== props.tab.title) {
+    emit('rename', props.tab.id, newTitle)
+  }
+  isEditing.value = false
+}
+
+function handleKeydown(e: KeyboardEvent) {
+  if (e.key === 'Enter') {
+    finishEditing()
+  }
+  else if (e.key === 'Escape') {
+    isEditing.value = false
+  }
 }
 </script>
 
@@ -33,8 +68,24 @@ function handleDelete(e: MouseEvent) {
     @click="handleSelect"
   >
     <div class="i-mingcute-file-line text-muted-foreground shrink-0" />
-    <span class="min-w-0 flex-1 truncate">{{ tab.title }}</span>
+    <Input
+      v-if="isEditing"
+      ref="inputRef"
+      v-model="editingTitle"
+      class="h-6 min-w-0 flex-1 px-1 py-0 text-sm"
+      @blur="finishEditing"
+      @keydown="handleKeydown"
+      @click.stop
+    />
+    <span
+      v-else
+      class="min-w-0 flex-1 truncate"
+      @dblclick.stop="startEditing"
+    >
+      {{ tab.title }}
+    </span>
     <Button
+      v-if="!isEditing"
       variant="ghost"
       size="icon"
       class="size-5 shrink-0 opacity-0 group-hover:opacity-100"

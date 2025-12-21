@@ -64,6 +64,10 @@ function handleTabReorder(newOrder: string[]) {
   }
 }
 
+function handleTabRename(id: string, title: string) {
+  workspaceStore.renameTab(id, title)
+}
+
 function handleCreateTab() {
   if (!activeWorkspaceId.value)
     return
@@ -147,6 +151,7 @@ function handleDeleteWorkspace() {
           :active-tab-id="activeTabId"
           @select="handleTabSelect"
           @delete="handleTabDelete"
+          @rename="handleTabRename"
           @reorder="handleTabReorder"
         />
         <div

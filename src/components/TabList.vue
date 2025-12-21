@@ -11,6 +11,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   select: [id: string]
   delete: [id: string]
+  rename: [id: string, title: string]
   reorder: [newOrder: string[]]
 }>()
 
@@ -24,6 +25,10 @@ function handleSelect(id: string) {
 
 function handleDelete(id: string) {
   emit('delete', id)
+}
+
+function handleRename(id: string, title: string) {
+  emit('rename', id, title)
 }
 
 function handleDragStart(e: DragEvent, tabId: string) {
@@ -108,6 +113,7 @@ function handleDrop(e: DragEvent, targetId: string) {
         :is-active="activeTabId === tab.id"
         @select="handleSelect"
         @delete="handleDelete"
+        @rename="handleRename"
       />
     </div>
   </div>

@@ -188,6 +188,13 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     )
   }
 
+  function renameTab(tabId: string, title: string): void {
+    tabsCollection.updateOne(
+      { id: tabId },
+      { $set: { title, updatedTime: Date.now() } },
+    )
+  }
+
   function deleteTab(tabId: string): void {
     const tab = tabsCollection.findOne({ id: tabId })
     if (!tab)
@@ -304,6 +311,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     // Tab Actions
     createTab,
     updateTab,
+    renameTab,
     deleteTab,
     setActiveTab,
     updateTabContent,
