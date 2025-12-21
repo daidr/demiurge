@@ -18,6 +18,7 @@ import {
 } from '@/components/ui/menubar'
 import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
 import WorkspaceCreateDialog from '@/components/WorkspaceCreateDialog.vue'
+import WorkspaceDeleteDialog from '@/components/WorkspaceDeleteDialog.vue'
 import { useLayoutStore } from '@/stores/layout'
 import { useToolsStore } from '@/stores/tools'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -30,10 +31,19 @@ const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const toolsStore = useToolsStore()
 const workspaceStore = useWorkspaceStore()
-const { activeWorkspaceId } = storeToRefs(workspaceStore)
+const { activeWorkspaceId, activeTabId, activeWorkspace } = storeToRefs(workspaceStore)
 
-// Whether tab-related menu items should be disabled
+// Whether tab-related menu items should be disabled (no workspace selected)
 const isTabMenuDisabled = computed(() => !activeWorkspaceId.value)
+
+// Whether remove tab should be disabled (no tab selected)
+const isRemoveTabDisabled = computed(() => !activeTabId.value)
+
+// Whether remove workspace should be disabled (no workspace selected)
+const isRemoveWorkspaceDisabled = computed(() => !activeWorkspaceId.value)
+
+// Active workspace title for delete dialog
+const activeWorkspaceTitle = computed(() => activeWorkspace.value?.title ?? '')
 
 // Check if running as installed PWA
 const isPWA = window.matchMedia('(display-mode: standalone)').matches
@@ -115,6 +125,21 @@ async function handleNewTabFromFile() {
   }
 }
 
+// Delete workspace dialog state
+const showDeleteWorkspaceDialog = ref(false)
+
+function handleRemoveTab() {
+  if (!activeTabId.value)
+    return
+  workspaceStore.deleteTab(activeTabId.value)
+}
+
+function handleRemoveWorkspace() {
+  if (!activeWorkspaceId.value)
+    return
+  showDeleteWorkspaceDialog.value = true
+}
+
 onMounted(() => {
   // Toggle sidebar is always available (not affected by PWA mode)
   hotkeys('command+b, ctrl+b', (e) => {
@@ -188,6 +213,11 @@ onUnmounted(() => {
     </MenubarMenu>
     <AboutDialog v-model:open="showAboutDialog" />
     <WorkspaceCreateDialog v-model:open="showNewWorkspaceDialog" />
+    <WorkspaceDeleteDialog
+      v-model:open="showDeleteWorkspaceDialog"
+      :workspace-id="activeWorkspaceId"
+      :workspace-title="activeWorkspaceTitle"
+    />
     <MenubarMenu v-if="!disabled">
       <MenubarTrigger>{{ t('menu.file') }}</MenubarTrigger>
       <MenubarContent>
@@ -220,12 +250,12 @@ onUnmounted(() => {
           </MenubarSubContent>
         </MenubarSub>
         <MenubarSeparator />
-        <MenubarItem>
+        <MenubarItem :disabled="isRemoveTabDisabled" @click="handleRemoveTab">
           {{ t('menu.remove_tab') }} <MenubarShortcut v-if="isPWA">
             ⌘W
           </MenubarShortcut>
         </MenubarItem>
-        <MenubarItem>
+        <MenubarItem :disabled="isRemoveWorkspaceDisabled" @click="handleRemoveWorkspace">
           {{ t('menu.remove_workspace') }} <MenubarShortcut v-if="isPWA">
             ⇧⌘W
           </MenubarShortcut>
