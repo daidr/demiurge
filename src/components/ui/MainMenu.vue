@@ -73,7 +73,11 @@ async function handleNewTabFromClipboard() {
 
   try {
     const text = await navigator.clipboard.readText()
-    const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'))
+    // Format timestamp as MM-DD/HH:mm:ss
+    const now = new Date()
+    const timestamp = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}/${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+    const tabTitle = t('tab.from_clipboard', { timestamp })
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, tabTitle)
     workspaceStore.setActiveTab(tabId)
     // Set the content after creating the tab
     workspaceStore.updateTabContent(tabId, text)

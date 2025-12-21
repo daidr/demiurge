@@ -36,7 +36,8 @@
   },
   "tab": {
     "untitled": "未命名",
-    "create_tab": "新建标签页"
+    "create_tab": "新建标签页",
+    "from_clipboard": "自剪贴板 {timestamp}"
   },
   "schema": {
     "editor_title": "JSON Schema 编辑器",

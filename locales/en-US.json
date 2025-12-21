@@ -36,7 +36,8 @@
   },
   "tab": {
     "untitled": "Untitled",
-    "create_tab": "New Tab"
+    "create_tab": "New Tab",
+    "from_clipboard": "Clipboard {timestamp}"
   },
   "schema": {
     "editor_title": "JSON Schema Editor",
