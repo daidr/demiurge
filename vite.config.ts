@@ -7,6 +7,7 @@ import { defineConfig } from 'vite'
 import { VitePWA } from 'vite-plugin-pwa'
 import vueDevTools from 'vite-plugin-vue-devtools'
 import { gitDefine } from './config/git'
+import { VITE_PWA_MANIFEST } from './config/manifest'
 
 // https://vitejs.dev/config/
 export default defineConfig(async () => {
@@ -20,7 +21,7 @@ export default defineConfig(async () => {
       VueI18nPlugin({
         include: resolve(dirname(fileURLToPath(import.meta.url)), './locales/[^_]*.json'),
       }),
-      VitePWA({ registerType: 'autoUpdate' }),
+      VitePWA({ registerType: 'prompt', manifest: VITE_PWA_MANIFEST }),
     ],
     resolve: {
       alias: {
