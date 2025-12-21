@@ -1,7 +1,10 @@
 <script setup lang="ts">
 import type { ISunburstChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import { registerSunburstChart, registerTooltip, VChart } from '@visactor/vchart'
+import { registerSunburstChart } from '@visactor/vchart/esm/chart'
+// 引入坐标轴、Tooltip、CrossHair组件
+import { registerTooltip } from '@visactor/vchart/esm/component'
+import { VChart } from '@visactor/vchart/esm/core'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { cn } from '@/lib/utils'
 
