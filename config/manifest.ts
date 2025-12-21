@@ -1,8 +1,8 @@
 import type { ManifestOptions } from 'vite-plugin-pwa'
 
 export const VITE_PWA_MANIFEST: Partial<ManifestOptions> = {
-  name: 'JSON Baker',
-  short_name: 'JSON Baker',
+  name: 'Demiurge',
+  short_name: 'Demiurge',
   description: 'All-in-one JSON processing assistant',
   icons: [
     {
