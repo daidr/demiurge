@@ -46,6 +46,20 @@ const toolsStore = useToolsStore()
 const { schemas, isEditMode, editingSchema, editingSchemaId } = storeToRefs(schemaStore)
 const { currentSchemaId, currentJsonSchema } = storeToRefs(toolsStore)
 
+// Schema status: null = no schema, true = valid JSON schema, false = invalid JSON
+const schemaStatus = computed(() => {
+  if (!currentSchemaId.value || !currentJsonSchema.value) {
+    return null
+  }
+  try {
+    JSON.parse(currentJsonSchema.value)
+    return true
+  }
+  catch {
+    return false
+  }
+})
+
 const isOpen = ref(false)
 const EditorRef = shallowRef<monacoEditor.IStandaloneCodeEditor>()
 let model: monacoEditor.ITextModel | null = null
@@ -154,8 +168,14 @@ function openSchemaEditor() {
 <template>
   <!-- Schema Editor Button -->
   <BaseTooltip :text="t('schema.open_editor')">
-    <Button size="xs" variant="ghost" @click="openSchemaEditor">
+    <Button size="xs" variant="ghost" class="relative" @click="openSchemaEditor">
       <span class="i-mingcute-braces-line" />
+      <!-- Status badge -->
+      <span
+        v-if="schemaStatus !== null"
+        class="absolute -right-0.5 -top-0.5 size-2 rounded-full border border-background"
+        :class="schemaStatus ? 'bg-green-500' : 'bg-destructive'"
+      />
     </Button>
   </BaseTooltip>
 
