@@ -20,7 +20,12 @@
     "pin_sidebar": "Pin sidebar",
     "unpin_sidebar": "Unpin sidebar",
     "tabs": "Tabs",
-    "no_tabs": "No tabs yet"
+    "no_tabs": "No tabs yet",
+    "storage_usage": "{used} / {total}",
+    "clear_all_data": "Clear All Data",
+    "clear_all_data_title": "Clear All Data",
+    "clear_all_data_description": "This will permanently delete all workspaces, tabs, and schemas. This action cannot be undone.",
+    "clear_all_data_confirm": "Clear All"
   },
   "workspace": {
     "create_workspace": "Create Workspace",

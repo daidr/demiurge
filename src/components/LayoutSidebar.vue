@@ -1,7 +1,17 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import {
   Popover,
   PopoverContent,
@@ -84,6 +94,82 @@ function handleDeleteWorkspace() {
     return
   deletingWorkspaceId.value = activeWorkspaceId.value
   showDeleteDialog.value = true
+}
+
+// Storage usage
+const storageUsage = ref<number | null>(null)
+const storageQuota = ref<number | null>(null)
+
+function formatBytes(bytes: number): string {
+  if (bytes < 1024)
+    return `${bytes} B`
+  if (bytes < 1024 * 1024)
+    return `${(bytes / 1024).toFixed(1)} KB`
+  if (bytes < 1024 * 1024 * 1024)
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`
+}
+
+const storagePercentage = computed(() => {
+  if (storageUsage.value === null || storageQuota.value === null || storageQuota.value === 0)
+    return 0
+  return Math.min(100, (storageUsage.value / storageQuota.value) * 100)
+})
+
+const formattedUsage = computed(() => formatBytes(storageUsage.value ?? 0))
+const formattedQuota = computed(() => formatBytes(storageQuota.value ?? 0))
+
+async function updateStorageEstimate() {
+  if (navigator.storage && navigator.storage.estimate) {
+    const estimate = await navigator.storage.estimate()
+    storageUsage.value = estimate.usage ?? null
+    storageQuota.value = estimate.quota ?? null
+  }
+}
+
+let storageInterval: ReturnType<typeof setInterval> | null = null
+
+onMounted(() => {
+  updateStorageEstimate()
+  // Update every 3 seconds
+  storageInterval = setInterval(updateStorageEstimate, 3000)
+})
+
+onUnmounted(() => {
+  if (storageInterval) {
+    clearInterval(storageInterval)
+  }
+})
+
+// Clear all data
+const showClearDataDialog = ref(false)
+const isClearing = ref(false)
+
+async function handleClearAllData() {
+  isClearing.value = true
+  try {
+    // Get OPFS root directory and delete all files
+    const root = await navigator.storage.getDirectory()
+    // Delete all demiurge files
+    const files = ['demiurge-workspaces.json', 'demiurge-tabs.json', 'demiurge-schemas.json', 'demiurge-app-state.json']
+    for (const file of files) {
+      try {
+        await root.removeEntry(file)
+      }
+      catch {
+        // File might not exist, ignore
+      }
+    }
+    // Reload the page to reinitialize
+    window.location.reload()
+  }
+  catch (error) {
+    console.error('Failed to clear data:', error)
+  }
+  finally {
+    isClearing.value = false
+    showClearDataDialog.value = false
+  }
 }
 </script>
 
@@ -212,12 +298,65 @@ function handleDeleteWorkspace() {
     <!-- Empty state when no workspace selected -->
     <div
       v-else
-      class="text-muted-foreground flex flex-col items-center justify-center py-8"
-      :class="{ 'flex-grow': !floatingSidebar }"
+      class="text-muted-foreground flex flex-1 flex-col items-center justify-center py-8"
     >
       <div class="i-mingcute-folder-line mb-2 text-3xl opacity-50" />
       <span class="text-sm">{{ t('sidebar.please_select_workspace') }}</span>
     </div>
+
+    <!-- Storage usage bar -->
+    <div
+      v-if="storageQuota !== null"
+      class="border-t border-border px-2 py-2"
+    >
+      <div class="mb-1 flex items-center justify-between">
+        <span class="text-muted-foreground text-xs">
+          {{ t('sidebar.storage_usage', { used: formattedUsage, total: formattedQuota }) }}
+        </span>
+        <BaseTooltip :text="t('sidebar.clear_all_data')">
+          <Button
+            size="xs"
+            variant="ghost"
+            class="text-destructive hover:text-destructive hover:bg-destructive/10 -mr-1 size-5 p-0"
+            @click="showClearDataDialog = true"
+          >
+            <span class="i-mingcute-delete-2-line text-xs" />
+          </Button>
+        </BaseTooltip>
+      </div>
+      <div class="bg-muted h-1.5 w-full overflow-hidden rounded-full">
+        <div
+          class="h-full rounded-full transition-all duration-300"
+          :class="storagePercentage > 90 ? 'bg-destructive' : storagePercentage > 70 ? 'bg-yellow-500' : 'bg-primary'"
+          :style="{ width: `${storagePercentage}%` }"
+        />
+      </div>
+    </div>
+
+    <!-- Clear all data dialog -->
+    <AlertDialog v-model:open="showClearDataDialog">
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{{ t('sidebar.clear_all_data_title') }}</AlertDialogTitle>
+          <AlertDialogDescription>
+            {{ t('sidebar.clear_all_data_description') }}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel :disabled="isClearing">
+            {{ t('common.cancel') }}
+          </AlertDialogCancel>
+          <AlertDialogAction
+            class="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            :disabled="isClearing"
+            @click="handleClearAllData"
+          >
+            <span v-if="isClearing" class="i-mingcute-loading-3-line mr-1 animate-spin" />
+            {{ t('sidebar.clear_all_data_confirm') }}
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
 
     <!-- Delete workspace dialog -->
     <WorkspaceDeleteDialog

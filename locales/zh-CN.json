@@ -20,7 +20,12 @@
     "pin_sidebar": "固定侧边栏",
     "unpin_sidebar": "取消固定侧边栏",
     "tabs": "标签页",
-    "no_tabs": "暂无标签页"
+    "no_tabs": "暂无标签页",
+    "storage_usage": "{used} / {total}",
+    "clear_all_data": "清除全部数据",
+    "clear_all_data_title": "清除全部数据",
+    "clear_all_data_description": "这将永久删除所有工作区、标签页和 Schema。此操作无法撤销。",
+    "clear_all_data_confirm": "全部清除"
   },
   "workspace": {
     "create_workspace": "创建工作区",
