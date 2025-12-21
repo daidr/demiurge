@@ -186,7 +186,7 @@ function openSchemaEditor() {
   <!-- Schema Editor Button -->
   <BaseTooltip :text="t('schema.open_editor')">
     <Button size="xs" variant="ghost" class="relative" @click="openSchemaEditor">
-      <span class="i-mingcute-braces-line" />
+      <span class="i-mingcute-file-check-line" />
       <!-- Status badge -->
       <span
         v-if="schemaStatus !== null"

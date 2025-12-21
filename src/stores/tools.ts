@@ -108,6 +108,7 @@ export const useToolsStore = defineStore('tools', () => {
     // For initial load with existing content, calculate immediately
     if (newContent && !sizeTree.value) {
       recalculateSizeTree()
+      triggerAutoRun()
       return
     }
     // For subsequent changes, debounce
@@ -175,6 +176,7 @@ export const useToolsStore = defineStore('tools', () => {
     workspaceStore.setTabPlaygroundMode(tabId, mode)
     playground.value.result = null
     playground.value.error = null
+    triggerAutoRun()
   }
 
   function setPlaygroundExpression(expr: string) {

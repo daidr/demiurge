@@ -5,6 +5,7 @@ import { onUnmounted, shallowRef, watch } from 'vue'
 import { useToolsStore } from '@/stores/tools'
 import MonacoEditor from './base/MonacoEditor.vue'
 import PanelHeader from './base/PanelHeader.vue'
+import FormatJsonButton from './tools/instant/FormatJsonButton.vue'
 import SchemaEditorButton from './tools/instant/SchemaEditorButton.vue'
 import SortJsonButton from './tools/instant/SortJsonButton.vue'
 
@@ -116,6 +117,7 @@ onUnmounted(() => {
   <div class="h-full flex flex-col">
     <PanelHeader title="JSON">
       <SchemaEditorButton />
+      <FormatJsonButton />
       <SortJsonButton />
     </PanelHeader>
     <div class="flex-1 min-h-0">

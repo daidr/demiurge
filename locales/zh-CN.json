@@ -92,6 +92,7 @@
     "size_viewer": "Size Viewer",
     "playground": "Playground",
     "sort_json_keys": "排序 JSON 键",
+    "format_json": "格式化 JSON",
     "tree": "树形",
     "treemap": "矩形树图",
     "sunburst": "旭日图",

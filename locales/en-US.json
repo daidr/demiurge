@@ -92,6 +92,7 @@
     "size_viewer": "Size Viewer",
     "playground": "Playground",
     "sort_json_keys": "Sort JSON Keys",
+    "format_json": "Format JSON",
     "tree": "Tree",
     "treemap": "Treemap",
     "sunburst": "Sunburst",
