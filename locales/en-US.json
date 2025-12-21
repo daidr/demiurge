@@ -63,5 +63,17 @@
     "build_time": "Build Time",
     "commit": "Commit",
     "pull_request": "Pull Request"
+  },
+  "menu": {
+    "file": "File",
+    "new_workspace": "New Workspace",
+    "new_tab": "New Tab",
+    "new_tab_from_clipboard": "New Tab from Clipboard",
+    "new_tab_from_file": "New Tab from File",
+    "export": "Export",
+    "export_current_workspace": "Current Workspace",
+    "export_all_workspaces": "All Workspaces",
+    "remove_tab": "Remove Tab",
+    "remove_workspace": "Remove Workspace"
   }
 }

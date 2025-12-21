@@ -63,5 +63,17 @@
     "build_time": "构建时间",
     "commit": "提交",
     "pull_request": "拉取请求"
+  },
+  "menu": {
+    "file": "文件",
+    "new_workspace": "新建工作区",
+    "new_tab": "新建标签页",
+    "new_tab_from_clipboard": "从剪贴板新建标签页",
+    "new_tab_from_file": "从文件新建标签页",
+    "export": "导出",
+    "export_current_workspace": "当前工作区",
+    "export_all_workspaces": "所有工作区",
+    "remove_tab": "移除标签页",
+    "remove_workspace": "移除工作区"
   }
 }

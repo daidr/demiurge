@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import hotkeys from 'hotkeys-js'
-import { onMounted, onUnmounted, ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import AboutDialog from '@/components/AboutDialog.vue'
 import {
   Menubar,
@@ -15,15 +17,26 @@ import {
   MenubarTrigger,
 } from '@/components/ui/menubar'
 import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
+import WorkspaceCreateDialog from '@/components/WorkspaceCreateDialog.vue'
 import { useLayoutStore } from '@/stores/layout'
 import { useToolsStore } from '@/stores/tools'
+import { useWorkspaceStore } from '@/stores/workspace'
 
 defineProps<{
   disabled?: boolean
 }>()
 
+const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const toolsStore = useToolsStore()
+const workspaceStore = useWorkspaceStore()
+const { activeWorkspaceId } = storeToRefs(workspaceStore)
+
+// Whether tab-related menu items should be disabled
+const isTabMenuDisabled = computed(() => !activeWorkspaceId.value)
+
+// Dialog state for new workspace
+const showNewWorkspaceDialog = ref(false)
 
 const showAboutDialog = ref(false)
 
@@ -42,6 +55,57 @@ async function sortJson() {
   }
 }
 
+function handleNewTab() {
+  if (!activeWorkspaceId.value)
+    return
+  const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'))
+  workspaceStore.setActiveTab(tabId)
+}
+
+async function handleNewTabFromClipboard() {
+  if (!activeWorkspaceId.value)
+    return
+
+  try {
+    const text = await navigator.clipboard.readText()
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'))
+    workspaceStore.setActiveTab(tabId)
+    // Set the content after creating the tab
+    workspaceStore.updateTabContent(tabId, text)
+  }
+  catch {
+    // Clipboard access denied or empty
+  }
+}
+
+async function handleNewTabFromFile() {
+  if (!activeWorkspaceId.value)
+    return
+
+  try {
+    // Use File System Access API
+    const [fileHandle] = await (window as any).showOpenFilePicker({
+      types: [
+        {
+          description: 'JSON files',
+          accept: { 'application/json': ['.json'] },
+        },
+      ],
+      multiple: false,
+    })
+    const file = await fileHandle.getFile()
+    const content = await file.text()
+    // Use file name without extension as tab title
+    const fileName = file.name.replace(/\.json$/i, '') || t('tab.untitled')
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, fileName)
+    workspaceStore.setActiveTab(tabId)
+    workspaceStore.updateTabContent(tabId, content)
+  }
+  catch {
+    // User cancelled or file read error
+  }
+}
+
 onMounted(() => {
   hotkeys('command+b, ctrl+b', (e) => {
     e.preventDefault()
@@ -55,12 +119,36 @@ onMounted(() => {
     e.preventDefault()
     sortJson()
   })
+  hotkeys('command+shift+n, ctrl+shift+n', (e) => {
+    e.preventDefault()
+    showNewWorkspaceDialog.value = true
+    return false
+  })
+  hotkeys('command+n, ctrl+n', (e) => {
+    e.preventDefault()
+    handleNewTab()
+    return false
+  })
+  hotkeys('command+alt+n, ctrl+alt+n', (e) => {
+    e.preventDefault()
+    handleNewTabFromClipboard()
+    return false
+  })
+  hotkeys('command+alt+o, ctrl+alt+o', (e) => {
+    e.preventDefault()
+    handleNewTabFromFile()
+    return false
+  })
 })
 
 onUnmounted(() => {
   hotkeys.unbind('command+b, ctrl+b')
   hotkeys.unbind('command+t, ctrl+t')
   hotkeys.unbind('command+shift+s, ctrl+shift+s')
+  hotkeys.unbind('command+shift+n, ctrl+shift+n')
+  hotkeys.unbind('command+n, ctrl+n')
+  hotkeys.unbind('command+alt+n, ctrl+alt+n')
+  hotkeys.unbind('command+alt+o, ctrl+alt+o')
 })
 </script>
 
@@ -79,35 +167,36 @@ onUnmounted(() => {
       </MenubarContent>
     </MenubarMenu>
     <AboutDialog v-model:open="showAboutDialog" />
+    <WorkspaceCreateDialog v-model:open="showNewWorkspaceDialog" />
     <MenubarMenu v-if="!disabled">
-      <MenubarTrigger>File</MenubarTrigger>
+      <MenubarTrigger>{{ t('menu.file') }}</MenubarTrigger>
       <MenubarContent>
-        <MenubarItem>
-          New Workspace <MenubarShortcut>⌘T</MenubarShortcut>
+        <MenubarItem @click="showNewWorkspaceDialog = true">
+          {{ t('menu.new_workspace') }} <MenubarShortcut>⇧⌘N</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem>
-          New Tab <MenubarShortcut>⌘N</MenubarShortcut>
+        <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTab">
+          {{ t('menu.new_tab') }} <MenubarShortcut>⌘N</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem>
-          New Tab from Clipboard <MenubarShortcut>⌥⌘N</MenubarShortcut>
+        <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTabFromClipboard">
+          {{ t('menu.new_tab_from_clipboard') }} <MenubarShortcut>⌥⌘N</MenubarShortcut>
         </MenubarItem>
-        <MenubarItem>
-          New Tab from File <MenubarShortcut>⌥⌘O</MenubarShortcut>
+        <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTabFromFile">
+          {{ t('menu.new_tab_from_file') }} <MenubarShortcut>⌥⌘O</MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
         <MenubarSub>
-          <MenubarSubTrigger>Export</MenubarSubTrigger>
+          <MenubarSubTrigger>{{ t('menu.export') }}</MenubarSubTrigger>
           <MenubarSubContent>
-            <MenubarItem>Current Workspace</MenubarItem>
-            <MenubarItem>All Workspaces</MenubarItem>
+            <MenubarItem>{{ t('menu.export_current_workspace') }}</MenubarItem>
+            <MenubarItem>{{ t('menu.export_all_workspaces') }}</MenubarItem>
           </MenubarSubContent>
         </MenubarSub>
         <MenubarSeparator />
         <MenubarItem>
-          Remove Tab <MenubarShortcut>⌘W</MenubarShortcut>
+          {{ t('menu.remove_tab') }} <MenubarShortcut>⌘W</MenubarShortcut>
         </MenubarItem>
         <MenubarItem>
-          Remove Workspace <MenubarShortcut>⇧⌘W</MenubarShortcut>
+          {{ t('menu.remove_workspace') }} <MenubarShortcut>⇧⌘W</MenubarShortcut>
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
