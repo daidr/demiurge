@@ -92,7 +92,16 @@ function handleDeleteWorkspace() {
         @update:model-value="handleWorkspaceChange"
       >
         <SelectTrigger class="min-w-0 flex-shrink">
-          <SelectValue :placeholder="t('sidebar.please_select_workspace')" />
+          <SelectValue :placeholder="t('sidebar.please_select_workspace')">
+            <div v-if="activeWorkspace" class="flex items-center gap-2">
+              <span
+                v-if="activeWorkspace.icon"
+                class="text-lg lh-0 before:content-[attr(data-value)]"
+                :data-value="activeWorkspace.icon"
+              />
+              <span class="truncate">{{ activeWorkspace.title }}</span>
+            </div>
+          </SelectValue>
         </SelectTrigger>
         <SelectContent>
           <template v-if="workspaces.length > 0">
