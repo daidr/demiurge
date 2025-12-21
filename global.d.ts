@@ -31,3 +31,18 @@ declare interface GitInfo {
 }
 
 declare const __GIT_DEFINE__: GitInfo
+
+/////////////////////////////
+/// Window Controls Overlay API
+/////////////////////////////
+
+interface WindowControlsOverlay extends EventTarget {
+  visible: boolean
+  getTitlebarAreaRect(): DOMRect
+  addEventListener(type: 'geometrychange', listener: (event: Event) => void): void
+  removeEventListener(type: 'geometrychange', listener: (event: Event) => void): void
+}
+
+interface Navigator {
+  windowControlsOverlay?: WindowControlsOverlay
+}
