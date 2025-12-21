@@ -25,6 +25,22 @@ const workspaceStore = useWorkspaceStore()
 const icon = ref(props.initialInfo?.icon ?? randomEmoji())
 const title = ref(props.initialInfo?.title ?? '')
 
+// Limit icon to single character (grapheme)
+function handleIconInput(e: Event) {
+  const input = e.target as HTMLInputElement
+  const value = input.value
+  // Use Intl.Segmenter to properly handle emoji and other grapheme clusters
+  const segmenter = new Intl.Segmenter('en', { granularity: 'grapheme' })
+  const segments = [...segmenter.segment(value)]
+  if (segments.length > 1) {
+    // Keep only the last grapheme (the newly typed one)
+    icon.value = segments[segments.length - 1].segment
+  }
+  else {
+    icon.value = value
+  }
+}
+
 function handleCreate() {
   if (!title.value.trim())
     return
@@ -57,9 +73,10 @@ function refreshEmoji() {
         <div class="col-span-2 flex gap-1">
           <Input
             id="icon"
-            v-model="icon"
+            :model-value="icon"
             type="text"
-            class="h-8 flex-1"
+            class="h-8 flex-1 text-center text-lg"
+            @input="handleIconInput"
           />
           <Button size="xs" variant="outline" type="button" @click="refreshEmoji">
             <span class="i-mingcute-refresh-2-line" />

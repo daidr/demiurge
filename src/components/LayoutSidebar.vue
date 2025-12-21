@@ -20,6 +20,7 @@ import BaseTooltip from './BaseTooltip.vue'
 import TabList from './TabList.vue'
 import { Button } from './ui/button'
 import WorkspaceDeleteDialog from './WorkspaceDeleteDialog.vue'
+import WorkspaceEditDialog from './WorkspaceEditDialog.vue'
 import WorkspaceEditPanel from './WorkspaceEditPanel.vue'
 
 const { t } = useI18n()
@@ -43,6 +44,9 @@ const deletingWorkspaceTitle = computed(() => {
   const ws = workspaces.value.find(w => w.id === deletingWorkspaceId.value)
   return ws?.title ?? ''
 })
+
+// Edit workspace dialog state
+const showEditDialog = ref(false)
 
 function handleWorkspaceChange(value: unknown) {
   if (typeof value === 'string') {
@@ -182,8 +186,17 @@ function handleDeleteWorkspace() {
         </div>
       </div>
 
-      <!-- Delete workspace button -->
-      <div class="border-t border-border p-2">
+      <!-- Workspace actions -->
+      <div class="flex flex-col gap-1 border-t border-border p-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          class="w-full justify-start"
+          @click="showEditDialog = true"
+        >
+          <div class="i-mingcute-edit-2-line mr-2" />
+          {{ t('workspace.edit_workspace') }}
+        </Button>
         <Button
           variant="ghost"
           size="sm"
@@ -211,6 +224,14 @@ function handleDeleteWorkspace() {
       v-model:open="showDeleteDialog"
       :workspace-id="deletingWorkspaceId"
       :workspace-title="deletingWorkspaceTitle"
+    />
+
+    <!-- Edit workspace dialog -->
+    <WorkspaceEditDialog
+      v-model:open="showEditDialog"
+      :workspace-id="activeWorkspaceId"
+      :initial-icon="activeWorkspace?.icon ?? ''"
+      :initial-title="activeWorkspace?.title ?? ''"
     />
   </div>
 </template>

@@ -16,6 +16,9 @@ import { randomEmoji } from '@/utils/emoji'
 
 const props = defineProps<{
   open: boolean
+  workspaceId: string | null
+  initialIcon: string
+  initialTitle: string
 }>()
 
 const emit = defineEmits<{
@@ -25,14 +28,14 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const workspaceStore = useWorkspaceStore()
 
-const icon = ref(randomEmoji())
+const icon = ref('')
 const title = ref('')
 
 // Reset form when dialog opens
 watch(() => props.open, (isOpen) => {
   if (isOpen) {
-    icon.value = randomEmoji()
-    title.value = ''
+    icon.value = props.initialIcon
+    title.value = props.initialTitle
   }
 })
 
@@ -56,12 +59,14 @@ function handleOpenChange(value: boolean) {
   emit('update:open', value)
 }
 
-function handleCreate() {
-  if (!title.value.trim())
+function handleSave() {
+  if (!title.value.trim() || !props.workspaceId)
     return
 
-  const id = workspaceStore.createWorkspace(title.value.trim(), icon.value)
-  workspaceStore.setActiveWorkspace(id)
+  workspaceStore.updateWorkspace(props.workspaceId, {
+    title: title.value.trim(),
+    icon: icon.value,
+  })
   emit('update:open', false)
 }
 
@@ -74,14 +79,14 @@ function refreshEmoji() {
   <Dialog :open="open" @update:open="handleOpenChange">
     <DialogContent class="sm:max-w-[400px]">
       <DialogHeader>
-        <DialogTitle>{{ t('workspace.create_workspace') }}</DialogTitle>
+        <DialogTitle>{{ t('workspace.edit_workspace') }}</DialogTitle>
       </DialogHeader>
       <div class="grid gap-4 py-4">
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="ws-icon" class="text-right">{{ t('workspace.icon') }}</Label>
+          <Label for="ws-edit-icon" class="text-right">{{ t('workspace.icon') }}</Label>
           <div class="col-span-3 flex gap-2">
             <Input
-              id="ws-icon"
+              id="ws-edit-icon"
               :model-value="icon"
               type="text"
               class="flex-1 text-center text-lg"
@@ -93,14 +98,14 @@ function refreshEmoji() {
           </div>
         </div>
         <div class="grid grid-cols-4 items-center gap-4">
-          <Label for="ws-title" class="text-right">{{ t('workspace.title') }}</Label>
+          <Label for="ws-edit-title" class="text-right">{{ t('workspace.title') }}</Label>
           <Input
-            id="ws-title"
+            id="ws-edit-title"
             v-model="title"
             type="text"
             :placeholder="t('workspace.title_placeholder')"
             class="col-span-3"
-            @keydown.enter="handleCreate"
+            @keydown.enter="handleSave"
           />
         </div>
       </div>
@@ -108,8 +113,8 @@ function refreshEmoji() {
         <Button variant="outline" @click="handleOpenChange(false)">
           {{ t('common.cancel') }}
         </Button>
-        <Button :disabled="!title.trim()" @click="handleCreate">
-          {{ t('common.create') }}
+        <Button :disabled="!title.trim()" @click="handleSave">
+          {{ t('common.save') }}
         </Button>
       </DialogFooter>
     </DialogContent>

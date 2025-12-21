@@ -35,6 +35,11 @@ const { activeWorkspaceId } = storeToRefs(workspaceStore)
 // Whether tab-related menu items should be disabled
 const isTabMenuDisabled = computed(() => !activeWorkspaceId.value)
 
+// Check if running as installed PWA
+const isPWA = window.matchMedia('(display-mode: standalone)').matches
+  || window.matchMedia('(display-mode: window-controls-overlay)').matches
+  || (navigator as any).standalone === true
+
 // Dialog state for new workspace
 const showNewWorkspaceDialog = ref(false)
 
@@ -107,10 +112,16 @@ async function handleNewTabFromFile() {
 }
 
 onMounted(() => {
+  // Toggle sidebar is always available (not affected by PWA mode)
   hotkeys('command+b, ctrl+b', (e) => {
     e.preventDefault()
     toggleSidePanel()
   })
+
+  // Other hotkeys only available in PWA mode
+  if (!isPWA)
+    return
+
   hotkeys('command+t, ctrl+t', (e) => {
     e.preventDefault()
     toggleToolPanel()
@@ -142,7 +153,12 @@ onMounted(() => {
 })
 
 onUnmounted(() => {
+  // Toggle sidebar is always registered
   hotkeys.unbind('command+b, ctrl+b')
+
+  if (!isPWA)
+    return
+
   hotkeys.unbind('command+t, ctrl+t')
   hotkeys.unbind('command+shift+s, ctrl+shift+s')
   hotkeys.unbind('command+shift+n, ctrl+shift+n')
@@ -172,16 +188,24 @@ onUnmounted(() => {
       <MenubarTrigger>{{ t('menu.file') }}</MenubarTrigger>
       <MenubarContent>
         <MenubarItem @click="showNewWorkspaceDialog = true">
-          {{ t('menu.new_workspace') }} <MenubarShortcut>⇧⌘N</MenubarShortcut>
+          {{ t('menu.new_workspace') }} <MenubarShortcut v-if="isPWA">
+            ⇧⌘N
+          </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTab">
-          {{ t('menu.new_tab') }} <MenubarShortcut>⌘N</MenubarShortcut>
+          {{ t('menu.new_tab') }} <MenubarShortcut v-if="isPWA">
+            ⌘N
+          </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTabFromClipboard">
-          {{ t('menu.new_tab_from_clipboard') }} <MenubarShortcut>⌥⌘N</MenubarShortcut>
+          {{ t('menu.new_tab_from_clipboard') }} <MenubarShortcut v-if="isPWA">
+            ⌥⌘N
+          </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTabFromFile">
-          {{ t('menu.new_tab_from_file') }} <MenubarShortcut>⌥⌘O</MenubarShortcut>
+          {{ t('menu.new_tab_from_file') }} <MenubarShortcut v-if="isPWA">
+            ⌥⌘O
+          </MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
         <MenubarSub>
@@ -193,10 +217,14 @@ onUnmounted(() => {
         </MenubarSub>
         <MenubarSeparator />
         <MenubarItem>
-          {{ t('menu.remove_tab') }} <MenubarShortcut>⌘W</MenubarShortcut>
+          {{ t('menu.remove_tab') }} <MenubarShortcut v-if="isPWA">
+            ⌘W
+          </MenubarShortcut>
         </MenubarItem>
         <MenubarItem>
-          {{ t('menu.remove_workspace') }} <MenubarShortcut>⇧⌘W</MenubarShortcut>
+          {{ t('menu.remove_workspace') }} <MenubarShortcut v-if="isPWA">
+            ⇧⌘W
+          </MenubarShortcut>
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
@@ -205,14 +233,13 @@ onUnmounted(() => {
         View
       </MenubarTrigger>
       <MenubarContent>
-        <MenubarItem>
-          Toggle Fullscreen <MenubarShortcut>⌘⌥F</MenubarShortcut>
-        </MenubarItem>
         <MenubarItem @click="toggleSidePanel">
           Toggle Sidebar <MenubarShortcut>⌘B</MenubarShortcut>
         </MenubarItem>
         <MenubarItem @click="toggleToolPanel">
-          Toggle Tool Panel <MenubarShortcut>⌘T</MenubarShortcut>
+          Toggle Tool Panel <MenubarShortcut v-if="isPWA">
+            ⌘T
+          </MenubarShortcut>
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
@@ -222,7 +249,9 @@ onUnmounted(() => {
       </MenubarTrigger>
       <MenubarContent>
         <MenubarItem @click="sortJson">
-          Sort JSON Keys <MenubarShortcut>⇧⌘S</MenubarShortcut>
+          Sort JSON Keys <MenubarShortcut v-if="isPWA">
+            ⇧⌘S
+          </MenubarShortcut>
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
