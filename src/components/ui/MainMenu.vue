@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import hotkeys from 'hotkeys-js'
-import { onMounted, onUnmounted } from 'vue'
+import { onMounted, onUnmounted, ref } from 'vue'
+import AboutDialog from '@/components/AboutDialog.vue'
 import {
   Menubar,
   MenubarContent,
@@ -23,6 +24,8 @@ defineProps<{
 
 const layoutStore = useLayoutStore()
 const toolsStore = useToolsStore()
+
+const showAboutDialog = ref(false)
 
 function toggleSidePanel() {
   layoutStore.toggleSidebar()
@@ -70,11 +73,12 @@ onUnmounted(() => {
           Preferences <MenubarShortcut>⌘,</MenubarShortcut>
         </MenubarItem> -->
         <!-- <MenubarSeparator /> -->
-        <MenubarItem>
+        <MenubarItem @click="showAboutDialog = true">
           About
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
+    <AboutDialog v-model:open="showAboutDialog" />
     <MenubarMenu v-if="!disabled">
       <MenubarTrigger>File</MenubarTrigger>
       <MenubarContent>

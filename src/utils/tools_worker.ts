@@ -150,7 +150,6 @@ class ToolsWorker {
       let parsed = JSON.parse(jsonString)
       if (flatten) {
         parsed = flattenJson(parsed)
-        console.log(parsed)
       }
       const totalSize = getByteSize(JSON.stringify(parsed))
       return buildSizeTree('root', '', parsed, totalSize)

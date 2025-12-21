@@ -47,7 +47,7 @@ export default defineConfig({
       collections: {
         mingcute: () => import('@iconify-json/mingcute/icons.json').then(i => i.default),
         custom: {
-          'json-baker': () => fs.readFile('./design/logo-compressed.svg', 'utf-8'),
+          demiurge: () => fs.readFile('./design/logo-compressed.svg', 'utf-8'),
         },
       },
     }),

@@ -24,7 +24,7 @@ const forwardedProps = useForwardProps(delegatedProps)
     )
     "
   >
-    <div class="i-custom-json-baker text-lg" />
+    <div class="i-custom-demiurge text-lg" />
     Demiurge
   </MenubarTrigger>
 </template>

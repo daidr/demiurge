@@ -12,3 +12,20 @@ interface FileSystemDirectoryHandle {
   keys: () => FileSystemDirectoryHandleAsyncIterator<string>
   values: () => FileSystemDirectoryHandleAsyncIterator<FileSystemHandle>
 }
+
+/////////////////////////////
+/// Git Define
+/////////////////////////////
+
+declare interface GitInfo {
+  owner: string
+  repo: string
+  branch: string
+  pr: string
+  commitHash: string
+  shortCommitHash: string
+  commitMessage: string
+  commitTimestamp: string
+}
+
+declare const __GIT_DEFINE__: GitInfo

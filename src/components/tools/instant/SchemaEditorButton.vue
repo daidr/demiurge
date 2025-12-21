@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { editor as monacoEditor } from 'monaco-editor'
-import { editor, languages, Uri } from 'monaco-editor'
+import { editor, json, Uri } from 'monaco-editor'
 import { storeToRefs } from 'pinia'
 import { ref, shallowRef, watch } from 'vue'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
@@ -10,7 +10,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { useToolsStore } from '@/stores/tools'
 
 // Configure JSON schema validation for the schema editor
-languages.json.jsonDefaults.setDiagnosticsOptions({
+json.jsonDefaults.setDiagnosticsOptions({
   schemas: [
     {
       uri: 'http://json-schema.org/draft-07/schema',
@@ -46,7 +46,7 @@ function onEditorMounted(_editor: monacoEditor.IStandaloneCodeEditor) {
   model = editor.createModel(
     currentJsonSchema.value,
     'json',
-    Uri.parse('internal://json-baker/json-schema.json'),
+    Uri.parse('internal://demiurge/json-schema.json'),
   )
   _editor.setModel(model)
   _editor.onDidChangeModelContent(() => {

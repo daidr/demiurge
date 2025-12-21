@@ -23,5 +23,14 @@
     "json-schema": {
       "placeholder": "在此输入 JSON Schema"
     }
+  },
+  "about": {
+    "description": "一款前端 JSON 处理工具，支持工作区编辑、Schema 验证和交互式工具。",
+    "version": "版本",
+    "author": "作者",
+    "license": "许可证",
+    "build_time": "构建时间",
+    "commit": "提交",
+    "pull_request": "拉取请求"
   }
 }

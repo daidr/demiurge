@@ -17,5 +17,14 @@
     "json-schema": {
       "placeholder": "Enter JSON Schema here"
     }
+  },
+  "about": {
+    "description": "A frontend JSON processing tool with workspace-based editing, schema validation, and interactive tools.",
+    "version": "Version",
+    "author": "Author",
+    "license": "License",
+    "build_time": "Build Time",
+    "commit": "Commit",
+    "pull_request": "Pull Request"
   }
 }

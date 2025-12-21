@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { editor, languages, Uri } from 'monaco-editor'
+import { editor, json, Uri } from 'monaco-editor'
 import { ref, shallowRef, watch } from 'vue'
 import MonacoEditor from './base/MonacoEditor.vue'
 
-languages.json.jsonDefaults.setDiagnosticsOptions({
+json.jsonDefaults.setDiagnosticsOptions({
   schemas: [
     {
       uri: 'http://json-schema.org/draft-07/schema',
@@ -31,7 +31,7 @@ function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
   model = editor.createModel(
     code.value,
     'json',
-    Uri.parse('internal://json-baker/json-schema.json'),
+    Uri.parse('internal://demiurge/json-schema.json'),
   )
   _editor.setModel(model)
   _editor.onDidChangeModelContent(() => {
@@ -55,9 +55,7 @@ function onEditorUnmounted() {
       formatOnType: true,
       formatOnPaste: true,
       placeholder: $t('editor.json-schema.placeholder'),
-    }"
-    @mounted="onEditorMounted"
-    @unmounted="onEditorUnmounted"
+    }" @mounted="onEditorMounted" @unmounted="onEditorUnmounted"
   />
 </template>
 

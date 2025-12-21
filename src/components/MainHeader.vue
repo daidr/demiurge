@@ -19,7 +19,7 @@ const { isBrowserSupported, showSidebar } = storeToRefs(layoutStore)
     </div>
     <div class="flex gap-1 p-1">
       <Button
-        size="xs" variant="outline" as="a" href="https://github.com/daidr/json-baker" target="_blank"
+        size="xs" variant="outline" as="a" href="https://github.com/daidr/demiurge" target="_blank"
         rel="noopener noreferrer"
       >
         <div class="i-mingcute-github-line" />
