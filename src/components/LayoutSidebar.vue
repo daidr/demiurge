@@ -13,6 +13,13 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog'
+import {
   Popover,
   PopoverContent,
   PopoverTrigger,
@@ -144,6 +151,9 @@ onUnmounted(() => {
 // Clear all data
 const showClearDataDialog = ref(false)
 const isClearing = ref(false)
+
+// Storage info dialog
+const showStorageInfoDialog = ref(false)
 
 async function handleClearAllData() {
   isClearing.value = true
@@ -310,8 +320,12 @@ async function handleClearAllData() {
       class="border-t border-border px-2 py-2"
     >
       <div class="mb-1 flex items-center justify-between">
-        <span class="text-muted-foreground text-xs">
+        <span class="text-muted-foreground flex items-center gap-1 text-xs">
           {{ t('sidebar.storage_usage', { used: formattedUsage, total: formattedQuota }) }}
+          <button
+            class="text-muted-foreground/50 hover:text-muted-foreground i-mingcute-information-line cursor-pointer transition-colors"
+            @click="showStorageInfoDialog = true"
+          />
         </span>
         <BaseTooltip :text="t('sidebar.clear_all_data')">
           <Button
@@ -372,5 +386,17 @@ async function handleClearAllData() {
       :initial-icon="activeWorkspace?.icon ?? ''"
       :initial-title="activeWorkspace?.title ?? ''"
     />
+
+    <!-- Storage info dialog -->
+    <Dialog v-model:open="showStorageInfoDialog">
+      <DialogContent class="max-w-sm">
+        <DialogHeader>
+          <DialogTitle>{{ t('sidebar.storage_info_title') }}</DialogTitle>
+          <DialogDescription class="whitespace-pre-line">
+            {{ t('sidebar.storage_info_description') }}
+          </DialogDescription>
+        </DialogHeader>
+      </DialogContent>
+    </Dialog>
   </div>
 </template>

@@ -22,6 +22,8 @@
     "tabs": "标签页",
     "no_tabs": "暂无标签页",
     "storage_usage": "{used} / {total}",
+    "storage_info_title": "存储空间说明",
+    "storage_info_description": "「已用」是浏览器估算的本应用占用空间，包含您的数据和缓存文件。\n\n「总量」是浏览器分配给本应用的大致上限，仅供参考。\n\n储存容量及上限由浏览器自动管理，无需担心。",
     "clear_all_data": "清除全部数据",
     "clear_all_data_title": "清除全部数据",
     "clear_all_data_description": "这将永久删除所有工作区、标签页和 Schema。此操作无法撤销。",

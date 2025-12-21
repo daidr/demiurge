@@ -22,6 +22,8 @@
     "tabs": "Tabs",
     "no_tabs": "No tabs yet",
     "storage_usage": "{used} / {total}",
+    "storage_info_title": "Storage Info",
+    "storage_info_description": "\"Used\" shows how much space this app is using, including your data and cached files.\n\n\"Total\" is the approximate limit allocated by your browser.\n\nStorage capacity and limits are managed automatically by your browser - nothing to worry about!",
     "clear_all_data": "Clear All Data",
     "clear_all_data_title": "Clear All Data",
     "clear_all_data_description": "This will permanently delete all workspaces, tabs, and schemas. This action cannot be undone.",
