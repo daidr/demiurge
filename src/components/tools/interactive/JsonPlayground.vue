@@ -134,7 +134,9 @@ onUnmounted(() => {
 
     <!-- Expression Editor (top half) -->
     <div class="min-h-0 flex-1 overflow-hidden rounded-md border">
-      <div class="text-muted-foreground bg-muted/50 border-b px-2 py-1 text-xs">
+      <div class="text-muted-foreground bg-muted/50 border-b px-2 py-1 text-xs flex items-center gap-1">
+        <span class="i-mingcute-code-line" />
+        <span class="font-medium">{{ t('tools.expression') }}</span>
         <template v-if="playgroundMode === 'javascript'">
           <i18n-t keypath="tools.expression_hint_js" tag="span">
             <template #dollar>
@@ -175,7 +177,7 @@ onUnmounted(() => {
       <div class="text-muted-foreground bg-muted/50 flex items-center gap-1 border-b px-2 py-1 text-xs">
         <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
         <span v-else class="i-mingcute-check-circle-line text-green-600" />
-        {{ t('tools.result') }}
+        <span class="font-medium">{{ t('tools.result') }}</span>
         <span v-if="playground.executionTime !== null" class="text-muted-foreground/70 ml-auto">
           {{ playground.executionTime.toFixed(1) }} ms
         </span>
