@@ -103,6 +103,7 @@
     "expression": "表达式",
     "expression_hint_js": "使用 {dollar} 或 {data} 访问 JSON",
     "expression_hint_jsonpath": "例如 {example}",
-    "result": "结果"
+    "result": "结果",
+    "alt_click_hint": "Alt+点击跳转"
   }
 }

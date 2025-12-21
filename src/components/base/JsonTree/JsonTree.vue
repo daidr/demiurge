@@ -81,6 +81,15 @@ function handleExpandedChange(keys: string[]) {
 function handleNodeClick(node: JsonSizeNode, event: MouseEvent) {
   emit('nodeClick', node.path, event)
 }
+
+// Capture phase handler to intercept alt+click before TreeItem handles it
+function handleClickCapture(node: JsonSizeNode, event: MouseEvent) {
+  if (event.altKey) {
+    event.stopPropagation()
+    event.preventDefault()
+    emit('nodeClick', node.path, event)
+  }
+}
 </script>
 
 <template>
@@ -107,6 +116,7 @@ function handleNodeClick(node: JsonSizeNode, event: MouseEvent) {
           'focus:bg-accent',
           hasChildren(item.value as JsonSizeNode) && 'font-medium',
         )"
+        @click.capture="handleClickCapture(item.value as JsonSizeNode, $event)"
         @click="handleNodeClick(item.value as JsonSizeNode, $event)"
       >
         <!-- Expand/collapse icon -->

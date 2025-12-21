@@ -103,6 +103,7 @@
     "expression": "Expression",
     "expression_hint_js": "use {dollar} or {data} to access JSON",
     "expression_hint_jsonpath": "e.g., {example}",
-    "result": "Result"
+    "result": "Result",
+    "alt_click_hint": "Alt+Click to navigate"
   }
 }

@@ -65,6 +65,10 @@ function handleNodeClick(path: string, event: MouseEvent) {
         />
         {{ t('tools.flatten') }}
       </Label>
+
+      <span v-if="!flattenEnabled" class="text-muted-foreground/60 text-xs ml-auto">
+        {{ t('tools.alt_click_hint') }}
+      </span>
     </div>
 
     <!-- Content -->
