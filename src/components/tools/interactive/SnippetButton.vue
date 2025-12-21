@@ -19,6 +19,7 @@ const { t } = useI18n()
 const snippetStore = useSnippetStore()
 const toolsStore = useToolsStore()
 const { snippets, selectedSnippetId, selectedSnippet, isEditMode } = storeToRefs(snippetStore)
+const { playgroundAutoRun } = storeToRefs(toolsStore)
 
 const isOpen = ref(false)
 
@@ -75,6 +76,7 @@ function handleCreateSnippet() {
 function handleDeleteSnippet() {
   if (selectedSnippetId.value) {
     snippetStore.deleteSnippet(selectedSnippetId.value)
+    snippetStore.setEditMode(false)
   }
 }
 
@@ -116,6 +118,11 @@ function handleApply() {
   if (selectedSnippet.value) {
     toolsStore.setPlaygroundMode(selectedSnippet.value.mode)
     toolsStore.setPlaygroundExpression(selectedSnippet.value.content)
+    // Trigger immediate execution if auto-run is enabled
+    if (playgroundAutoRun.value) {
+      toolsStore.executePlayground()
+    }
+    snippetStore.setEditMode(false)
     isOpen.value = false
   }
 }
