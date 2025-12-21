@@ -95,20 +95,26 @@ function handleDeleteWorkspace() {
           <SelectValue :placeholder="t('sidebar.please_select_workspace')" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem
-            v-for="ws in workspaces"
-            :key="ws.id"
-            :value="ws.id"
-          >
-            <div class="flex items-center gap-2">
-              <span
-                v-if="ws.icon"
-                class="text-lg lh-0 before:content-[attr(data-value)]"
-                :data-value="ws.icon"
-              />
-              <span>{{ ws.title }}</span>
-            </div>
-          </SelectItem>
+          <template v-if="workspaces.length > 0">
+            <SelectItem
+              v-for="ws in workspaces"
+              :key="ws.id"
+              :value="ws.id"
+            >
+              <div class="flex items-center gap-2">
+                <span
+                  v-if="ws.icon"
+                  class="text-lg lh-0 before:content-[attr(data-value)]"
+                  :data-value="ws.icon"
+                />
+                <span>{{ ws.title }}</span>
+              </div>
+            </SelectItem>
+          </template>
+          <div v-else class="text-muted-foreground px-2 py-4 text-center text-sm">
+            <div class="i-mingcute-folder-line mx-auto mb-2 text-xl opacity-50" />
+            <span>{{ t('sidebar.no_workspaces') }}</span>
+          </div>
         </SelectContent>
       </Select>
 

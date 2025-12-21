@@ -16,6 +16,7 @@
   "sidebar": {
     "workspaces": "Workspaces",
     "please_select_workspace": "Please select a workspace",
+    "no_workspaces": "No workspaces yet",
     "pin_sidebar": "Pin sidebar",
     "unpin_sidebar": "Unpin sidebar",
     "tabs": "Tabs",
