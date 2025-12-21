@@ -2,6 +2,7 @@ import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
+import { ROOT_PATH } from '@/components/base/JsonTree/types'
 import { schemasCollection } from '@/db'
 import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
@@ -160,7 +161,7 @@ export const useToolsStore = defineStore('tools', () => {
   // Collect all paths from a tree node (for expanding all)
   function collectAllPaths(node: JsonSizeNode, paths: Set<string> = new Set()): Set<string> {
     if (node.children && node.children.length > 0) {
-      const key = node.path || 'root'
+      const key = node.path || ROOT_PATH
       paths.add(key)
       for (const child of node.children) {
         collectAllPaths(child, paths)

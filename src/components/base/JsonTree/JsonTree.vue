@@ -3,6 +3,7 @@ import type { JsonSizeNode } from './types'
 import { TreeItem, TreeRoot, TreeVirtualizer } from 'reka-ui'
 import { computed } from 'vue'
 import { cn } from '@/lib/utils'
+import { ROOT_PATH } from './types'
 
 const props = defineProps<{
   node: JsonSizeNode
@@ -21,7 +22,7 @@ const items = computed(() => [props.node])
 const expandedArray = computed(() => Array.from(props.expandedPaths))
 
 function getKey(item: JsonSizeNode) {
-  return item.path || 'root'
+  return item.path || ROOT_PATH
 }
 
 function getChildren(item: JsonSizeNode) {

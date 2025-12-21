@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import type { ISunburstChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
+import {
+  registerCustomAnimate,
+} from '@visactor/vchart/esm/animation'
 import { registerSunburstChart } from '@visactor/vchart/esm/chart'
-// 引入坐标轴、Tooltip、CrossHair组件
 import { registerTooltip } from '@visactor/vchart/esm/component'
 import { VChart } from '@visactor/vchart/esm/core'
+import { registerDomTooltipHandler } from '@visactor/vchart/esm/plugin/components/tooltip-handler'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { cn } from '@/lib/utils'
 
@@ -17,7 +20,7 @@ const emit = defineEmits<{
   nodeClick: [path: string, event: MouseEvent]
 }>()
 
-VChart.useRegisters([registerSunburstChart, registerTooltip])
+VChart.useRegisters([registerSunburstChart, registerTooltip, registerDomTooltipHandler, registerCustomAnimate])
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const chartInstance = shallowRef<VChart | null>(null)
@@ -224,7 +227,7 @@ watch(() => props.node, () => {
 </script>
 
 <template>
-  <div :class="cn('w-full h-full', props.class)">
+  <div :class="cn('w-full h-full overflow-hidden', props.class)">
     <div ref="containerRef" class="w-full h-full" />
   </div>
 </template>
