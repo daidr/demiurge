@@ -75,6 +75,7 @@
   "menu": {
     "file": "File",
     "view": "View",
+    "tools": "Tools",
     "new_workspace": "New Workspace",
     "new_tab": "New Tab",
     "new_tab_from_clipboard": "New Tab from Clipboard",
@@ -85,7 +86,8 @@
     "remove_tab": "Remove Tab",
     "remove_workspace": "Remove Workspace",
     "toggle_sidebar": "Toggle Sidebar",
-    "toggle_tool_panel": "Toggle Tool Panel"
+    "toggle_tool_panel": "Toggle Tool Panel",
+    "json_diff": "JSON Diff"
   },
   "tools": {
     "title": "Tools",
@@ -125,5 +127,11 @@
     "offline_ready": "Offline Ready",
     "offline_description": "App is ready to work offline.",
     "reload": "Reload"
+  },
+  "diff": {
+    "title": "JSON Diff",
+    "left_tab": "Left",
+    "right_tab": "Right",
+    "select_tab": "Select a tab"
   }
 }

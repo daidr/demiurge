@@ -75,6 +75,7 @@
   "menu": {
     "file": "文件",
     "view": "视图",
+    "tools": "工具",
     "new_workspace": "新建工作区",
     "new_tab": "新建标签页",
     "new_tab_from_clipboard": "从剪贴板新建标签页",
@@ -85,7 +86,8 @@
     "remove_tab": "移除标签页",
     "remove_workspace": "移除工作区",
     "toggle_sidebar": "切换侧边栏",
-    "toggle_tool_panel": "切换工具面板"
+    "toggle_tool_panel": "切换工具面板",
+    "json_diff": "JSON 对比"
   },
   "tools": {
     "title": "工具",
@@ -125,5 +127,11 @@
     "offline_ready": "离线就绪",
     "offline_description": "应用已可离线使用。",
     "reload": "重新加载"
+  },
+  "diff": {
+    "title": "JSON 对比",
+    "left_tab": "左侧",
+    "right_tab": "右侧",
+    "select_tab": "选择标签页"
   }
 }

@@ -4,6 +4,7 @@ import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AboutDialog from '@/components/AboutDialog.vue'
+import DiffWindow from '@/components/DiffWindow.vue'
 import {
   Menubar,
   MenubarContent,
@@ -26,7 +27,7 @@ defineProps<{
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
 const workspaceStore = useWorkspaceStore()
-const { activeWorkspaceId, activeTabId, activeWorkspace, hasActiveTab } = storeToRefs(workspaceStore)
+const { activeWorkspaceId, activeTabId, activeWorkspace, hasActiveTab, sortedTabs } = storeToRefs(workspaceStore)
 
 // Whether tab-related menu items should be disabled (no workspace selected)
 const isTabMenuDisabled = computed(() => !activeWorkspaceId.value)
@@ -40,6 +41,9 @@ const isToolPanelDisabled = computed(() => !hasActiveTab.value)
 // Whether remove workspace should be disabled (no workspace selected)
 const isRemoveWorkspaceDisabled = computed(() => !activeWorkspaceId.value)
 
+// Whether diff menu should be disabled (no workspace or no tabs)
+const isDiffDisabled = computed(() => !activeWorkspaceId.value || sortedTabs.value.length === 0)
+
 // Active workspace title for delete dialog
 const activeWorkspaceTitle = computed(() => activeWorkspace.value?.title ?? '')
 
@@ -52,6 +56,9 @@ const isPWA = window.matchMedia('(display-mode: standalone)').matches
 const showNewWorkspaceDialog = ref(false)
 
 const showAboutDialog = ref(false)
+
+// DiffWindow state
+const showDiffWindow = ref(false)
 
 function toggleSidePanel() {
   layoutStore.toggleSidebar()
@@ -263,6 +270,15 @@ onUnmounted(() => {
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
+    <MenubarMenu v-if="!disabled">
+      <MenubarTrigger>{{ t('menu.tools') }}</MenubarTrigger>
+      <MenubarContent>
+        <MenubarItem :disabled="isDiffDisabled" @click="showDiffWindow = true">
+          {{ t('menu.json_diff') }}
+        </MenubarItem>
+      </MenubarContent>
+    </MenubarMenu>
+    <DiffWindow v-model="showDiffWindow" />
   </Menubar>
 </template>
 
