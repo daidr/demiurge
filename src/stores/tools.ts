@@ -1,54 +1,78 @@
 import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import { acceptHMRUpdate, defineStore } from 'pinia'
-import { ref, shallowRef } from 'vue'
+import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
+import { computed, ref, shallowRef, watch } from 'vue'
+import { schemasCollection } from '@/db'
 import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
+import { useWorkspaceStore } from './workspace'
 
-export type InteractiveTool = 'size-viewer' | 'playground'
-export type PlaygroundMode = 'javascript' | 'jsonpath'
-export type SizeViewerMode = 'tree' | 'treemap' | 'sunburst'
+// Re-export types from db for convenience
+export type { InteractiveTool, PlaygroundMode, SizeViewerMode } from '@/db'
 
 export interface PlaygroundState {
-  mode: PlaygroundMode
-  expression: string
   result: string | null
   error: string | null
   isExecuting: boolean
-  autoRun: boolean
   executionTime: number | null
 }
 
 export const useToolsStore = defineStore('tools', () => {
-  // Active interactive tool tab
-  const activeTab = ref<InteractiveTool>('size-viewer')
+  const workspaceStore = useWorkspaceStore()
+  const { activeTab: activeTabData, activeTabId } = storeToRefs(workspaceStore)
 
-  // JSON Size Viewer state
+  // ========== Computed from Tab (persisted state) ==========
+
+  // Active tool tab
+  const activeToolTab = computed(() => activeTabData.value?.activeToolTab ?? 'size-viewer')
+
+  // Size Viewer mode
+  const sizeViewerMode = computed(() => activeTabData.value?.sizeViewerMode ?? 'tree')
+
+  // Flatten enabled
+  const flattenEnabled = computed(() => activeTabData.value?.flattenEnabled ?? false)
+
+  // Playground mode
+  const playgroundMode = computed(() => activeTabData.value?.playgroundMode ?? 'javascript')
+
+  // Playground expression
+  const playgroundExpression = computed(() => activeTabData.value?.playgroundExpression ?? '')
+
+  // Playground auto-run
+  const playgroundAutoRun = computed(() => activeTabData.value?.playgroundAutoRun ?? false)
+
+  // Current JSON content
+  const currentJsonContent = computed(() => activeTabData.value?.content ?? '')
+
+  // Current schema ID
+  const currentSchemaId = computed(() => activeTabData.value?.schemaId ?? null)
+
+  // Current JSON schema content (from schema collection)
+  const currentJsonSchema = computed(() => {
+    const schemaId = currentSchemaId.value
+    if (!schemaId)
+      return ''
+    const schema = schemasCollection.findOne({ id: schemaId })
+    return schema?.content ?? ''
+  })
+
+  // ========== Runtime State (not persisted) ==========
+
+  // JSON Size Viewer runtime state
   const sizeTree = ref<JsonSizeNode | null>(null)
   const expandedPaths = ref<Set<string>>(new Set())
-  const sizeViewerMode = ref<SizeViewerMode>('tree')
-  const flattenEnabled = ref<boolean>(false)
   const isCalculating = ref<boolean>(false)
 
   // Sort JSON state
   const isSorting = ref<boolean>(false)
 
-  // JSON Schema state
-  const currentJsonSchema = ref<string>('')
-
-  // Playground state
+  // Playground runtime state
   const playground = ref<PlaygroundState>({
-    mode: 'javascript',
-    expression: '',
     result: null,
     error: null,
     isExecuting: false,
-    autoRun: false,
     executionTime: null,
   })
-
-  // Current JSON content (will be set from workspace)
-  const currentJsonContent = ref<string>('')
 
   // Editor reference (set by LayoutJsonEditor)
   const editorRef = shallowRef<editor.IStandaloneCodeEditor | null>(null)
@@ -58,8 +82,47 @@ export const useToolsStore = defineStore('tools', () => {
   // Debounce timer for playground auto-run
   let playgroundDebounceTimer: ReturnType<typeof setTimeout> | null = null
 
-  function setActiveTab(tab: InteractiveTool) {
-    activeTab.value = tab
+  // ========== Watchers for recalculation ==========
+
+  // Watch for tab changes to reset runtime state
+  watch(activeTabId, () => {
+    sizeTree.value = null
+    expandedPaths.value = new Set()
+    playground.value = {
+      result: null,
+      error: null,
+      isExecuting: false,
+      executionTime: null,
+    }
+    // Recalculate size tree when tab changes
+    if (activeTabData.value?.content) {
+      recalculateSizeTree()
+    }
+  })
+
+  // Watch for content changes
+  watch(currentJsonContent, () => {
+    if (debounceTimer) {
+      clearTimeout(debounceTimer)
+    }
+    debounceTimer = setTimeout(() => {
+      recalculateSizeTree()
+      triggerAutoRun()
+    }, 300)
+  })
+
+  // Watch for flatten changes
+  watch(flattenEnabled, () => {
+    recalculateSizeTree()
+  })
+
+  // ========== Actions ==========
+
+  function setActiveToolTab(tab: 'size-viewer' | 'playground') {
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabActiveToolTab(tabId, tab)
   }
 
   function toggleSizeTreeNode(path: string) {
@@ -73,17 +136,21 @@ export const useToolsStore = defineStore('tools', () => {
     expandedPaths.value = newPaths
   }
 
-  function setSizeViewerMode(mode: SizeViewerMode) {
-    sizeViewerMode.value = mode
+  function setSizeViewerMode(mode: 'tree' | 'treemap' | 'sunburst') {
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabSizeViewerMode(tabId, mode)
   }
 
   function setFlattenEnabled(enabled: boolean) {
-    flattenEnabled.value = enabled
-    recalculateSizeTree()
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabFlattenEnabled(tabId, enabled)
   }
 
   // Collect all paths from a tree node (for expanding all)
-  // Uses same key logic as JsonTree component: empty path becomes 'root'
   function collectAllPaths(node: JsonSizeNode, paths: Set<string> = new Set()): Set<string> {
     if (node.children && node.children.length > 0) {
       const key = node.path || 'root'
@@ -95,26 +162,35 @@ export const useToolsStore = defineStore('tools', () => {
     return paths
   }
 
-  function setPlaygroundMode(mode: PlaygroundMode) {
-    playground.value.mode = mode
+  function setPlaygroundMode(mode: 'javascript' | 'jsonpath') {
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabPlaygroundMode(tabId, mode)
     playground.value.result = null
     playground.value.error = null
   }
 
   function setPlaygroundExpression(expr: string) {
-    playground.value.expression = expr
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabPlaygroundExpression(tabId, expr)
     triggerAutoRun()
   }
 
   function setPlaygroundAutoRun(enabled: boolean) {
-    playground.value.autoRun = enabled
-    if (enabled && playground.value.expression.trim()) {
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabPlaygroundAutoRun(tabId, enabled)
+    if (enabled && playgroundExpression.value.trim()) {
       executePlayground()
     }
   }
 
   function triggerAutoRun() {
-    if (!playground.value.autoRun || !playground.value.expression.trim()) {
+    if (!playgroundAutoRun.value || !playgroundExpression.value.trim()) {
       return
     }
 
@@ -156,16 +232,10 @@ export const useToolsStore = defineStore('tools', () => {
   }
 
   function setCurrentJsonContent(content: string) {
-    currentJsonContent.value = content
-
-    // Debounce recalculation to avoid excessive worker calls during typing
-    if (debounceTimer) {
-      clearTimeout(debounceTimer)
-    }
-    debounceTimer = setTimeout(() => {
-      recalculateSizeTree()
-      triggerAutoRun()
-    }, 300)
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.updateTabContent(tabId, content)
   }
 
   async function executePlayground() {
@@ -186,8 +256,8 @@ export const useToolsStore = defineStore('tools', () => {
       const worker = await getToolsWorker()
       const { result, error } = await worker.executePlayground(
         content,
-        playground.value.expression,
-        playground.value.mode,
+        playgroundExpression.value,
+        playgroundMode.value,
       )
       playground.value.result = result
       playground.value.error = error
@@ -221,8 +291,11 @@ export const useToolsStore = defineStore('tools', () => {
     }
   }
 
-  function setCurrentJsonSchema(schema: string) {
-    currentJsonSchema.value = schema
+  function setTabSchemaId(schemaId: string | null) {
+    const tabId = activeTabId.value
+    if (!tabId)
+      return
+    workspaceStore.setTabSchemaId(tabId, schemaId)
   }
 
   function setEditorRef(editor: editor.IStandaloneCodeEditor | null) {
@@ -248,17 +321,26 @@ export const useToolsStore = defineStore('tools', () => {
   }
 
   return {
-    activeTab,
-    sizeTree,
-    expandedPaths,
+    // Computed from Tab (persisted)
+    activeToolTab,
     sizeViewerMode,
     flattenEnabled,
+    playgroundMode,
+    playgroundExpression,
+    playgroundAutoRun,
+    currentJsonContent,
+    currentSchemaId,
+    currentJsonSchema,
+
+    // Runtime state (not persisted)
+    sizeTree,
+    expandedPaths,
     isCalculating,
     isSorting,
     playground,
-    currentJsonContent,
-    currentJsonSchema,
-    setActiveTab,
+
+    // Actions
+    setActiveToolTab,
     toggleSizeTreeNode,
     setSizeViewerMode,
     setFlattenEnabled,
@@ -266,7 +348,7 @@ export const useToolsStore = defineStore('tools', () => {
     setPlaygroundExpression,
     setPlaygroundAutoRun,
     setCurrentJsonContent,
-    setCurrentJsonSchema,
+    setTabSchemaId,
     setEditorRef,
     navigateToJsonPath,
     executePlayground,

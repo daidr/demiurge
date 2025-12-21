@@ -6,18 +6,48 @@
     "en-US": "英语 (美国)",
     "zh-CN": "简体中文"
   },
+  "common": {
+    "create": "创建",
+    "cancel": "取消",
+    "delete": "删除",
+    "save": "保存",
+    "confirm": "确认"
+  },
   "sidebar": {
     "workspaces": "工作区",
-    "draft_workspace": "草稿工作区",
     "please_select_workspace": "请选择工作区",
     "pin_sidebar": "固定侧边栏",
-    "unpin_sidebar": "取消固定侧边栏"
+    "unpin_sidebar": "取消固定侧边栏",
+    "tabs": "标签页",
+    "no_tabs": "暂无标签页"
   },
   "workspace": {
     "create_workspace": "创建工作区",
     "edit_workspace": "编辑工作区",
+    "delete_workspace": "删除工作区",
     "icon": "图标",
-    "label": "标签"
+    "title": "标题",
+    "title_placeholder": "请输入工作区标题",
+    "delete_confirm": "确定要删除工作区 \"{title}\" 吗？此操作无法撤销。",
+    "delete_warning_has_tabs": "工作区 \"{title}\" 包含 {count} 个标签页，删除后数据将无法恢复。",
+    "delete_confirm_with_tabs": "确定要删除工作区 \"{title}\" 及其 {count} 个标签页吗？此操作无法撤销！",
+    "confirm_delete": "确认删除"
+  },
+  "tab": {
+    "untitled": "未命名",
+    "create_tab": "新建标签页"
+  },
+  "schema": {
+    "editor_title": "JSON Schema 编辑器",
+    "select_schema": "选择 Schema",
+    "no_schema": "无 Schema",
+    "edit_mode": "编辑模式",
+    "create_schema": "创建 Schema",
+    "name": "名称",
+    "name_placeholder": "请输入 Schema 名称"
+  },
+  "empty_state": {
+    "select_or_create_tab": "请选择或创建一个标签页以开始"
   },
   "editor": {
     "json-schema": {

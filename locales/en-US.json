@@ -6,12 +6,48 @@
     "en-US": "English (US)",
     "zh-CN": "Simplified Chinese"
   },
+  "common": {
+    "create": "Create",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "save": "Save",
+    "confirm": "Confirm"
+  },
   "sidebar": {
     "workspaces": "Workspaces",
-    "draft_workspace": "Draft Workspace",
     "please_select_workspace": "Please select a workspace",
     "pin_sidebar": "Pin sidebar",
-    "unpin_sidebar": "Unpin sidebar"
+    "unpin_sidebar": "Unpin sidebar",
+    "tabs": "Tabs",
+    "no_tabs": "No tabs yet"
+  },
+  "workspace": {
+    "create_workspace": "Create Workspace",
+    "edit_workspace": "Edit Workspace",
+    "delete_workspace": "Delete Workspace",
+    "icon": "Icon",
+    "title": "Title",
+    "title_placeholder": "Enter workspace title",
+    "delete_confirm": "Are you sure you want to delete workspace \"{title}\"? This action cannot be undone.",
+    "delete_warning_has_tabs": "Workspace \"{title}\" contains {count} tab(s). All data will be lost.",
+    "delete_confirm_with_tabs": "Are you sure you want to delete workspace \"{title}\" and its {count} tab(s)? This action cannot be undone!",
+    "confirm_delete": "Confirm Delete"
+  },
+  "tab": {
+    "untitled": "Untitled",
+    "create_tab": "New Tab"
+  },
+  "schema": {
+    "editor_title": "JSON Schema Editor",
+    "select_schema": "Select Schema",
+    "no_schema": "No Schema",
+    "edit_mode": "Edit Mode",
+    "create_schema": "Create Schema",
+    "name": "Name",
+    "name_placeholder": "Enter schema name"
+  },
+  "empty_state": {
+    "select_or_create_tab": "Select or create a tab to get started"
   },
   "editor": {
     "json-schema": {

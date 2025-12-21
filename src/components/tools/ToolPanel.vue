@@ -8,16 +8,16 @@ import JsonPlayground from './interactive/JsonPlayground.vue'
 import JsonSizeViewer from './interactive/JsonSizeViewer.vue'
 
 const toolsStore = useToolsStore()
-const { activeTab } = storeToRefs(toolsStore)
+const { activeToolTab } = storeToRefs(toolsStore)
 
 function handleTabChange(value: StringOrNumber) {
-  toolsStore.setActiveTab(value as 'size-viewer' | 'playground')
+  toolsStore.setActiveToolTab(value as 'size-viewer' | 'playground')
 }
 </script>
 
 <template>
   <div class="h-full flex flex-col bg-background">
-    <Tabs :model-value="activeTab" class="flex-grow flex flex-col overflow-hidden" @update:model-value="handleTabChange">
+    <Tabs :model-value="activeToolTab" class="flex-grow flex flex-col overflow-hidden" @update:model-value="handleTabChange">
       <PanelHeader title="Tools">
         <TabsList class="h-7">
           <TabsTrigger value="size-viewer" class="gap-1 text-xs h-6 px-2">

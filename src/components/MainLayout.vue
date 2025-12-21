@@ -3,35 +3,47 @@ import { storeToRefs } from 'pinia'
 import { Pane, Splitpanes } from 'splitpanes'
 
 import { useLayoutStore } from '@/stores/layout'
+import { useWorkspaceStore } from '@/stores/workspace'
+import EmptyState from './EmptyState.vue'
 import LayoutJsonEditor from './LayoutJsonEditor.vue'
 import LayoutSidebar from './LayoutSidebar.vue'
 import ToolPanel from './tools/ToolPanel.vue'
 import 'splitpanes/dist/splitpanes.css'
 
 const layoutStore = useLayoutStore()
+const workspaceStore = useWorkspaceStore()
 const { showSidebar, showToolPanel, floatingSidebar } = storeToRefs(layoutStore)
+const { hasActiveTab } = storeToRefs(workspaceStore)
 </script>
 
 <template>
-  <div class="flex-grow h-0 flex">
+  <div class="h-0 flex flex-grow">
     <aside
       v-if="showSidebar" class="flex-shrink-0"
-      :class="floatingSidebar ? 'absolute left-2 top-11 bottom-2 z-50' : 'relative h-full'"
+      :class="floatingSidebar ? 'absolute left-2 top-11 bottom-2 z-50 overflow-hidden' : 'relative h-full'"
     >
-      <div class=" bg-background" :class="floatingSidebar ? 'shadow-xl rounded-lg border-1.5 w-64' : 'w-64 border-r border-border h-full'">
+      <div class=" bg-background" :class="floatingSidebar ? 'shadow-xl rounded-lg border-1.5 w-64 min-h-0 max-h-full flex flex-col' : 'w-64 border-r border-border h-full'">
         <LayoutSidebar />
       </div>
     </aside>
 
-    <div class="flex-grow min-w-0">
-      <Splitpanes>
-        <Pane min-size="30">
-          <LayoutJsonEditor />
-        </Pane>
-        <Pane v-if="showToolPanel" min-size="20" max-size="50">
-          <ToolPanel />
-        </Pane>
-      </Splitpanes>
+    <div class="min-w-0 flex-grow">
+      <!-- Show empty state when no tab is selected -->
+      <template v-if="!hasActiveTab">
+        <EmptyState />
+      </template>
+
+      <!-- Show editor and tools when a tab is selected -->
+      <template v-else>
+        <Splitpanes>
+          <Pane min-size="30">
+            <LayoutJsonEditor />
+          </Pane>
+          <Pane v-if="showToolPanel" min-size="20" max-size="50">
+            <ToolPanel />
+          </Pane>
+        </Splitpanes>
+      </template>
     </div>
   </div>
 </template>

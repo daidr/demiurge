@@ -56,7 +56,7 @@ watch(() => props.options, (newOptions) => {
 <template>
   <Teleport to="body">
     <div
-      ref="OverflowRef" class="monaco-editor-overflows monaco-editor" :style="{
+      ref="OverflowRef" class="monaco-editor-overflows monaco-editor w-full" :style="{
         transform: `translate(${x}px, ${y}px)`,
       }"
     />

@@ -17,7 +17,13 @@ import { registerJsonPathLanguage } from '@/utils/monaco-jsonpath'
 registerJsonPathLanguage()
 
 const toolsStore = useToolsStore()
-const { playground, currentJsonContent } = storeToRefs(toolsStore)
+const {
+  playground,
+  playgroundMode,
+  playgroundExpression,
+  playgroundAutoRun,
+  currentJsonContent,
+} = storeToRefs(toolsStore)
 
 // Track the extra lib disposable for cleanup
 let extraLibDisposable: IDisposable | null = null
@@ -43,7 +49,7 @@ function handleExecute() {
 
 // Update TypeScript type definitions for `this` based on current JSON
 function updateTypeDefinitions() {
-  if (playground.value.mode !== 'javascript') {
+  if (playgroundMode.value !== 'javascript') {
     return
   }
 
@@ -70,7 +76,7 @@ function updateTypeDefinitions() {
 
 function onExpressionEditorMounted(_editor: editor.IStandaloneCodeEditor) {
   expressionEditorRef.value = _editor
-  _editor.setValue(playground.value.expression)
+  _editor.setValue(playgroundExpression.value)
   _editor.onDidChangeModelContent(() => {
     toolsStore.setPlaygroundExpression(_editor.getValue())
   })
@@ -91,13 +97,20 @@ function updateResultEditor() {
   }
 }
 
+// Watch expression changes to sync to editor
+watch(playgroundExpression, (newExpr) => {
+  if (expressionEditorRef.value && expressionEditorRef.value.getValue() !== newExpr) {
+    expressionEditorRef.value.setValue(newExpr)
+  }
+})
+
 watch(() => [playground.value.result, playground.value.error], updateResultEditor)
 
 // Watch for JSON content changes to update type definitions
 watch(currentJsonContent, updateTypeDefinitions)
 
 // Watch for mode changes to update type definitions
-watch(() => playground.value.mode, updateTypeDefinitions)
+watch(playgroundMode, updateTypeDefinitions)
 
 // Cleanup on unmount
 onUnmounted(() => {
@@ -111,44 +124,44 @@ onUnmounted(() => {
 <template>
   <div class="h-full flex flex-col gap-2">
     <!-- Mode Toggle + Execute Button -->
-    <div class="flex items-center gap-2 flex-shrink-0">
-      <ToggleGroup type="single" :model-value="playground.mode" @update:model-value="handleModeChange">
-        <ToggleGroupItem value="javascript" class="text-xs px-2">
+    <div class="flex flex-shrink-0 items-center gap-2">
+      <ToggleGroup type="single" :model-value="playgroundMode" @update:model-value="handleModeChange">
+        <ToggleGroupItem value="javascript" class="px-2 text-xs">
           JavaScript
         </ToggleGroupItem>
-        <ToggleGroupItem value="jsonpath" class="text-xs px-2">
+        <ToggleGroupItem value="jsonpath" class="px-2 text-xs">
           JSONPath
         </ToggleGroupItem>
       </ToggleGroup>
 
-      <Button size="sm" :disabled="playground.isExecuting || !playground.expression.trim()" @click="handleExecute">
-        <span v-if="playground.isExecuting" class="i-mingcute-loading-3-line animate-spin mr-1" />
+      <Button size="sm" :disabled="playground.isExecuting || !playgroundExpression.trim()" @click="handleExecute">
+        <span v-if="playground.isExecuting" class="i-mingcute-loading-3-line mr-1 animate-spin" />
         <span v-else class="i-mingcute-play-fill mr-1" />
         Run
       </Button>
 
-      <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none ml-auto">
-        <Checkbox :model-value="playground.autoRun" @update:model-value="handleAutoRunChange" />
+      <Label class="ml-auto flex cursor-pointer select-none items-center gap-1.5 text-xs">
+        <Checkbox :model-value="playgroundAutoRun" @update:model-value="handleAutoRunChange" />
         Auto Run
       </Label>
     </div>
 
     <!-- Expression Editor (top half) -->
-    <div class="flex-1 min-h-0 border rounded-md overflow-hidden">
-      <div class="text-xs text-muted-foreground px-2 py-1 border-b bg-muted/50">
-        <template v-if="playground.mode === 'javascript'">
-          Expression (use <code class="font-mono bg-muted px-1 rounded">$</code> or <code
-            class="font-mono bg-muted px-1 rounded"
+    <div class="min-h-0 flex-1 overflow-hidden rounded-md border">
+      <div class="text-muted-foreground bg-muted/50 border-b px-2 py-1 text-xs">
+        <template v-if="playgroundMode === 'javascript'">
+          Expression (use <code class="bg-muted rounded px-1 font-mono">$</code> or <code
+            class="bg-muted rounded px-1 font-mono"
           >data</code> to access JSON)
         </template>
         <template v-else>
-          JSONPath (e.g., <code class="font-mono bg-muted px-1 rounded">$.store.book[*].author</code>)
+          JSONPath (e.g., <code class="bg-muted rounded px-1 font-mono">$.store.book[*].author</code>)
         </template>
       </div>
       <div class="h-[calc(100%-28px)]">
         <MonacoEditor
           :options="{
-            language: playground.mode === 'javascript' ? 'javascript' : 'jsonpath',
+            language: playgroundMode === 'javascript' ? 'javascript' : 'jsonpath',
             minimap: { enabled: false },
             lineNumbers: 'off',
             scrollBeyondLastLine: true,
@@ -160,12 +173,12 @@ onUnmounted(() => {
     </div>
 
     <!-- Result/Error Display (bottom half) -->
-    <div class="flex-1 min-h-0 border rounded-md overflow-hidden">
-      <div class="text-xs text-muted-foreground px-2 py-1 border-b bg-muted/50 flex items-center gap-1">
+    <div class="min-h-0 flex-1 overflow-hidden rounded-md border">
+      <div class="text-muted-foreground bg-muted/50 flex items-center gap-1 border-b px-2 py-1 text-xs">
         <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
         <span v-else class="i-mingcute-check-circle-line text-green-600" />
         Result
-        <span v-if="playground.executionTime !== null" class="ml-auto text-muted-foreground/70">
+        <span v-if="playground.executionTime !== null" class="text-muted-foreground/70 ml-auto">
           {{ playground.executionTime.toFixed(1) }} ms
         </span>
       </div>

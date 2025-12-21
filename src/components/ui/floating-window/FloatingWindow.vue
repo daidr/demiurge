@@ -209,17 +209,27 @@ onUnmounted(() => {
           }"
         >
           <!-- Title bar -->
-          <div
-            class="flex items-center gap-2 px-3 py-2 border-b border-border bg-muted/50 cursor-move flex-shrink-0"
-            @mousedown="onDragStart"
-          >
-            <span class="text-sm font-medium flex-1 select-none">{{ title }}</span>
-            <button
-              class="floating-window-close w-6 h-6 flex items-center justify-center rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
-              @click="close"
+          <div class="flex-shrink-0">
+            <div
+              class="flex items-center gap-2 px-3 py-2 border-b border-border bg-muted/50 cursor-move"
+              @mousedown="onDragStart"
             >
-              <span class="i-mingcute-close-line text-sm" />
-            </button>
+              <span class="text-sm font-medium select-none">{{ title }}</span>
+              <div v-if="$slots.header" class="flex items-center" @mousedown.stop>
+                <slot name="header" />
+              </div>
+              <div class="flex-1" />
+              <button
+                class="floating-window-close w-6 h-6 flex items-center justify-center rounded hover:bg-accent text-muted-foreground hover:text-foreground transition-colors"
+                @click="close"
+              >
+                <span class="i-mingcute-close-line text-sm" />
+              </button>
+            </div>
+            <!-- Toolbar (second header row) -->
+            <div v-if="$slots.toolbar" class="flex items-center gap-2 px-3 py-1.5 border-b border-border bg-muted/30">
+              <slot name="toolbar" />
+            </div>
           </div>
 
           <!-- Content -->
