@@ -118,5 +118,12 @@
     "edit_mode": "编辑",
     "no_snippets": "暂无代码片段",
     "no_snippets_selected": "请选择或创建一个代码片段"
+  },
+  "pwa": {
+    "update_available": "发现新版本",
+    "update_description": "新版本已就绪，点击重新加载以更新。",
+    "offline_ready": "离线就绪",
+    "offline_description": "应用已可离线使用。",
+    "reload": "重新加载"
   }
 }

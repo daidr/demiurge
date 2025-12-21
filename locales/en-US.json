@@ -118,5 +118,12 @@
     "edit_mode": "Edit",
     "no_snippets": "No snippets yet",
     "no_snippets_selected": "Select or create a snippet"
+  },
+  "pwa": {
+    "update_available": "Update Available",
+    "update_description": "A new version is available. Click reload to update.",
+    "offline_ready": "Offline Ready",
+    "offline_description": "App is ready to work offline.",
+    "reload": "Reload"
   }
 }

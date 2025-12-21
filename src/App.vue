@@ -5,6 +5,7 @@ import {
 } from '@/components/ui/tooltip'
 import MainHeader from './components/MainHeader.vue'
 import MainLayout from './components/MainLayout.vue'
+import ReloadPrompt from './components/ReloadPrompt.vue'
 import { useInitI18n } from './composables/useInitI18n'
 import { useLayoutStore } from './stores/layout'
 
@@ -16,6 +17,7 @@ const { isBrowserSupported } = storeToRefs(layoutStore)
 
 <template>
   <TooltipProvider>
+    <ReloadPrompt />
     <MainHeader />
     <MainLayout v-if="isBrowserSupported" />
     <div v-else class="flex flex-grow items-center justify-center px-6">

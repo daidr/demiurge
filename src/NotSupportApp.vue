@@ -9,6 +9,7 @@ useInitI18n()
 
 <template>
   <TooltipProvider>
+    <ReloadWithoutPrompt />
     <div class="flex flex-grow items-center justify-center px-6">
       {{ $t('general.browser_not_supported_tips') }}
     </div>
