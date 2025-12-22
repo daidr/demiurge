@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { onKeyStroke } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { Pane, Splitpanes } from 'splitpanes'
 
@@ -14,12 +15,20 @@ const layoutStore = useLayoutStore()
 const workspaceStore = useWorkspaceStore()
 const { showSidebar, showToolPanel, floatingSidebar } = storeToRefs(layoutStore)
 const { hasActiveTab } = storeToRefs(workspaceStore)
+
+// Close floating sidebar on ESC
+onKeyStroke('Escape', () => {
+  if (floatingSidebar.value && showSidebar.value) {
+    layoutStore.toggleSidebar()
+  }
+})
 </script>
 
 <template>
   <div class="h-0 flex flex-grow">
     <aside
-      v-if="showSidebar" class="flex-shrink-0"
+      v-if="showSidebar"
+      class="flex-shrink-0"
       :class="floatingSidebar ? 'absolute left-2 top-11 bottom-2 z-50' : 'relative h-full'"
     >
       <div class=" bg-background" :class="floatingSidebar ? 'shadow-xl rounded-lg border-1.5 w-64 min-h-0 max-h-full flex flex-col' : 'w-64 border-r border-border h-full'">
