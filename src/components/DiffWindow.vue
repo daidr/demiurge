@@ -2,7 +2,7 @@
 import type { editor as monacoEditor } from 'monaco-editor'
 import { useMonaco } from '@guolao/vue-monaco-editor'
 import { storeToRefs } from 'pinia'
-import { computed, nextTick, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, nextTick, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { FloatingWindow } from '@/components/ui/floating-window'
 import { Label } from '@/components/ui/label'
@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useWorkspaceStore } from '@/stores/workspace'
+import { getToolsWorker } from '@/utils/tools_service'
 
 const props = defineProps<{
   modelValue?: boolean
@@ -29,7 +30,7 @@ const isOpen = computed({
 })
 
 const { t } = useI18n()
-const { monacoRef, unload } = useMonaco()
+const { monacoRef } = useMonaco()
 
 const workspaceStore = useWorkspaceStore()
 const { sortedTabs } = storeToRefs(workspaceStore)
@@ -38,45 +39,37 @@ const { sortedTabs } = storeToRefs(workspaceStore)
 const leftTabId = ref<string | null>(null)
 const rightTabId = ref<string | null>(null)
 
-// Sort JSON keys recursively
-function sortJsonKeys(obj: unknown): unknown {
-  if (Array.isArray(obj)) {
-    return obj.map(sortJsonKeys)
-  }
-  if (obj !== null && typeof obj === 'object') {
-    const sorted: Record<string, unknown> = {}
-    Object.keys(obj as Record<string, unknown>).sort().forEach((key) => {
-      sorted[key] = sortJsonKeys((obj as Record<string, unknown>)[key])
-    })
-    return sorted
-  }
-  return obj
+// Formatted content (async from worker)
+const leftContent = ref('')
+const rightContent = ref('')
+
+// Get raw content for a tab
+function getRawContent(tabId: string | null): string {
+  if (!tabId)
+    return ''
+  const tab = sortedTabs.value.find(t => t.id === tabId)
+  return tab?.content ?? ''
 }
 
-// Format and sort JSON content
-function formatJson(content: string): string {
+// Format JSON using worker
+async function formatJson(content: string): Promise<string> {
   if (!content.trim())
     return ''
-  try {
-    const parsed = JSON.parse(content)
-    const sorted = sortJsonKeys(parsed)
-    return JSON.stringify(sorted, null, 2)
-  }
-  catch {
-    return content
-  }
+  const worker = await getToolsWorker()
+  const result = await worker.sortJson(content)
+  return result ?? content
 }
 
-// Get formatted content for left tab
-const leftContent = computed(() => {
-  const tab = sortedTabs.value.find(t => t.id === leftTabId.value)
-  return tab ? formatJson(tab.content) : ''
+// Update left content when tab changes
+watch(leftTabId, async (tabId) => {
+  const raw = getRawContent(tabId)
+  leftContent.value = await formatJson(raw)
 })
 
-// Get formatted content for right tab
-const rightContent = computed(() => {
-  const tab = sortedTabs.value.find(t => t.id === rightTabId.value)
-  return tab ? formatJson(tab.content) : ''
+// Update right content when tab changes
+watch(rightTabId, async (tabId) => {
+  const raw = getRawContent(tabId)
+  rightContent.value = await formatJson(raw)
 })
 
 // Monaco diff editor ref
@@ -85,33 +78,75 @@ const diffEditorRef = shallowRef<monacoEditor.IStandaloneDiffEditor>()
 let originalModel: monacoEditor.ITextModel | null = null
 let modifiedModel: monacoEditor.ITextModel | null = null
 
-// Initialize diff editor when container is ready and window is open
-const stop = watch([() => containerRef.value, () => isOpen.value, () => monacoRef.value], async ([container, open, monaco]) => {
-  if (container && open && monaco) {
-    nextTick(() => stop())
+// Cleanup function for Monaco resources
+function disposeMonaco() {
+  if (diffEditorRef.value) {
+    diffEditorRef.value.dispose()
+    diffEditorRef.value = undefined
+  }
+  if (originalModel) {
+    originalModel.dispose()
+    originalModel = null
+  }
+  if (modifiedModel) {
+    modifiedModel.dispose()
+    modifiedModel = null
+  }
+}
 
-    // Create models
-    originalModel = monaco.editor.createModel('', 'json')
-    modifiedModel = monaco.editor.createModel('', 'json')
+// Initialize Monaco when window opens
+function initMonaco() {
+  const container = containerRef.value
+  const monaco = monacoRef.value
+  if (!container || !monaco)
+    return
 
-    // Create diff editor
-    diffEditorRef.value = monaco.editor.createDiffEditor(container, {
-      automaticLayout: true,
-      readOnly: true,
-      renderSideBySide: true,
-      minimap: { enabled: false },
-      scrollBeyondLastLine: false,
-      fontSize: 13,
-    })
+  // Create models
+  originalModel = monaco.editor.createModel('', 'json')
+  modifiedModel = monaco.editor.createModel('', 'json')
 
-    diffEditorRef.value.setModel({
-      original: originalModel,
-      modified: modifiedModel,
-    })
+  // Create diff editor
+  diffEditorRef.value = monaco.editor.createDiffEditor(container, {
+    automaticLayout: true,
+    readOnly: true,
+    renderSideBySide: true,
+    useInlineViewWhenSpaceIsLimited: false,
+    minimap: { enabled: false },
+    scrollBeyondLastLine: false,
+    fontSize: 13,
+  })
 
-    // Update content
-    originalModel.setValue(leftContent.value)
-    modifiedModel.setValue(rightContent.value)
+  diffEditorRef.value.setModel({
+    original: originalModel,
+    modified: modifiedModel,
+  })
+
+  // Set initial content
+  originalModel.setValue(leftContent.value)
+  modifiedModel.setValue(rightContent.value)
+}
+
+// Watch for window open/close to manage Monaco lifecycle
+watch(isOpen, async (open) => {
+  if (open) {
+    // Wait for container to be rendered, then init Monaco
+    await nextTick()
+    initMonaco()
+  }
+  else {
+    // Reset state and cleanup Monaco
+    leftTabId.value = null
+    rightTabId.value = null
+    leftContent.value = ''
+    rightContent.value = ''
+    disposeMonaco()
+  }
+})
+
+// Also watch for monaco to become available after window opens
+watch(monacoRef, (monaco) => {
+  if (monaco && isOpen.value && !diffEditorRef.value) {
+    initMonaco()
   }
 })
 
@@ -126,30 +161,6 @@ watch(rightContent, (content) => {
   if (modifiedModel) {
     modifiedModel.setValue(content)
   }
-})
-
-// Cleanup when window closes
-watch(isOpen, (open) => {
-  if (!open) {
-    leftTabId.value = null
-    rightTabId.value = null
-  }
-})
-
-onUnmounted(() => {
-  if (diffEditorRef.value) {
-    diffEditorRef.value.dispose()
-    diffEditorRef.value = undefined
-  }
-  if (originalModel) {
-    originalModel.dispose()
-    originalModel = null
-  }
-  if (modifiedModel) {
-    modifiedModel.dispose()
-    modifiedModel = null
-  }
-  unload()
 })
 </script>
 
