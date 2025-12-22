@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
+import { Toaster } from '@/components/ui/sonner'
 import {
   TooltipProvider,
 } from '@/components/ui/tooltip'
@@ -8,6 +9,7 @@ import MainLayout from './components/MainLayout.vue'
 import ReloadPrompt from './components/ReloadPrompt.vue'
 import { useInitI18n } from './composables/useInitI18n'
 import { useLayoutStore } from './stores/layout'
+import 'vue-sonner/style.css'
 
 useInitI18n()
 
@@ -23,6 +25,7 @@ const { isBrowserSupported } = storeToRefs(layoutStore)
     <div v-else class="flex flex-grow items-center justify-center px-6">
       {{ $t('general.browser_not_supported_tips') }}
     </div>
+    <Toaster />
   </TooltipProvider>
 </template>
 

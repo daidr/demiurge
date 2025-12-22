@@ -18,7 +18,7 @@ export const VITE_PWA_MANIFEST: Partial<ManifestOptions> = {
   ],
   theme_color: '#ffffff',
   background_color: '#ffffff',
-  start_url: 'https://json.daidr.me/?utm_source=pwa',
+  start_url: 'http://localhost:4173/?utm_source=pwa',
   display: 'standalone',
   display_override: [
     'window-controls-overlay',

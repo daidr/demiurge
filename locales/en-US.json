@@ -126,6 +126,8 @@
     "no_snippets_selected": "Select or create a snippet"
   },
   "pwa": {
+    "install": "Install",
+    "install_tooltip": "Install as PWA locally",
     "update_available": "Update Available",
     "update_description": "A new version is available. Click reload to update.",
     "offline_ready": "Offline Ready",

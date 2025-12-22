@@ -6,9 +6,12 @@ import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 
 import { getDefaultLanguage } from './composables/useInitI18n'
+import { init as initInstallEvent } from './utils/pwa'
 import '@unocss/reset/tailwind.css'
 import './assets/main.css'
 import 'virtual:uno.css'
+
+initInstallEvent()
 
 if (import.meta.env.DEV) {
   import('@signaldb/devtools')

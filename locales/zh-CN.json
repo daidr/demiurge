@@ -126,6 +126,8 @@
     "no_snippets_selected": "请选择或创建一个代码片段"
   },
   "pwa": {
+    "install": "安装",
+    "install_tooltip": "以 PWA 形式安装到本地",
     "update_available": "发现新版本",
     "update_description": "新版本已就绪，点击重新加载以更新。",
     "offline_ready": "离线就绪",

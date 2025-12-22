@@ -1,10 +1,15 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, ref } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useLayoutStore } from '@/stores/layout'
+import { installFunction, showInstallButton } from '@/utils/pwa'
 import LangSwitch from './LangSwitch.vue'
 import MainMenu from './ui/MainMenu.vue'
+
+const { t } = useI18n()
 
 const layoutStore = useLayoutStore()
 const { isBrowserSupported, showSidebar } = storeToRefs(layoutStore)
@@ -14,6 +19,10 @@ const isWCOMode = ref(false)
 
 function updateWCOMode() {
   isWCOMode.value = navigator.windowControlsOverlay?.visible ?? false
+}
+
+function handleInstall() {
+  installFunction.value?.()
 }
 
 onMounted(() => {
@@ -38,6 +47,21 @@ onUnmounted(() => {
       <MainMenu :disabled="!isBrowserSupported" />
     </div>
     <div class="header-right flex gap-1 p-1">
+      <Tooltip v-if="showInstallButton">
+        <TooltipTrigger as-child>
+          <Button
+            size="xs"
+            variant="outline"
+            @click="handleInstall"
+          >
+            <div class="i-mingcute-download-2-line" />
+            {{ t('pwa.install') }}
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          {{ t('pwa.install_tooltip') }}
+        </TooltipContent>
+      </Tooltip>
       <Button
         size="xs" variant="outline" as="a" href="https://github.com/daidr/demiurge" target="_blank"
         rel="noopener noreferrer"
