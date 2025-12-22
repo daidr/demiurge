@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AcceptableValue } from 'reka-ui'
 import type { SizeViewerMode } from '@/stores/tools'
 import { storeToRefs } from 'pinia'
 import { computed } from 'vue'
@@ -8,7 +7,7 @@ import { JsonTree } from '@/components/base/JsonTree'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Label } from '@/components/ui/label'
 import { Sunburst } from '@/components/ui/sunburst'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { SizeViewerModeToggle } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
 import { isMac } from '@/utils/platform'
 
@@ -23,10 +22,8 @@ function handleToggle(path: string) {
   toolsStore.toggleSizeTreeNode(path)
 }
 
-function handleModeChange(value: AcceptableValue) {
-  if (typeof value === 'string' && (value === 'tree' || value === 'sunburst')) {
-    toolsStore.setSizeViewerMode(value as SizeViewerMode)
-  }
+function handleModeChange(value: SizeViewerMode) {
+  toolsStore.setSizeViewerMode(value)
 }
 
 function handleFlattenChange(checked: boolean | 'indeterminate') {
@@ -48,20 +45,10 @@ function handleNodeClick(path: string, event: MouseEvent) {
   <div class="h-full flex flex-col">
     <!-- Mode toggle -->
     <div class="flex-shrink-0 pb-2 flex items-center gap-3">
-      <ToggleGroup
-        type="single"
+      <SizeViewerModeToggle
         :model-value="sizeViewerMode"
         @update:model-value="handleModeChange"
-      >
-        <ToggleGroupItem value="tree" class="text-xs px-2 gap-1">
-          <span class="i-mingcute-list-check-line" />
-          {{ t('tools.tree') }}
-        </ToggleGroupItem>
-        <ToggleGroupItem value="sunburst" class="text-xs px-2 gap-1">
-          <span class="i-mingcute-sun-line" />
-          {{ t('tools.sunburst') }}
-        </ToggleGroupItem>
-      </ToggleGroup>
+      />
 
       <Label class="flex items-center gap-1.5 text-xs cursor-pointer select-none">
         <Checkbox

@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { AcceptableValue } from 'reka-ui'
 import type { PlaygroundMode } from '@/db'
 import { storeToRefs } from 'pinia'
 import { computed, ref, watch } from 'vue'
@@ -11,7 +10,7 @@ import { FloatingWindow } from '@/components/ui/floating-window'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { PlaygroundModeToggle } from '@/components/ui/toggle-group'
 import { useSnippetStore } from '@/stores/snippet'
 import { useToolsStore } from '@/stores/tools'
 
@@ -98,12 +97,10 @@ function handleNameBlur() {
   }
 }
 
-function handleModeChange(value: AcceptableValue) {
-  if (typeof value === 'string' && (value === 'javascript' || value === 'jsonpath')) {
-    localMode.value = value
-    if (selectedSnippetId.value && isEditMode.value) {
-      snippetStore.updateSnippet(selectedSnippetId.value, { mode: value })
-    }
+function handleModeChange(value: PlaygroundMode) {
+  localMode.value = value
+  if (selectedSnippetId.value && isEditMode.value) {
+    snippetStore.updateSnippet(selectedSnippetId.value, { mode: value })
   }
 }
 
@@ -167,7 +164,6 @@ function formatTime(timestamp: number): string {
         <Switch
           id="snippet-edit-mode"
           :model-value="isEditMode"
-          size="sm"
           @update:model-value="handleEditModeChange"
         />
         <Label
@@ -231,19 +227,11 @@ function formatTime(timestamp: number): string {
             </div>
             <div class="flex items-center gap-2">
               <Label class="text-xs text-muted-foreground w-12">{{ t('snippet.mode') }}</Label>
-              <ToggleGroup
-                type="single"
+              <PlaygroundModeToggle
                 :model-value="localMode"
                 :disabled="!isEditMode"
                 @update:model-value="handleModeChange"
-              >
-                <ToggleGroupItem value="javascript" class="px-2 text-xs h-7">
-                  JavaScript
-                </ToggleGroupItem>
-                <ToggleGroupItem value="jsonpath" class="px-2 text-xs h-7">
-                  JSONPath
-                </ToggleGroupItem>
-              </ToggleGroup>
+              />
             </div>
           </div>
 

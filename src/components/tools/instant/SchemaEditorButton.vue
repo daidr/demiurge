@@ -263,7 +263,6 @@ function openSchemaEditor() {
           id="edit-mode-switch"
           :model-value="isEditMode"
           :disabled="!currentSchemaId"
-          size="sm"
           @update:model-value="handleEditModeChange"
         />
         <Label

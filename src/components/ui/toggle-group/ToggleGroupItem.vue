@@ -19,7 +19,7 @@ const size = inject(toggleGroupSizeKey, ref('default'))
 
 const sizeClass = computed(() => {
   const sizeClasses = {
-    default: 'px-3 py-1 text-sm',
+    default: 'px-3 py-0.5 text-sm',
     sm: 'px-2 py-0.5 text-xs',
   }
   return sizeClasses[size.value]

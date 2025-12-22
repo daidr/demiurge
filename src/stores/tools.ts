@@ -8,6 +8,8 @@ import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
 import { useWorkspaceStore } from './workspace'
 
+export type ToolTab = 'size-viewer' | 'playground'
+
 // Re-export types from db for convenience
 export type { InteractiveTool, PlaygroundMode, SizeViewerMode } from '@/db'
 
@@ -126,7 +128,7 @@ export const useToolsStore = defineStore('tools', () => {
 
   // ========== Actions ==========
 
-  function setActiveToolTab(tab: 'size-viewer' | 'playground') {
+  function setActiveToolTab(tab: ToolTab) {
     const tabId = activeTabId.value
     if (!tabId)
       return

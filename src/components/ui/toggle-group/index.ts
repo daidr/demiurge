@@ -1,2 +1,5 @@
+export { default as PlaygroundModeToggle } from './PlaygroundModeToggle.vue'
+export { default as SizeViewerModeToggle } from './SizeViewerModeToggle.vue'
 export { default as ToggleGroup } from './ToggleGroup.vue'
 export { default as ToggleGroupItem } from './ToggleGroupItem.vue'
+export { default as ToolTabToggle } from './ToolTabToggle.vue'

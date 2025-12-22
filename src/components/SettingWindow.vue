@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { PlaygroundModeToggle, SizeViewerModeToggle, ToolTabToggle } from '@/components/ui/toggle-group'
 import { useLocale } from '@/composables/useInitI18n'
 import { useSettingsStore } from '@/stores/settings'
 import locales from '../../locales/_locales.json'
@@ -93,7 +93,6 @@ const { settings } = storeToRefs(settingsStore)
               {{ t('settings.show_github_button') }}
             </Label>
             <Switch
-              size="sm"
               :model-value="settings.showGitHubButton"
               @update:model-value="settingsStore.updateSetting('showGitHubButton', $event)"
             />
@@ -111,19 +110,11 @@ const { settings } = storeToRefs(settingsStore)
             <Label class="text-sm text-muted-foreground">
               {{ t('settings.default_tool_tab') }}
             </Label>
-            <ToggleGroup
-              type="single"
+            <ToolTabToggle
               size="sm"
               :model-value="settings.defaultToolTab"
-              @update:model-value="(v: string) => v && settingsStore.updateSetting('defaultToolTab', v as 'size-viewer' | 'playground')"
-            >
-              <ToggleGroupItem value="size-viewer">
-                {{ t('tools.size_viewer') }}
-              </ToggleGroupItem>
-              <ToggleGroupItem value="playground">
-                {{ t('tools.playground') }}
-              </ToggleGroupItem>
-            </ToggleGroup>
+              @update:model-value="settingsStore.updateSetting('defaultToolTab', $event)"
+            />
           </div>
 
           <!-- Default Size Viewer Mode -->
@@ -131,19 +122,11 @@ const { settings } = storeToRefs(settingsStore)
             <Label class="text-sm text-muted-foreground">
               {{ t('settings.default_size_viewer_mode') }}
             </Label>
-            <ToggleGroup
-              type="single"
+            <SizeViewerModeToggle
               size="sm"
               :model-value="settings.defaultSizeViewerMode"
-              @update:model-value="(v: string) => v && settingsStore.updateSetting('defaultSizeViewerMode', v as 'tree' | 'sunburst')"
-            >
-              <ToggleGroupItem value="tree">
-                {{ t('tools.tree') }}
-              </ToggleGroupItem>
-              <ToggleGroupItem value="sunburst">
-                {{ t('tools.sunburst') }}
-              </ToggleGroupItem>
-            </ToggleGroup>
+              @update:model-value="settingsStore.updateSetting('defaultSizeViewerMode', $event)"
+            />
           </div>
 
           <!-- Default Playground Mode -->
@@ -151,19 +134,11 @@ const { settings } = storeToRefs(settingsStore)
             <Label class="text-sm text-muted-foreground">
               {{ t('settings.default_playground_mode') }}
             </Label>
-            <ToggleGroup
-              type="single"
+            <PlaygroundModeToggle
               size="sm"
               :model-value="settings.defaultPlaygroundMode"
-              @update:model-value="(v: string) => v && settingsStore.updateSetting('defaultPlaygroundMode', v as 'javascript' | 'jsonpath')"
-            >
-              <ToggleGroupItem value="javascript">
-                JavaScript
-              </ToggleGroupItem>
-              <ToggleGroupItem value="jsonpath">
-                JSONPath
-              </ToggleGroupItem>
-            </ToggleGroup>
+              @update:model-value="settingsStore.updateSetting('defaultPlaygroundMode', $event)"
+            />
           </div>
 
           <!-- Default Playground Auto Run -->
@@ -172,7 +147,6 @@ const { settings } = storeToRefs(settingsStore)
               {{ t('settings.default_playground_auto_run') }}
             </Label>
             <Switch
-              size="sm"
               :model-value="settings.defaultPlaygroundAutoRun"
               @update:model-value="settingsStore.updateSetting('defaultPlaygroundAutoRun', $event)"
             />
@@ -194,7 +168,6 @@ const { settings } = storeToRefs(settingsStore)
               </span>
             </div>
             <Switch
-              size="sm"
               :model-value="settings.autoFormatOnPaste"
               @update:model-value="settingsStore.updateSetting('autoFormatOnPaste', $event)"
             />
