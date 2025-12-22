@@ -21,7 +21,29 @@ export default defineConfig(async () => {
       VueI18nPlugin({
         include: resolve(dirname(fileURLToPath(import.meta.url)), './locales/[^_]*.json'),
       }),
-      VitePWA({ registerType: 'prompt', manifest: VITE_PWA_MANIFEST }),
+      VitePWA({
+        registerType: 'prompt',
+        manifest: VITE_PWA_MANIFEST,
+        workbox: {
+          runtimeCaching: [
+            {
+              // Cache Monaco Editor CDN resources
+              urlPattern: /^https:\/\/cdn\.staticfile\.net\/monaco-editor\/.*/i,
+              handler: 'CacheFirst',
+              options: {
+                cacheName: 'monaco-editor-cdn',
+                expiration: {
+                  maxEntries: 100,
+                  maxAgeSeconds: 60 * 60 * 24 * 30,
+                },
+                cacheableResponse: {
+                  statuses: [0, 200],
+                },
+              },
+            },
+          ],
+        },
+      }),
     ],
     resolve: {
       alias: {
