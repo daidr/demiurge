@@ -173,6 +173,16 @@ onMounted(() => {
     handleNewTabFromFile()
     return false
   })
+  hotkeys('command+w, ctrl+w', (e) => {
+    e.preventDefault()
+    handleRemoveTab()
+    return false
+  })
+  hotkeys('command+shift+w, ctrl+shift+w', (e) => {
+    e.preventDefault()
+    handleRemoveWorkspace()
+    return false
+  })
 })
 
 onUnmounted(() => {
@@ -187,6 +197,8 @@ onUnmounted(() => {
   hotkeys.unbind('command+n, ctrl+n')
   hotkeys.unbind('command+alt+n, ctrl+alt+n')
   hotkeys.unbind('command+alt+o, ctrl+alt+o')
+  hotkeys.unbind('command+w, ctrl+w')
+  hotkeys.unbind('command+shift+w, ctrl+shift+w')
 })
 </script>
 
