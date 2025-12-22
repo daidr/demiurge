@@ -32,7 +32,9 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { useLayoutStore } from '@/stores/layout'
+import { useSettingsStore } from '@/stores/settings'
 import { useWorkspaceStore } from '@/stores/workspace'
+import { tryFormatJson } from '@/utils/json'
 import BaseTooltip from './BaseTooltip.vue'
 import TabList from './TabList.vue'
 import { Button } from './ui/button'
@@ -43,7 +45,9 @@ import WorkspaceEditPanel from './WorkspaceEditPanel.vue'
 const { t } = useI18n()
 const workspaceStore = useWorkspaceStore()
 const layoutStore = useLayoutStore()
+const settingsStore = useSettingsStore()
 const { floatingSidebar } = storeToRefs(layoutStore)
+const { settings } = storeToRefs(settingsStore)
 const {
   workspaces,
   activeWorkspaceId,
@@ -51,6 +55,15 @@ const {
   sortedTabs,
   activeTabId,
 } = storeToRefs(workspaceStore)
+
+function getDefaultTabOptions() {
+  return {
+    activeToolTab: settings.value.defaultToolTab,
+    sizeViewerMode: settings.value.defaultSizeViewerMode,
+    playgroundMode: settings.value.defaultPlaygroundMode,
+    playgroundAutoRun: settings.value.defaultPlaygroundAutoRun,
+  }
+}
 
 // Drag and drop state
 const isDragOver = ref(false)
@@ -102,9 +115,13 @@ async function handleDrop(e: DragEvent) {
       // Check if it's a JSON file or text file
       if (file.type === 'application/json' || file.name.endsWith('.json') || file.type.startsWith('text/')) {
         try {
-          const content = await file.text()
+          let content = await file.text()
+          // Auto format if enabled and valid JSON
+          if (settings.value.autoFormatOnPaste) {
+            content = tryFormatJson(content)
+          }
           const fileName = file.name.replace(/\.(json|txt)$/i, '') || t('tab.untitled')
-          const tabId = workspaceStore.createTab(activeWorkspaceId.value, fileName)
+          const tabId = workspaceStore.createTab(activeWorkspaceId.value, fileName, getDefaultTabOptions())
           workspaceStore.setActiveTab(tabId)
           workspaceStore.updateTabContent(tabId, content)
         }
@@ -117,13 +134,17 @@ async function handleDrop(e: DragEvent) {
   }
 
   // Check for text data
-  const text = e.dataTransfer.getData('text/plain')
+  let text = e.dataTransfer.getData('text/plain')
   if (text) {
+    // Auto format if enabled and valid JSON
+    if (settings.value.autoFormatOnPaste) {
+      text = tryFormatJson(text)
+    }
     // Format timestamp as MM-DD/HH:mm:ss
     const now = new Date()
     const timestamp = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}/${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
     const tabTitle = t('tab.from_drop', { timestamp })
-    const tabId = workspaceStore.createTab(activeWorkspaceId.value, tabTitle)
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, tabTitle, getDefaultTabOptions())
     workspaceStore.setActiveTab(tabId)
     workspaceStore.updateTabContent(tabId, text)
   }
@@ -172,7 +193,7 @@ function handleTabRename(id: string, title: string) {
 function handleCreateTab() {
   if (!activeWorkspaceId.value)
     return
-  const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'))
+  const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'), getDefaultTabOptions())
   workspaceStore.setActiveTab(tabId)
 }
 

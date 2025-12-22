@@ -9,6 +9,13 @@ import {
   workspacesCollection,
 } from '@/db'
 
+export interface CreateTabOptions {
+  activeToolTab?: Tab['activeToolTab']
+  sizeViewerMode?: Tab['sizeViewerMode']
+  playgroundMode?: Tab['playgroundMode']
+  playgroundAutoRun?: boolean
+}
+
 export const useWorkspaceStore = defineStore('workspace', () => {
   // ========== Reactive Queries ==========
 
@@ -150,7 +157,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
 
   // ========== Tab Actions ==========
 
-  function createTab(workspaceId: string, title: string = 'Untitled'): string {
+  function createTab(workspaceId: string, title: string = 'Untitled', options?: CreateTabOptions): string {
     const id = uuidv7()
     const now = Date.now()
 
@@ -163,12 +170,12 @@ export const useWorkspaceStore = defineStore('workspace', () => {
       updatedTime: now,
       content: '',
       schemaId: null,
-      activeToolTab: 'size-viewer',
-      sizeViewerMode: 'tree',
+      activeToolTab: options?.activeToolTab ?? 'size-viewer',
+      sizeViewerMode: options?.sizeViewerMode ?? 'tree',
       flattenEnabled: false,
-      playgroundMode: 'javascript',
+      playgroundMode: options?.playgroundMode ?? 'javascript',
       playgroundExpression: '',
-      playgroundAutoRun: false,
+      playgroundAutoRun: options?.playgroundAutoRun ?? false,
     })
 
     // Update workspace's tabOrder

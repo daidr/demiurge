@@ -77,6 +77,8 @@
     "pull_request": "Pull Request"
   },
   "menu": {
+    "preferences": "Preferences",
+    "about": "About",
     "file": "File",
     "view": "View",
     "tools": "Tools",
@@ -139,5 +141,20 @@
     "left_tab": "Left",
     "right_tab": "Right",
     "select_tab": "Select a tab"
+  },
+  "settings": {
+    "title": "Preferences",
+    "language": "Language",
+    "display_language": "Display Language",
+    "appearance": "Appearance",
+    "show_github_button": "Show GitHub Button in Header",
+    "tools": "Tools",
+    "default_tool_tab": "Default Tool Tab",
+    "default_size_viewer_mode": "Default Size Viewer Mode",
+    "default_playground_mode": "Default Playground Mode",
+    "default_playground_auto_run": "Enable Auto Run by Default",
+    "editor": "Editor",
+    "auto_format_on_paste": "Auto Format JSON",
+    "auto_format_on_paste_hint": "Automatically format valid JSON when pasting, importing from file, or creating from clipboard"
   }
 }

@@ -77,6 +77,8 @@
     "pull_request": "拉取请求"
   },
   "menu": {
+    "preferences": "首选项",
+    "about": "关于",
     "file": "文件",
     "view": "视图",
     "tools": "工具",
@@ -139,5 +141,20 @@
     "left_tab": "左侧",
     "right_tab": "右侧",
     "select_tab": "选择标签页"
+  },
+  "settings": {
+    "title": "首选项",
+    "language": "语言",
+    "display_language": "显示语言",
+    "appearance": "外观",
+    "show_github_button": "在标题栏显示 GitHub 按钮",
+    "tools": "工具",
+    "default_tool_tab": "默认工具面板",
+    "default_size_viewer_mode": "默认 Size Viewer 视图",
+    "default_playground_mode": "默认 Playground 语言",
+    "default_playground_auto_run": "默认开启自动运行",
+    "editor": "编辑器",
+    "auto_format_on_paste": "自动格式化 JSON",
+    "auto_format_on_paste_hint": "粘贴、从文件导入或从剪贴板新建时，自动格式化有效的 JSON"
   }
 }

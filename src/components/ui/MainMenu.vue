@@ -5,6 +5,7 @@ import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import AboutDialog from '@/components/AboutDialog.vue'
 import DiffWindow from '@/components/DiffWindow.vue'
+import SettingWindow from '@/components/SettingWindow.vue'
 import {
   Menubar,
   MenubarContent,
@@ -18,7 +19,9 @@ import LogoMenubarTrigger from '@/components/ui/menubar/LogoMenubarTrigger.vue'
 import WorkspaceCreateDialog from '@/components/WorkspaceCreateDialog.vue'
 import WorkspaceDeleteDialog from '@/components/WorkspaceDeleteDialog.vue'
 import { useLayoutStore } from '@/stores/layout'
+import { useSettingsStore } from '@/stores/settings'
 import { useWorkspaceStore } from '@/stores/workspace'
+import { tryFormatJson } from '@/utils/json'
 import { isMac } from '@/utils/platform'
 
 defineProps<{
@@ -31,8 +34,10 @@ const altKey = isMac() ? '⌥' : 'Alt+'
 
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
+const settingsStore = useSettingsStore()
 const workspaceStore = useWorkspaceStore()
 const { activeWorkspaceId, activeTabId, activeWorkspace, hasActiveTab, sortedTabs } = storeToRefs(workspaceStore)
+const { settings } = storeToRefs(settingsStore)
 
 // Whether tab-related menu items should be disabled (no workspace selected)
 const isTabMenuDisabled = computed(() => !activeWorkspaceId.value)
@@ -62,6 +67,9 @@ const showNewWorkspaceDialog = ref(false)
 
 const showAboutDialog = ref(false)
 
+// SettingWindow state
+const showSettingWindow = ref(false)
+
 // DiffWindow state
 const showDiffWindow = ref(false)
 
@@ -73,10 +81,19 @@ function toggleToolPanel() {
   layoutStore.toggleToolPanel()
 }
 
+function getDefaultTabOptions() {
+  return {
+    activeToolTab: settings.value.defaultToolTab,
+    sizeViewerMode: settings.value.defaultSizeViewerMode,
+    playgroundMode: settings.value.defaultPlaygroundMode,
+    playgroundAutoRun: settings.value.defaultPlaygroundAutoRun,
+  }
+}
+
 function handleNewTab() {
   if (!activeWorkspaceId.value)
     return
-  const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'))
+  const tabId = workspaceStore.createTab(activeWorkspaceId.value, t('tab.untitled'), getDefaultTabOptions())
   workspaceStore.setActiveTab(tabId)
 }
 
@@ -85,12 +102,16 @@ async function handleNewTabFromClipboard() {
     return
 
   try {
-    const text = await navigator.clipboard.readText()
+    let text = await navigator.clipboard.readText()
+    // Auto format if enabled and valid JSON
+    if (settings.value.autoFormatOnPaste) {
+      text = tryFormatJson(text)
+    }
     // Format timestamp as MM-DD/HH:mm:ss
     const now = new Date()
     const timestamp = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}/${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
     const tabTitle = t('tab.from_clipboard', { timestamp })
-    const tabId = workspaceStore.createTab(activeWorkspaceId.value, tabTitle)
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, tabTitle, getDefaultTabOptions())
     workspaceStore.setActiveTab(tabId)
     // Set the content after creating the tab
     workspaceStore.updateTabContent(tabId, text)
@@ -116,10 +137,14 @@ async function handleNewTabFromFile() {
       multiple: false,
     })
     const file = await fileHandle.getFile()
-    const content = await file.text()
+    let content = await file.text()
+    // Auto format if enabled and valid JSON
+    if (settings.value.autoFormatOnPaste) {
+      content = tryFormatJson(content)
+    }
     // Use file name without extension as tab title
     const fileName = file.name.replace(/\.json$/i, '') || t('tab.untitled')
-    const tabId = workspaceStore.createTab(activeWorkspaceId.value, fileName)
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, fileName, getDefaultTabOptions())
     workspaceStore.setActiveTab(tabId)
     workspaceStore.updateTabContent(tabId, content)
   }
@@ -148,6 +173,12 @@ onMounted(() => {
   hotkeys('command+b, ctrl+b', (e) => {
     e.preventDefault()
     toggleSidePanel()
+  })
+
+  // Preferences hotkey - always available
+  hotkeys('command+,, ctrl+,', (e) => {
+    e.preventDefault()
+    showSettingWindow.value = true
   })
 
   // Other hotkeys only available in PWA mode
@@ -193,6 +224,8 @@ onMounted(() => {
 onUnmounted(() => {
   // Toggle sidebar is always registered
   hotkeys.unbind('command+b, ctrl+b')
+  // Preferences hotkey is always registered
+  hotkeys.unbind('command+,, ctrl+,')
 
   if (!isPWA)
     return
@@ -212,16 +245,17 @@ onUnmounted(() => {
     <MenubarMenu>
       <LogoMenubarTrigger />
       <MenubarContent>
-        <!-- <MenubarItem>
-          Preferences <MenubarShortcut>⌘,</MenubarShortcut>
-        </MenubarItem> -->
-        <!-- <MenubarSeparator /> -->
+        <MenubarItem @click="showSettingWindow = true">
+          {{ t('menu.preferences') }} <MenubarShortcut>{{ modKey }},</MenubarShortcut>
+        </MenubarItem>
+        <MenubarSeparator />
         <MenubarItem @click="showAboutDialog = true">
-          About
+          {{ t('menu.about') }}
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
     <AboutDialog v-model:open="showAboutDialog" />
+    <SettingWindow v-model="showSettingWindow" />
     <WorkspaceCreateDialog v-model:open="showNewWorkspaceDialog" />
     <WorkspaceDeleteDialog
       v-model:open="showDeleteWorkspaceDialog"

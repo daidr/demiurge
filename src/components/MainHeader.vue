@@ -5,14 +5,16 @@ import { useI18n } from 'vue-i18n'
 import { Button } from '@/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useLayoutStore } from '@/stores/layout'
+import { useSettingsStore } from '@/stores/settings'
 import { installFunction, showInstallButton } from '@/utils/pwa'
-import LangSwitch from './LangSwitch.vue'
 import MainMenu from './ui/MainMenu.vue'
 
 const { t } = useI18n()
 
 const layoutStore = useLayoutStore()
+const settingsStore = useSettingsStore()
 const { isBrowserSupported, showSidebar } = storeToRefs(layoutStore)
+const { settings } = storeToRefs(settingsStore)
 
 // Detect window-controls-overlay mode
 const isWCOMode = ref(false)
@@ -42,18 +44,17 @@ onUnmounted(() => {
   >
     <div class="header-left ml-1 flex items-center gap-1">
       <Button size="xs" variant="ghost" @click="layoutStore.toggleSidebar">
-        <span class="text-lg" :class="showSidebar ? 'i-mingcute-layout-top-close-fill' : 'i-mingcute-layout-top-open-line'" />
+        <span
+          class="text-lg"
+          :class="showSidebar ? 'i-mingcute-layout-top-close-fill' : 'i-mingcute-layout-top-open-line'"
+        />
       </Button>
       <MainMenu :disabled="!isBrowserSupported" />
     </div>
     <div class="header-right flex gap-1 p-1">
       <Tooltip v-if="showInstallButton">
         <TooltipTrigger as-child>
-          <Button
-            size="xs"
-            variant="outline"
-            @click="handleInstall"
-          >
+          <Button size="xs" variant="outline" @click="handleInstall">
             <div class="i-mingcute-download-2-line" />
             {{ t('pwa.install') }}
           </Button>
@@ -63,17 +64,20 @@ onUnmounted(() => {
         </TooltipContent>
       </Tooltip>
       <Button
-        size="xs" variant="outline" as="a" href="https://github.com/daidr/demiurge" target="_blank"
-        rel="noopener noreferrer"
+        v-if="settings.showGitHubButton" size="xs" variant="outline" as="a"
+        href="https://github.com/daidr/demiurge" target="_blank" rel="noopener noreferrer"
       >
         <div class="i-mingcute-github-line" />
       </Button>
-      <LangSwitch />
     </div>
   </header>
 </template>
 
 <style scoped lang="scss">
+.header {
+  height: 38px;
+}
+
 .header.wco-mode {
   // Adjust height to match titlebar
   height: calc(env(titlebar-area-height, 100%) + 1px);
