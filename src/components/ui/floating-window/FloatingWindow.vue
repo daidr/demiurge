@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { cn } from '@/lib/utils'
+import { useLayoutStore } from '@/stores/layout'
 
 const props = withDefaults(defineProps<{
   title?: string
@@ -22,6 +23,8 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   'update:modelValue': [value: boolean]
 }>()
+
+const layoutStore = useLayoutStore()
 
 const isOpen = computed({
   get: () => props.modelValue,
@@ -166,9 +169,13 @@ function close() {
 }
 
 // Watch for open changes to center window
-watch(isOpen, (newVal) => {
+watch(isOpen, (newVal, oldVal) => {
   if (newVal) {
     centerWindow()
+    layoutStore.incrementDialogCount()
+  }
+  else if (oldVal) {
+    layoutStore.decrementDialogCount()
   }
 })
 
@@ -183,6 +190,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('mousemove', onMouseMove)
   window.removeEventListener('mouseup', onMouseUp)
+  // Decrement dialog count if window was open when unmounted
+  if (isOpen.value) {
+    layoutStore.decrementDialogCount()
+  }
 })
 </script>
 
@@ -191,7 +202,7 @@ onUnmounted(() => {
     <Transition name="fade">
       <div v-if="isOpen" class="fixed inset-0 z-50">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/30 dark:bg-black/50" @click="close" />
+        <div class="absolute inset-0 bg-black/50" @click="close" />
 
         <!-- Window -->
         <div

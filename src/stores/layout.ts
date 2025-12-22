@@ -6,7 +6,7 @@ import { appStateCollection } from '@/db'
 
 const LIGHT_THEME_COLOR = '#ffffff'
 const DARK_THEME_COLOR = '#0a0a0a'
-const LIGHT_THEME_COLOR_WITH_OVERLAY = '#333333'
+const LIGHT_THEME_COLOR_WITH_OVERLAY = '#808080'
 const DARK_THEME_COLOR_WITH_OVERLAY = '#050505'
 
 export const useLayoutStore = defineStore('layout', () => {
@@ -93,7 +93,6 @@ export const useLayoutStore = defineStore('layout', () => {
   }
 
   watch([() => hasDialogOpen.value, () => mode.value], ([hasOpen, mode]) => {
-    console.log('hasDialogOpen', hasOpen)
     if (hasOpen) {
       setMetaThemeColorTag(mode === 'dark' ? DARK_THEME_COLOR_WITH_OVERLAY : LIGHT_THEME_COLOR_WITH_OVERLAY)
     }
