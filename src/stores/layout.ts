@@ -65,6 +65,18 @@ export const useLayoutStore = defineStore('layout', () => {
     )
   }
 
+  // Track number of open dialogs
+  const openDialogCount = ref(0)
+  const hasDialogOpen = computed(() => openDialogCount.value > 0)
+
+  function incrementDialogCount() {
+    openDialogCount.value++
+  }
+
+  function decrementDialogCount() {
+    openDialogCount.value = Math.max(0, openDialogCount.value - 1)
+  }
+
   return {
     isBrowserSupported,
     showSidebar,
@@ -74,6 +86,9 @@ export const useLayoutStore = defineStore('layout', () => {
     toggleToolPanel,
     toggleFloatingSidebar,
     setFloatingSidebar,
+    hasDialogOpen,
+    incrementDialogCount,
+    decrementDialogCount,
   }
 })
 
