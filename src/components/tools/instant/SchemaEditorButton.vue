@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { editor as monacoEditor } from 'monaco-editor'
-import { useMonaco } from '@guolao/vue-monaco-editor'
+import type * as Monaco from 'monaco-editor'
 import { storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -26,7 +26,7 @@ import { Switch } from '@/components/ui/switch'
 import { useSchemaStore } from '@/stores/schema'
 import { useToolsStore } from '@/stores/tools'
 
-const { monacoRef } = useMonaco()
+const monacoRef = shallowRef<typeof Monaco>()
 
 const { t } = useI18n()
 const schemaStore = useSchemaStore()
@@ -105,11 +105,8 @@ function configureJsonSchemaValidation() {
   })
 }
 
-function onEditorMounted(_editor: monacoEditor.IStandaloneCodeEditor) {
-  const monaco = monacoRef.value
-  if (!monaco)
-    return
-
+function onEditorMounted(_editor: monacoEditor.IStandaloneCodeEditor, monaco: typeof Monaco) {
+  monacoRef.value = monaco
   configureJsonSchemaValidation()
 
   EditorRef.value = _editor

@@ -28,7 +28,7 @@ export default defineConfig(async () => {
           runtimeCaching: [
             {
               // Cache Monaco Editor CDN resources
-              urlPattern: /^https:\/\/cdn\.staticfile\.net\/monaco-editor\/.*/i,
+              urlPattern: /^https:\/\/unpkg\.com\/monaco-editor\/.*/i,
               handler: 'CacheFirst',
               options: {
                 cacheName: 'monaco-editor-cdn',

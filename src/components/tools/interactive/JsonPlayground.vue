@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { editor, IDisposable } from 'monaco-editor'
+import type * as Monaco from 'monaco-editor'
 import type { AcceptableValue } from 'reka-ui'
-import { useMonaco } from '@guolao/vue-monaco-editor'
 import { storeToRefs } from 'pinia'
-import { computed, onUnmounted, watch } from 'vue'
+import { SplitterGroup, SplitterPanel, SplitterResizeHandle } from 'reka-ui'
+import { computed, onUnmounted, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import { Button } from '@/components/ui/button'
@@ -15,7 +16,7 @@ import { generateThisTypeDeclaration } from '@/utils/jsonToType'
 import { registerJsonPathLanguage } from '@/utils/monaco-jsonpath'
 import SnippetButton from './SnippetButton.vue'
 
-const { monacoRef } = useMonaco()
+const monacoRef = shallowRef<typeof Monaco>()
 const { t } = useI18n()
 const toolsStore = useToolsStore()
 const {
@@ -81,10 +82,8 @@ function updateTypeDefinitions() {
   }
 }
 
-function onExpressionEditorMounted(_editor: editor.IStandaloneCodeEditor) {
-  const monaco = monacoRef.value
-  if (!monaco)
-    return
+function onExpressionEditorMounted(_editor: editor.IStandaloneCodeEditor, monaco: typeof Monaco) {
+  monacoRef.value = monaco
 
   // Register JSONPath language for syntax highlighting
   registerJsonPathLanguage(monaco)
@@ -135,69 +134,95 @@ onUnmounted(() => {
       </Label>
     </div>
 
-    <!-- Expression Editor (top half) -->
-    <div class="min-h-0 flex-1 overflow-hidden rounded-md border">
-      <div class="text-muted-foreground bg-muted/50 border-b px-2 py-1 text-xs flex items-center gap-1">
-        <span class="i-mingcute-code-line" />
-        <span class="font-medium">{{ t('tools.expression') }}</span>
-        <template v-if="playgroundMode === 'javascript'">
-          <i18n-t keypath="tools.expression_hint_js" tag="span">
-            <template #dollar>
-              <code class="bg-muted rounded px-1 font-mono">$</code>
+    <!-- Splitter for Expression and Result panels -->
+    <SplitterGroup direction="vertical" class="min-h-0 flex-1">
+      <!-- Expression Editor Panel -->
+      <SplitterPanel :min-size="20" :default-size="50">
+        <div class="h-full overflow-hidden rounded-md border">
+          <div class="text-muted-foreground bg-muted/50 border-b px-2 py-1 text-xs flex items-center gap-1">
+            <span class="i-mingcute-code-line" />
+            <span class="font-medium">{{ t('tools.expression') }}</span>
+            <template v-if="playgroundMode === 'javascript'">
+              <i18n-t keypath="tools.expression_hint_js" tag="span">
+                <template #dollar>
+                  <code class="bg-muted rounded px-1 font-mono">$</code>
+                </template>
+                <template #data>
+                  <code class="bg-muted rounded px-1 font-mono">data</code>
+                </template>
+              </i18n-t>
             </template>
-            <template #data>
-              <code class="bg-muted rounded px-1 font-mono">data</code>
+            <template v-else>
+              <i18n-t keypath="tools.expression_hint_jsonpath" tag="span">
+                <template #example>
+                  <code class="bg-muted rounded px-1 font-mono">$.store.book[*].author</code>
+                </template>
+              </i18n-t>
             </template>
-          </i18n-t>
-        </template>
-        <template v-else>
-          <i18n-t keypath="tools.expression_hint_jsonpath" tag="span">
-            <template #example>
-              <code class="bg-muted rounded px-1 font-mono">$.store.book[*].author</code>
-            </template>
-          </i18n-t>
-        </template>
-      </div>
-      <div class="h-[calc(100%-28px)]">
-        <MonacoEditor
-          :value="playgroundExpression"
-          :options="{
-            language: playgroundMode === 'javascript' ? 'javascript' : 'jsonpath',
-            minimap: { enabled: false },
-            lineNumbers: 'off',
-            scrollBeyondLastLine: true,
-            wordWrap: 'on',
-            fontSize: 13,
-          }"
-          @update:value="handleExpressionChange"
-          @mounted="onExpressionEditorMounted"
-        />
-      </div>
-    </div>
+          </div>
+          <div class="h-[calc(100%-28px)]">
+            <MonacoEditor
+              :value="playgroundExpression"
+              :options="{
+                language: playgroundMode === 'javascript' ? 'javascript' : 'jsonpath',
+                minimap: { enabled: false },
+                lineNumbers: 'off',
+                scrollBeyondLastLine: true,
+                wordWrap: 'on',
+                fontSize: 13,
+              }"
+              @update:value="handleExpressionChange"
+              @mounted="onExpressionEditorMounted"
+            />
+          </div>
+        </div>
+      </SplitterPanel>
 
-    <!-- Result/Error Display (bottom half) -->
-    <div class="min-h-0 flex-1 overflow-hidden rounded-md border">
-      <div class="text-muted-foreground bg-muted/50 flex items-center gap-1 border-b px-2 py-1 text-xs">
-        <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
-        <span v-else class="i-mingcute-check-circle-line text-green-600" />
-        <span class="font-medium">{{ t('tools.result') }}</span>
-        <span v-if="playground.executionTime !== null" class="text-muted-foreground/70 ml-auto">
-          {{ playground.executionTime.toFixed(1) }} ms
-        </span>
-      </div>
-      <div class="h-[calc(100%-28px)]">
-        <MonacoEditor
-          :value="resultContent"
-          :options="{
-            language: 'json',
-            readOnly: true,
-            minimap: { enabled: false },
-            scrollBeyondLastLine: false,
-            wordWrap: 'on',
-            fontSize: 13,
-          }"
-        />
-      </div>
-    </div>
+      <!-- Resize Handle -->
+      <SplitterResizeHandle class="splitter-handle" />
+
+      <!-- Result/Error Display Panel -->
+      <SplitterPanel :min-size="20" :default-size="50" class="min-h-[200px]">
+        <div class="h-full overflow-hidden rounded-md border">
+          <div class="text-muted-foreground bg-muted/50 flex items-center gap-1 border-b px-2 py-1 text-xs">
+            <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
+            <span v-else class="i-mingcute-check-circle-line text-green-600" />
+            <span class="font-medium">{{ t('tools.result') }}</span>
+            <span v-if="playground.executionTime !== null" class="text-muted-foreground/70 ml-auto">
+              {{ playground.executionTime.toFixed(1) }} ms
+            </span>
+          </div>
+          <div class="h-[calc(100%-28px)]">
+            <MonacoEditor
+              :value="resultContent"
+              :options="{
+                language: 'json',
+                readOnly: true,
+                minimap: { enabled: false },
+                scrollBeyondLastLine: false,
+                wordWrap: 'on',
+                fontSize: 13,
+              }"
+            />
+          </div>
+        </div>
+      </SplitterPanel>
+    </SplitterGroup>
   </div>
 </template>
+
+<style scoped>
+.splitter-handle {
+  @apply relative h-2 w-full flex items-center justify-center transition-colors;
+}
+
+.splitter-handle::before {
+  content: '';
+  @apply absolute left-1/2 h-0.5 w-12 -translate-x-1/2 rounded-full bg-border transition-colors;
+}
+
+.splitter-handle:hover::before,
+.splitter-handle[data-state="drag"]::before {
+  @apply bg-primary;
+}
+</style>

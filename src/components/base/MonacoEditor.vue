@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
+import type * as MonacoEditor from 'monaco-editor'
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import { useElementBounding } from '@vueuse/core'
 import { ref, shallowRef } from 'vue'
@@ -10,7 +11,7 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  'mounted': [editor.IStandaloneCodeEditor]
+  'mounted': [editor: editor.IStandaloneCodeEditor, monaco: typeof MonacoEditor]
   'unmounted': [editor.IStandaloneCodeEditor]
   'update:value': [string]
 }>()
@@ -20,9 +21,9 @@ const ContainerRef = ref<HTMLDivElement | null>(null)
 const OverflowRef = ref<HTMLDivElement | null>(null)
 const { x, y } = useElementBounding(ContainerRef)
 
-function handleEditorMount(editor: editor.IStandaloneCodeEditor) {
+function handleEditorMount(editor: editor.IStandaloneCodeEditor, monaco: typeof MonacoEditor) {
   EditorRef.value = editor
-  emit('mounted', editor)
+  emit('mounted', editor, monaco)
 }
 
 function handleEditorUnmount() {

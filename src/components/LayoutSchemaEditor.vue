@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
-import { useMonaco } from '@guolao/vue-monaco-editor'
+import type * as Monaco from 'monaco-editor'
 import { ref, shallowRef, watch } from 'vue'
 import MonacoEditor from './base/MonacoEditor.vue'
 
-const { monacoRef } = useMonaco()
-
 const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
+const monacoRef = shallowRef<typeof Monaco>()
 let model: editor.ITextModel | null = null
 const code = ref('')
 
@@ -39,11 +38,8 @@ function configureJsonSchemaValidation() {
   })
 }
 
-function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
-  const monaco = monacoRef.value
-  if (!monaco)
-    return
-
+function onEditorMounted(_editor: editor.IStandaloneCodeEditor, monaco: typeof Monaco) {
+  monacoRef.value = monaco
   configureJsonSchemaValidation()
 
   EditorRef.value = _editor

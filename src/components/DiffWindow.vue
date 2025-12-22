@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { editor as monacoEditor } from 'monaco-editor'
-import { useMonaco } from '@guolao/vue-monaco-editor'
+import { VueMonacoDiffEditor } from '@guolao/vue-monaco-editor'
 import { storeToRefs } from 'pinia'
-import { computed, nextTick, ref, shallowRef, watch } from 'vue'
+import { computed, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { FloatingWindow } from '@/components/ui/floating-window'
 import { Label } from '@/components/ui/label'
@@ -30,7 +30,6 @@ const isOpen = computed({
 })
 
 const { t } = useI18n()
-const { monacoRef } = useMonaco()
 
 const workspaceStore = useWorkspaceStore()
 const { sortedTabs } = storeToRefs(workspaceStore)
@@ -73,93 +72,21 @@ watch(rightTabId, async (tabId) => {
 })
 
 // Monaco diff editor ref
-const containerRef = ref<HTMLDivElement>()
 const diffEditorRef = shallowRef<monacoEditor.IStandaloneDiffEditor>()
-let originalModel: monacoEditor.ITextModel | null = null
-let modifiedModel: monacoEditor.ITextModel | null = null
 
-// Cleanup function for Monaco resources
-function disposeMonaco() {
-  if (diffEditorRef.value) {
-    diffEditorRef.value.dispose()
-    diffEditorRef.value = undefined
-  }
-  if (originalModel) {
-    originalModel.dispose()
-    originalModel = null
-  }
-  if (modifiedModel) {
-    modifiedModel.dispose()
-    modifiedModel = null
-  }
+// Handle diff editor mount
+function handleDiffEditorMount(editor: monacoEditor.IStandaloneDiffEditor) {
+  diffEditorRef.value = editor
 }
 
-// Initialize Monaco when window opens
-function initMonaco() {
-  const container = containerRef.value
-  const monaco = monacoRef.value
-  if (!container || !monaco)
-    return
-
-  // Create models
-  originalModel = monaco.editor.createModel('', 'json')
-  modifiedModel = monaco.editor.createModel('', 'json')
-
-  // Create diff editor
-  diffEditorRef.value = monaco.editor.createDiffEditor(container, {
-    automaticLayout: true,
-    readOnly: true,
-    renderSideBySide: true,
-    useInlineViewWhenSpaceIsLimited: false,
-    minimap: { enabled: false },
-    scrollBeyondLastLine: false,
-    fontSize: 13,
-  })
-
-  diffEditorRef.value.setModel({
-    original: originalModel,
-    modified: modifiedModel,
-  })
-
-  // Set initial content
-  originalModel.setValue(leftContent.value)
-  modifiedModel.setValue(rightContent.value)
-}
-
-// Watch for window open/close to manage Monaco lifecycle
-watch(isOpen, async (open) => {
-  if (open) {
-    // Wait for container to be rendered, then init Monaco
-    await nextTick()
-    initMonaco()
-  }
-  else {
-    // Reset state and cleanup Monaco
+// Reset state when window closes
+watch(isOpen, (open) => {
+  if (!open) {
     leftTabId.value = null
     rightTabId.value = null
     leftContent.value = ''
     rightContent.value = ''
-    disposeMonaco()
-  }
-})
-
-// Also watch for monaco to become available after window opens
-watch(monacoRef, (monaco) => {
-  if (monaco && isOpen.value && !diffEditorRef.value) {
-    initMonaco()
-  }
-})
-
-// Update models when content changes
-watch(leftContent, (content) => {
-  if (originalModel) {
-    originalModel.setValue(content)
-  }
-})
-
-watch(rightContent, (content) => {
-  if (modifiedModel) {
-    modifiedModel.setValue(content)
+    diffEditorRef.value = undefined
   }
 })
 </script>
@@ -203,21 +130,23 @@ watch(rightContent, (content) => {
       </div>
     </template>
 
-    <!-- Monaco Diff Editor container -->
-    <div ref="containerRef" class="size-full" :class="{ 'is-loading': !diffEditorRef }" />
+    <!-- Monaco Diff Editor -->
+    <VueMonacoDiffEditor
+      v-if="isOpen"
+      class="size-full"
+      :original="leftContent"
+      :modified="rightContent"
+      language="json"
+      :options="{
+        automaticLayout: true,
+        readOnly: true,
+        renderSideBySide: true,
+        useInlineViewWhenSpaceIsLimited: false,
+        minimap: { enabled: false },
+        scrollBeyondLastLine: false,
+        fontSize: 13,
+      }"
+      @mount="handleDiffEditorMount"
+    />
   </FloatingWindow>
 </template>
-
-<style scoped>
-.is-loading {
-  position: relative;
-}
-
-.is-loading::after {
-  content: 'loading...';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-}
-</style>

@@ -18,8 +18,10 @@ if (import.meta.env.DEV) {
 }
 
 // 配置 Monaco Editor 使用 CDN 加载
-const MONACO_VERSION = '0.52.2'
-const CDN_BASE = `https://cdn.staticfile.net/monaco-editor/${MONACO_VERSION}`
+const MONACO_VERSION = '0.55.0'
+// const CDN_BASE = `https://registry.npmmirror.com/monaco-editor/${MONACO_VERSION}/files`
+// const CDN_BASE = `https://cdn.jsdelivr.net/npm/monaco-editor@${MONACO_VERSION}`
+const CDN_BASE = `https://unpkg.com/monaco-editor@${MONACO_VERSION}`
 
 // 根据语言偏好设置 Monaco 的 locale
 function getMonacoLocale(): string | undefined {
@@ -34,16 +36,21 @@ function getMonacoLocale(): string | undefined {
   return undefined
 }
 
+const monacoLocale = getMonacoLocale()
+
 loader.config({
-  'paths': {
+  paths: {
     vs: `${CDN_BASE}/min/vs`,
   },
-  'vs/nls': {
-    availableLanguages: {
-      '*': getMonacoLocale() || '',
-    },
-  },
 })
+
+// 手动加载 nls，不依赖 loader
+if (monacoLocale) {
+  const path = `${CDN_BASE}/esm/nls.messages.${monacoLocale}.js`
+  const script = document.createElement('script')
+  script.src = path
+  document.head.appendChild(script)
+}
 
 const i18n = createI18n({
   locale: 'en',

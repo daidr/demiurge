@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
-import { useMonaco } from '@guolao/vue-monaco-editor'
+import type * as Monaco from 'monaco-editor'
 import { onUnmounted, shallowRef, watch } from 'vue'
 import { useToolsStore } from '@/stores/tools'
 import MonacoEditor from './base/MonacoEditor.vue'
@@ -10,9 +10,9 @@ import SchemaEditorButton from './tools/instant/SchemaEditorButton.vue'
 import SortJsonButton from './tools/instant/SortJsonButton.vue'
 
 const toolsStore = useToolsStore()
-const { monacoRef } = useMonaco()
 
 const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
+const monacoRef = shallowRef<typeof Monaco>()
 let model: editor.ITextModel | null = null
 
 // Watch for external content changes (e.g., from Sort JSON)
@@ -73,11 +73,8 @@ function updateJsonSchemaValidation(schemaString: string) {
   }
 }
 
-function onEditorMounted(_editor: editor.IStandaloneCodeEditor) {
-  const monaco = monacoRef.value
-  if (!monaco)
-    return
-
+function onEditorMounted(_editor: editor.IStandaloneCodeEditor, monaco: typeof Monaco) {
+  monacoRef.value = monaco
   EditorRef.value = _editor
   toolsStore.setEditorRef(_editor)
   model = monaco.editor.createModel(
