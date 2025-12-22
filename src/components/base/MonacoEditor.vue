@@ -4,6 +4,7 @@ import type * as MonacoEditor from 'monaco-editor'
 import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
 import { useElementBounding } from '@vueuse/core'
 import { ref, shallowRef } from 'vue'
+import { useEditorTheme } from '@/composables/useEditorTheme'
 
 const props = defineProps<{
   options?: editor.IStandaloneEditorConstructionOptions
@@ -15,6 +16,8 @@ const emit = defineEmits<{
   'unmounted': [editor.IStandaloneCodeEditor]
   'update:value': [string]
 }>()
+
+const { editorTheme } = useEditorTheme()
 
 const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
 const ContainerRef = ref<HTMLDivElement | null>(null)
@@ -50,6 +53,7 @@ function handleValueChange(value: string | undefined) {
       class="h-full w-full"
       :value="props.value"
       :language="options?.language"
+      :theme="editorTheme"
       :options="{
         ...options,
         automaticLayout: true,

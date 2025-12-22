@@ -1,8 +1,11 @@
 <script setup lang="ts">
 import type { ITreemapChartSpec } from '@visactor/vchart'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import { registerTooltip, registerTreemapChart, VChart } from '@visactor/vchart'
+import { registerTooltip, registerTreemapChart, ThemeManager, VChart } from '@visactor/vchart'
+import darkTheme from '@visactor/vchart-theme/public/dark.json'
+import lightTheme from '@visactor/vchart-theme/public/light.json'
 import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { useEditorTheme } from '@/composables/useEditorTheme'
 import { cn } from '@/lib/utils'
 
 const props = defineProps<{
@@ -15,6 +18,12 @@ const emit = defineEmits<{
 }>()
 
 VChart.useRegisters([registerTreemapChart, registerTooltip])
+
+// Register themes
+ThemeManager.registerTheme('light', lightTheme as any)
+ThemeManager.registerTheme('dark', darkTheme as any)
+
+const { isDark } = useEditorTheme()
 
 const containerRef = ref<HTMLDivElement | null>(null)
 const chartInstance = shallowRef<VChart | null>(null)
@@ -72,6 +81,7 @@ function createChart() {
 
   const spec = {
     type: 'treemap',
+    background: 'transparent',
     data: [
       {
         id: 'data',
@@ -180,7 +190,10 @@ function createChart() {
     },
   } satisfies ITreemapChartSpec
 
-  chartInstance.value = new VChart(spec as any, { dom: containerRef.value })
+  chartInstance.value = new VChart(spec as any, {
+    dom: containerRef.value,
+    theme: isDark.value ? 'dark' : 'light',
+  })
   chartInstance.value.renderSync()
 
   // Add click event listener for Alt+Click navigation
@@ -216,6 +229,11 @@ onUnmounted(() => {
 watch(() => props.node, () => {
   createChart()
 }, { deep: true })
+
+// Watch for theme changes
+watch(isDark, () => {
+  createChart()
+})
 </script>
 
 <template>

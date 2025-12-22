@@ -49,18 +49,18 @@ function handleOpenChange(value: boolean) {
       <div class="flex flex-col gap-3 py-4">
         <!-- Version -->
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ t('about.version') }}</span>
+          <span class="text-muted-foreground">{{ t('about.version') }}</span>
           <span>0.0.1-alpha</span>
         </div>
 
         <!-- Author -->
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ t('about.author') }}</span>
+          <span class="text-muted-foreground">{{ t('about.author') }}</span>
           <a
             href="https://github.com/daidr"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-blue-600 hover:underline"
+            class="text-primary hover:text-primary/80 hover:underline"
           >
             daidr
           </a>
@@ -68,18 +68,18 @@ function handleOpenChange(value: boolean) {
 
         <!-- License -->
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ t('about.license') }}</span>
+          <span class="text-muted-foreground">{{ t('about.license') }}</span>
           <span>MIT</span>
         </div>
 
         <!-- GitHub -->
         <div class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">GitHub</span>
+          <span class="text-muted-foreground">GitHub</span>
           <a
             href="https://github.com/daidr/demiurge"
             target="_blank"
             rel="noopener noreferrer"
-            class="text-blue-600 hover:underline"
+            class="text-primary hover:text-primary/80 hover:underline"
           >
             daidr/demiurge
           </a>
@@ -87,18 +87,18 @@ function handleOpenChange(value: boolean) {
 
         <!-- Build Time -->
         <div v-if="formattedCommitTimestamp" class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ t('about.build_time') }}</span>
+          <span class="text-muted-foreground">{{ t('about.build_time') }}</span>
           <span class="font-mono text-xs">{{ formattedCommitTimestamp }}</span>
         </div>
 
         <!-- Git Commit -->
         <div v-if="gitInfo.shortCommitHash" class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ t('about.commit') }}</span>
+          <span class="text-muted-foreground">{{ t('about.commit') }}</span>
           <a
             :href="`https://github.com/${gitInfo.owner}/${gitInfo.repo}/commit/${gitInfo.shortCommitHash}`"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-mono text-xs text-blue-600 hover:underline"
+            class="font-mono text-xs text-primary hover:text-primary/80 hover:underline"
           >
             {{ gitInfo.shortCommitHash }}
           </a>
@@ -106,12 +106,12 @@ function handleOpenChange(value: boolean) {
 
         <!-- Pull Request -->
         <div v-if="gitInfo.pr" class="flex items-center justify-between text-sm">
-          <span class="text-gray-500">{{ t('about.pull_request') }}</span>
+          <span class="text-muted-foreground">{{ t('about.pull_request') }}</span>
           <a
             :href="`https://github.com/${gitInfo.owner}/${gitInfo.repo}/pull/${gitInfo.pr}`"
             target="_blank"
             rel="noopener noreferrer"
-            class="font-mono text-xs text-blue-600 hover:underline"
+            class="font-mono text-xs text-primary hover:text-primary/80 hover:underline"
           >
             #{{ gitInfo.pr }}
           </a>

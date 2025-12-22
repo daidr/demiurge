@@ -74,7 +74,7 @@ const { settings } = storeToRefs(settingsStore)
                   <p class="font-medium">
                     {{ (locales as any)[item] }}
                   </p>
-                  <p v-if="item !== lang" class="text-xs text-slate-500">
+                  <p v-if="item !== lang" class="text-xs text-muted-foreground">
                     {{ t(`locales.${item}`) }}
                   </p>
                 </SelectItem>

@@ -13,6 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { useEditorTheme } from '@/composables/useEditorTheme'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { getToolsWorker } from '@/utils/tools_service'
 
@@ -30,6 +31,7 @@ const isOpen = computed({
 })
 
 const { t } = useI18n()
+const { editorTheme } = useEditorTheme()
 
 const workspaceStore = useWorkspaceStore()
 const { sortedTabs } = storeToRefs(workspaceStore)
@@ -137,6 +139,7 @@ watch(isOpen, (open) => {
       :original="leftContent"
       :modified="rightContent"
       language="json"
+      :theme="editorTheme"
       :options="{
         automaticLayout: true,
         readOnly: true,

@@ -22,6 +22,7 @@
     "@signaldb/vue": "^1.0.0",
     "@unocss/reset": "^66.5.10",
     "@visactor/vchart": "^2.0.11",
+    "@visactor/vchart-theme": "^1.12.2",
     "@vueuse/core": "^13.9.0",
     "comlink": "^4.4.2",
     "hotkeys-js": "^3.13.15",

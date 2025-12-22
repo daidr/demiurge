@@ -191,7 +191,7 @@ onUnmounted(() => {
     <Transition name="fade">
       <div v-if="isOpen" class="fixed inset-0 z-50">
         <!-- Backdrop -->
-        <div class="absolute inset-0 bg-black/30" @click="close" />
+        <div class="absolute inset-0 bg-black/30 dark:bg-black/50" @click="close" />
 
         <!-- Window -->
         <div

@@ -31,13 +31,15 @@ export default defineConfig({
     },
   },
   presets: [
-    presetWind3(),
+    presetWind3({
+      dark: 'class',
+    }),
     presetAnimations(),
     presetShadcn(
       {
-        color: 'slate',
+        color: 'neutral',
         // With default setting for SolidUI, you need to set the darkSelector option.
-        darkSelector: '[data-kb-theme="dark"]',
+        darkSelector: '[class="dark"]',
       },
       {
         componentLibrary: 'reka',

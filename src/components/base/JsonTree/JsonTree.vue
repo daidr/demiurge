@@ -99,14 +99,13 @@ function handleClickCapture(node: JsonSizeNode, event: MouseEvent) {
     :get-key="getKey"
     :get-children="getChildren"
     :expanded="expandedArray"
-    class="text-sm select-none h-full overflow-y-auto"
+    class="text-sm select-none h-full overflow-y-auto tree"
     @update:expanded="handleExpandedChange"
   >
     <TreeVirtualizer
       v-slot="{ item }"
       :estimate-size="28"
       :text-content="(opt) => opt.key"
-      class="h-full overflow-auto"
     >
       <TreeItem
         v-slot="{ isExpanded }"
@@ -142,7 +141,7 @@ function handleClickCapture(node: JsonSizeNode, event: MouseEvent) {
         </span>
 
         <!-- Size bar -->
-        <div class="w-16 h-1.5 bg-muted rounded-full overflow-hidden flex-shrink-0 ring-1 ring-white">
+        <div class="w-16 h-1.5 bg-muted rounded-full overflow-hidden flex-shrink-0 ring-1 ring-background">
           <div
             class="h-full bg-primary transition-all"
             :style="{ width: `${Math.max(item.value.percentage, 1)}%` }"
@@ -152,3 +151,9 @@ function handleClickCapture(node: JsonSizeNode, event: MouseEvent) {
     </TreeVirtualizer>
   </TreeRoot>
 </template>
+
+<style scoped lang="scss">
+.tree {
+  scrollbar-width: thin;
+}
+</style>

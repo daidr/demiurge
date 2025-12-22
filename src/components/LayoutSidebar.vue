@@ -458,7 +458,7 @@ async function handleClearAllData() {
       <div class="bg-muted h-1.5 w-full overflow-hidden rounded-full">
         <div
           class="h-full rounded-full transition-all duration-300"
-          :class="storagePercentage > 90 ? 'bg-destructive' : storagePercentage > 70 ? 'bg-yellow-500' : 'bg-primary'"
+          :class="storagePercentage > 90 ? 'bg-destructive' : storagePercentage > 70 ? 'bg-yellow-500 dark:bg-yellow-600' : 'bg-primary'"
           :style="{ width: `${storagePercentage}%` }"
         />
       </div>

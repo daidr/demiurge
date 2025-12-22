@@ -12,6 +12,7 @@
         "@signaldb/vue": "^1.0.0",
         "@unocss/reset": "^66.5.10",
         "@visactor/vchart": "^2.0.11",
+        "@visactor/vchart-theme": "^1.12.2",
         "@vueuse/core": "^13.9.0",
         "comlink": "^4.4.2",
         "hotkeys-js": "^3.13.15",
@@ -799,6 +800,8 @@
     "@unocss/vite": ["@unocss/vite@66.5.10", "", { "dependencies": { "@jridgewell/remapping": "^2.3.5", "@unocss/config": "66.5.10", "@unocss/core": "66.5.10", "@unocss/inspector": "66.5.10", "chokidar": "^3.6.0", "magic-string": "^0.30.21", "pathe": "^2.0.3", "tinyglobby": "^0.2.15", "unplugin-utils": "^0.3.1" }, "peerDependencies": { "vite": "^2.9.0 || ^3.0.0-0 || ^4.0.0 || ^5.0.0-0 || ^6.0.0-0 || ^7.0.0-0" } }, "sha512-GegFDmcWe0V2CR/uN1f+iQuDh2R1vA6EAwSvl1nyL+6ue0/zLyF9yhdVnypIVlJnS6RK/xaLPOP6vWJnqRGhZg=="],
 
     "@visactor/vchart": ["@visactor/vchart@2.0.11", "", { "dependencies": { "@visactor/vdataset": "~1.0.12", "@visactor/vlayouts": "~1.0.12", "@visactor/vrender-animate": "~1.0.32", "@visactor/vrender-components": "~1.0.32", "@visactor/vrender-core": "~1.0.32", "@visactor/vrender-kits": "~1.0.32", "@visactor/vscale": "~1.0.12", "@visactor/vutils": "~1.0.12", "@visactor/vutils-extension": "2.0.11" } }, "sha512-67z4yDfkU7WV1nL4cPPPdXT5Psi3Wq9vzZhqCAuH6V3NV9YlcOeeuCCGorg7+7SasdeXeZxg8gDbZM78Y+uCkQ=="],
+
+    "@visactor/vchart-theme": ["@visactor/vchart-theme@1.12.2", "", { "peerDependencies": { "@visactor/vchart": ">=1.10.4" } }, "sha512-r298TUdK+CKbHGVYWgQnNSEB5uqpFvF2/aMNZ/2POQnd2CovAPJOx2nTE6hAcOn8rra2FwJ2xF8AyP1O5OhrTw=="],
 
     "@visactor/vdataset": ["@visactor/vdataset@1.0.21", "", { "dependencies": { "@turf/flatten": "^6.5.0", "@turf/helpers": "^6.5.0", "@turf/rewind": "^6.5.0", "@visactor/vutils": "1.0.21", "d3-dsv": "^2.0.0", "d3-geo": "^1.12.1", "d3-hexbin": "^0.2.2", "d3-hierarchy": "^3.1.1", "eventemitter3": "^4.0.7", "geobuf": "^3.0.1", "geojson-dissolve": "^3.1.0", "path-browserify": "^1.0.1", "pbf": "^3.2.1", "point-at-length": "^1.1.0", "simple-statistics": "^7.7.3", "simplify-geojson": "^1.0.4", "topojson-client": "^3.1.0" } }, "sha512-ZY1LFZsiZ3lHnDydQGoVJfuVAk6WWddSQXrWxFM4g+59OeByNJwLCf+46QtbJIjeRrJU7qgr+L2mlI4Mz3qeWQ=="],
 

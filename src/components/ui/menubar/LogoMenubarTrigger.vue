@@ -19,10 +19,9 @@ const forwardedProps = useForwardProps(delegatedProps)
 <template>
   <MenubarTrigger
     v-bind="forwardedProps" :class="cn(
-      'logo flex cursor-default select-none items-center outline-none focus:(bg-black text-white shadow-md shadow-black/20) data-[state=open]:(bg-black text-white shadow-md shadow-black/20)',
+      'logo flex cursor-default select-none items-center outline-none focus:(bg-foreground text-background shadow-md shadow-foreground/20) data-[state=open]:(bg-foreground text-background shadow-md shadow-foreground/20)',
       props.class,
-    )
-    "
+    )"
   >
     <div class="i-custom-demiurge text-lg" />
     Demiurge
