@@ -142,6 +142,11 @@
     "right_tab": "右侧",
     "select_tab": "选择标签页"
   },
+  "theme": {
+    "light": "浅色模式",
+    "dark": "深色模式",
+    "system": "跟随系统"
+  },
   "settings": {
     "title": "首选项",
     "language": "语言",

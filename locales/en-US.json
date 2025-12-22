@@ -142,6 +142,11 @@
     "right_tab": "Right",
     "select_tab": "Select a tab"
   },
+  "theme": {
+    "light": "Light Mode",
+    "dark": "Dark Mode",
+    "system": "System"
+  },
   "settings": {
     "title": "Preferences",
     "language": "Language",

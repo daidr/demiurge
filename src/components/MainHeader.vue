@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 import { useLayoutStore } from '@/stores/layout'
 import { useSettingsStore } from '@/stores/settings'
 import { installFunction, showInstallButton } from '@/utils/pwa'
+import ModeToggle from './ModeToggle.vue'
 import MainMenu from './ui/MainMenu.vue'
 
 const { t } = useI18n()
@@ -63,6 +64,7 @@ onUnmounted(() => {
           {{ t('pwa.install_tooltip') }}
         </TooltipContent>
       </Tooltip>
+      <ModeToggle />
       <Button
         v-if="settings.showGitHubButton" size="xs" variant="outline" as="a"
         href="https://github.com/daidr/demiurge" target="_blank" rel="noopener noreferrer"
