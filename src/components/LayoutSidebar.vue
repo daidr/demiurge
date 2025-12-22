@@ -142,6 +142,9 @@ const deletingWorkspaceTitle = computed(() => {
 // Edit workspace dialog state
 const showEditDialog = ref(false)
 
+// Create workspace popover state
+const showCreatePopover = ref(false)
+
 function handleWorkspaceChange(value: unknown) {
   if (typeof value === 'string') {
     workspaceStore.setActiveWorkspace(value)
@@ -320,14 +323,14 @@ async function handleClearAllData() {
         </SelectContent>
       </Select>
 
-      <Popover :modal="true">
+      <Popover v-model:open="showCreatePopover" :modal="true">
         <PopoverTrigger>
           <Button size="xs" variant="outline">
             <div class="i-mingcute-add-line" />
           </Button>
         </PopoverTrigger>
         <PopoverContent>
-          <WorkspaceEditPanel />
+          <WorkspaceEditPanel @close="() => showCreatePopover = false" />
         </PopoverContent>
       </Popover>
 
