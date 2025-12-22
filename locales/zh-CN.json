@@ -27,7 +27,8 @@
     "clear_all_data": "清除全部数据",
     "clear_all_data_title": "清除全部数据",
     "clear_all_data_description": "这将永久删除所有工作区、标签页和 Schema。此操作无法撤销。",
-    "clear_all_data_confirm": "全部清除"
+    "clear_all_data_confirm": "全部清除",
+    "drop_to_create_tab": "松开以新建标签页"
   },
   "workspace": {
     "create_workspace": "创建工作区",
@@ -44,7 +45,8 @@
   "tab": {
     "untitled": "未命名",
     "create_tab": "新建标签页",
-    "from_clipboard": "自剪贴板 {timestamp}"
+    "from_clipboard": "自剪贴板 {timestamp}",
+    "from_drop": "拖放 {timestamp}"
   },
   "schema": {
     "editor_title": "JSON Schema 编辑器",

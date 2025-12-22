@@ -52,6 +52,77 @@ const {
   activeTabId,
 } = storeToRefs(workspaceStore)
 
+// Drag and drop state
+const isDragOver = ref(false)
+let dragCounter = 0
+
+function handleDragEnter(e: DragEvent) {
+  e.preventDefault()
+  if (!activeWorkspaceId.value)
+    return
+  dragCounter++
+  isDragOver.value = true
+}
+
+function handleDragLeave(e: DragEvent) {
+  e.preventDefault()
+  dragCounter--
+  if (dragCounter === 0) {
+    isDragOver.value = false
+  }
+}
+
+function handleDragOver(e: DragEvent) {
+  e.preventDefault()
+  if (!activeWorkspaceId.value)
+    return
+  if (e.dataTransfer) {
+    e.dataTransfer.dropEffect = 'copy'
+  }
+}
+
+async function handleDrop(e: DragEvent) {
+  e.preventDefault()
+  isDragOver.value = false
+  dragCounter = 0
+
+  if (!activeWorkspaceId.value || !e.dataTransfer)
+    return
+
+  // Check for files first
+  const files = e.dataTransfer.files
+  if (files.length > 0) {
+    for (const file of files) {
+      // Check if it's a JSON file or text file
+      if (file.type === 'application/json' || file.name.endsWith('.json') || file.type.startsWith('text/')) {
+        try {
+          const content = await file.text()
+          const fileName = file.name.replace(/\.(json|txt)$/i, '') || t('tab.untitled')
+          const tabId = workspaceStore.createTab(activeWorkspaceId.value, fileName)
+          workspaceStore.setActiveTab(tabId)
+          workspaceStore.updateTabContent(tabId, content)
+        }
+        catch {
+          // Failed to read file
+        }
+      }
+    }
+    return
+  }
+
+  // Check for text data
+  const text = e.dataTransfer.getData('text/plain')
+  if (text) {
+    // Format timestamp as MM-DD/HH:mm:ss
+    const now = new Date()
+    const timestamp = `${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}/${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}:${String(now.getSeconds()).padStart(2, '0')}`
+    const tabTitle = t('tab.from_drop', { timestamp })
+    const tabId = workspaceStore.createTab(activeWorkspaceId.value, tabTitle)
+    workspaceStore.setActiveTab(tabId)
+    workspaceStore.updateTabContent(tabId, text)
+  }
+}
+
 // Delete workspace dialog state
 const showDeleteDialog = ref(false)
 const deletingWorkspaceId = ref<string | null>(null)
@@ -184,7 +255,23 @@ async function handleClearAllData() {
 </script>
 
 <template>
-  <div class="flex h-full flex-col flex-shrink overflow-hidden">
+  <div
+    class="relative flex h-full flex-col flex-shrink overflow-hidden"
+    @dragenter="handleDragEnter"
+    @dragleave="handleDragLeave"
+    @dragover="handleDragOver"
+    @drop="handleDrop"
+  >
+    <!-- Drop overlay -->
+    <div
+      v-if="isDragOver && activeWorkspaceId"
+      class="pointer-events-none absolute inset-0 z-50 flex items-center justify-center bg-primary/10 border-2 border-dashed border-primary rounded-lg"
+    >
+      <div class="text-primary flex flex-col items-center gap-2">
+        <div class="i-mingcute-file-download-line text-3xl" />
+        <span class="text-sm font-medium">{{ t('sidebar.drop_to_create_tab') }}</span>
+      </div>
+    </div>
     <!-- Workspace selector and controls -->
     <div class="flex gap-1 p-1">
       <Select

@@ -27,7 +27,8 @@
     "clear_all_data": "Clear All Data",
     "clear_all_data_title": "Clear All Data",
     "clear_all_data_description": "This will permanently delete all workspaces, tabs, and schemas. This action cannot be undone.",
-    "clear_all_data_confirm": "Clear All"
+    "clear_all_data_confirm": "Clear All",
+    "drop_to_create_tab": "Drop to create tab"
   },
   "workspace": {
     "create_workspace": "Create Workspace",
@@ -44,7 +45,8 @@
   "tab": {
     "untitled": "Untitled",
     "create_tab": "New Tab",
-    "from_clipboard": "Clipboard {timestamp}"
+    "from_clipboard": "Clipboard {timestamp}",
+    "from_drop": "Drop {timestamp}"
   },
   "schema": {
     "editor_title": "JSON Schema Editor",
