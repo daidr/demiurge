@@ -56,9 +56,14 @@ const {
 const isDragOver = ref(false)
 let dragCounter = 0
 
+// Check if this is an internal tab drag (not external file/text)
+function isInternalDrag(e: DragEvent): boolean {
+  return e.dataTransfer?.types.includes('application/x-demiurge-tab') ?? false
+}
+
 function handleDragEnter(e: DragEvent) {
   e.preventDefault()
-  if (!activeWorkspaceId.value)
+  if (!activeWorkspaceId.value || isInternalDrag(e))
     return
   dragCounter++
   isDragOver.value = true
@@ -74,7 +79,7 @@ function handleDragLeave(e: DragEvent) {
 
 function handleDragOver(e: DragEvent) {
   e.preventDefault()
-  if (!activeWorkspaceId.value)
+  if (!activeWorkspaceId.value || isInternalDrag(e))
     return
   if (e.dataTransfer) {
     e.dataTransfer.dropEffect = 'copy'
@@ -86,7 +91,8 @@ async function handleDrop(e: DragEvent) {
   isDragOver.value = false
   dragCounter = 0
 
-  if (!activeWorkspaceId.value || !e.dataTransfer)
+  // Ignore internal tab drag
+  if (!activeWorkspaceId.value || !e.dataTransfer || isInternalDrag(e))
     return
 
   // Check for files first

@@ -36,6 +36,8 @@ function handleDragStart(e: DragEvent, tabId: string) {
   if (e.dataTransfer) {
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.setData('text/plain', tabId)
+    // Mark as internal drag for sidebar to ignore
+    e.dataTransfer.setData('application/x-demiurge-tab', tabId)
   }
 }
 
