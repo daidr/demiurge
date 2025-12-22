@@ -19,10 +19,15 @@ import WorkspaceCreateDialog from '@/components/WorkspaceCreateDialog.vue'
 import WorkspaceDeleteDialog from '@/components/WorkspaceDeleteDialog.vue'
 import { useLayoutStore } from '@/stores/layout'
 import { useWorkspaceStore } from '@/stores/workspace'
+import { isMac } from '@/utils/platform'
 
 defineProps<{
   disabled?: boolean
 }>()
+// Shortcut key symbols based on platform
+const modKey = isMac() ? '⌘' : 'Ctrl+'
+const shiftKey = isMac() ? '⇧' : 'Shift+'
+const altKey = isMac() ? '⌥' : 'Alt+'
 
 const { t } = useI18n()
 const layoutStore = useLayoutStore()
@@ -228,22 +233,22 @@ onUnmounted(() => {
       <MenubarContent>
         <MenubarItem @click="showNewWorkspaceDialog = true">
           {{ t('menu.new_workspace') }} <MenubarShortcut v-if="isPWA">
-            ⇧⌘N
+            {{ shiftKey }}{{ modKey }}N
           </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTab">
           {{ t('menu.new_tab') }} <MenubarShortcut v-if="isPWA">
-            ⌘N
+            {{ modKey }}N
           </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTabFromClipboard">
           {{ t('menu.new_tab_from_clipboard') }} <MenubarShortcut v-if="isPWA">
-            ⌥⌘N
+            {{ altKey }}{{ modKey }}N
           </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isTabMenuDisabled" @click="handleNewTabFromFile">
           {{ t('menu.new_tab_from_file') }} <MenubarShortcut v-if="isPWA">
-            ⌥⌘O
+            {{ altKey }}{{ modKey }}O
           </MenubarShortcut>
         </MenubarItem>
         <MenubarSeparator />
@@ -257,12 +262,12 @@ onUnmounted(() => {
         <MenubarSeparator /> -->
         <MenubarItem :disabled="isRemoveTabDisabled" @click="handleRemoveTab">
           {{ t('menu.remove_tab') }} <MenubarShortcut v-if="isPWA">
-            ⌘W
+            {{ modKey }}W
           </MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isRemoveWorkspaceDisabled" @click="handleRemoveWorkspace">
           {{ t('menu.remove_workspace') }} <MenubarShortcut v-if="isPWA">
-            ⇧⌘W
+            {{ shiftKey }}{{ modKey }}W
           </MenubarShortcut>
         </MenubarItem>
       </MenubarContent>
@@ -273,11 +278,11 @@ onUnmounted(() => {
       </MenubarTrigger>
       <MenubarContent>
         <MenubarItem @click="toggleSidePanel">
-          {{ t('menu.toggle_sidebar') }} <MenubarShortcut>⌘B</MenubarShortcut>
+          {{ t('menu.toggle_sidebar') }} <MenubarShortcut>{{ modKey }}B</MenubarShortcut>
         </MenubarItem>
         <MenubarItem :disabled="isToolPanelDisabled" @click="toggleToolPanel">
           {{ t('menu.toggle_tool_panel') }} <MenubarShortcut v-if="isPWA">
-            ⌘T
+            {{ modKey }}T
           </MenubarShortcut>
         </MenubarItem>
       </MenubarContent>

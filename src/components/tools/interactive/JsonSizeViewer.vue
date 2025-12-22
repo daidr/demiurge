@@ -10,14 +10,14 @@ import { Label } from '@/components/ui/label'
 import { Sunburst } from '@/components/ui/sunburst'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { useToolsStore } from '@/stores/tools'
+import { isMac } from '@/utils/platform'
 
 const { t } = useI18n()
 const toolsStore = useToolsStore()
 const { sizeTree, expandedPaths, sizeViewerMode, flattenEnabled, isCalculating } = storeToRefs(toolsStore)
 
 // Detect Mac platform for showing correct modifier key hint
-const isMac = computed(() => navigator.platform.toLowerCase().includes('mac'))
-const altClickHint = computed(() => isMac.value ? t('tools.option_click_hint') : t('tools.alt_click_hint'))
+const altClickHint = computed(() => isMac() ? t('tools.option_click_hint') : t('tools.alt_click_hint'))
 
 function handleToggle(path: string) {
   toolsStore.toggleSizeTreeNode(path)
