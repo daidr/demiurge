@@ -188,7 +188,7 @@ function openSchemaEditor() {
       <span
         v-if="schemaStatus !== null"
         class="absolute -right-0.5 -top-0.5 size-2 rounded-full border border-background"
-        :class="schemaStatus ? 'bg-green-500' : 'bg-destructive'"
+        :class="schemaStatus ? 'bg-green-500 dark:bg-green-600' : 'bg-destructive'"
       />
     </Button>
   </BaseTooltip>

@@ -181,7 +181,7 @@ onUnmounted(() => {
         <div class="h-full overflow-hidden rounded-md border">
           <div class="text-muted-foreground bg-muted/50 flex items-center gap-1 border-b px-2 py-1 text-xs">
             <span v-if="playground.error" class="i-mingcute-close-circle-line text-destructive" />
-            <span v-else class="i-mingcute-check-circle-line text-green-600" />
+            <span v-else class="i-mingcute-check-circle-line text-green-600 dark:text-green-500" />
             <span class="font-medium">{{ t('tools.result') }}</span>
             <span v-if="playground.executionTime !== null" class="text-muted-foreground/70 ml-auto">
               {{ playground.executionTime.toFixed(1) }} ms

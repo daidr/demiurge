@@ -2,7 +2,7 @@ import fs from 'node:fs/promises'
 import {
   defineConfig,
   presetIcons,
-  presetWind3,
+  presetWind4,
   transformerDirectives,
   transformerVariantGroup,
 } from 'unocss'
@@ -31,7 +31,7 @@ export default defineConfig({
     },
   },
   presets: [
-    presetWind3({
+    presetWind4({
       dark: 'class',
     }),
     presetAnimations(),

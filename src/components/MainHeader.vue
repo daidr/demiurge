@@ -40,7 +40,7 @@ onUnmounted(() => {
 
 <template>
   <header
-    class="header flex select-none items-center justify-between border-b-1.5 border-gray-2"
+    class="header flex select-none items-center justify-between border-b-1.5 border-border"
     :class="{ 'wco-mode': isWCOMode }"
   >
     <div class="header-left ml-1 flex items-center gap-1">
