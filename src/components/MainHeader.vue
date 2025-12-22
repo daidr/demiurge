@@ -97,7 +97,7 @@ onUnmounted(() => {
 
   // Right padding to avoid window controls (Windows)
   .header-right {
-    padding-right: calc(100% - env(titlebar-area-width, 100%) - env(titlebar-area-x, 0) - 2px);
+    padding-right: calc(100% - env(titlebar-area-width, 100%) - env(titlebar-area-x, 0) + 2px);
     -webkit-app-region: no-drag;
     app-region: no-drag;
   }

@@ -1,7 +1,13 @@
+import { useColorMode } from '@vueuse/core'
 import { acceptHMRUpdate, defineStore } from 'pinia'
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect } from 'vue'
 import { useCollectionQuery } from '@/composables/useCollection'
 import { appStateCollection } from '@/db'
+
+const LIGHT_THEME_COLOR = '#ffffff'
+const DARK_THEME_COLOR = '#0a0a0a'
+const LIGHT_THEME_COLOR_WITH_OVERLAY = '#333333'
+const DARK_THEME_COLOR_WITH_OVERLAY = '#050505'
 
 export const useLayoutStore = defineStore('layout', () => {
   const isBrowserSupported = computed(() => {
@@ -76,6 +82,27 @@ export const useLayoutStore = defineStore('layout', () => {
   function decrementDialogCount() {
     openDialogCount.value = Math.max(0, openDialogCount.value - 1)
   }
+
+  const mode = useColorMode()
+
+  function setMetaThemeColorTag(color: string) {
+    const metaThemeColor = document.querySelector('meta[name="theme-color"]')
+    if (metaThemeColor) {
+      metaThemeColor.setAttribute('content', color)
+    }
+  }
+
+  watch([() => hasDialogOpen.value, () => mode.value], ([hasOpen, mode]) => {
+    console.log('hasDialogOpen', hasOpen)
+    if (hasOpen) {
+      setMetaThemeColorTag(mode === 'dark' ? DARK_THEME_COLOR_WITH_OVERLAY : LIGHT_THEME_COLOR_WITH_OVERLAY)
+    }
+    else {
+      setMetaThemeColorTag(mode === 'dark' ? DARK_THEME_COLOR : LIGHT_THEME_COLOR)
+    }
+  }, {
+    immediate: true,
+  })
 
   return {
     isBrowserSupported,
