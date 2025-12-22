@@ -3,7 +3,7 @@ import type { ManifestOptions } from 'vite-plugin-pwa'
 export const VITE_PWA_MANIFEST: Partial<ManifestOptions> = {
   name: 'Demiurge',
   short_name: 'Demiurge',
-  description: 'All-in-one JSON processing assistant',
+  description: 'All-in-one JSON Analysis Tool',
   icons: [
     {
       src: '/pwa/android-chrome-192x192.png',
