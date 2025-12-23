@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 import { createI18n } from 'vue-i18n'
 
+import App from './App.vue'
 import { getDefaultLanguage } from './composables/useInitI18n'
 import { init as initInstallEvent } from './utils/pwa'
 import '@unocss/reset/tailwind.css'
@@ -57,35 +58,9 @@ const i18n = createI18n({
   messages,
 })
 
-async function initApp() {
-  let dbPromise: Promise<void> | null = null
+const app = createApp(App)
 
-  try {
-    if (!navigator?.storage?.getDirectory) {
-      throw new Error('Browser does not support OPFS')
-    }
-    dbPromise = import('./db').then(({ waitForCollectionsReady }) => waitForCollectionsReady())
-    await dbPromise
-  }
-  catch (error) {
-    console.error('Failed to initialize database:', error)
-    const App = (await import('./NotSupportApp.vue')).default
-    const app = createApp(App)
+app.use(i18n)
+app.use(createPinia())
 
-    app.use(i18n)
-    app.use(createPinia())
-
-    app.mount('#app')
-    return
-  }
-
-  const App = (await import('./App.vue')).default
-  const app = createApp(App)
-
-  app.use(i18n)
-  app.use(createPinia())
-
-  app.mount('#app')
-}
-
-initApp()
+app.mount('#app')

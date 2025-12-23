@@ -1,6 +1,9 @@
 {
   "general": {
-    "browser_not_supported_tips": "当前浏览器不支持使用德谬歌, 请升级浏览器版本或使用Chrome、Firefox、Safari等现代浏览器"
+    "browser_not_supported_tips": "当前浏览器不支持使用德谬歌, 请升级浏览器版本或使用Chrome、Firefox、Safari等现代浏览器",
+    "loading_db": "加载数据库中...",
+    "loading_workspace": "加载工作区中...",
+    "loading_ready": "准备就绪!"
   },
   "locales": {
     "en-US": "英语 (美国)",
