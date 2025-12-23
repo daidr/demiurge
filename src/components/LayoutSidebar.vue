@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { storeToRefs } from 'pinia'
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import {
   AlertDialog,
@@ -244,10 +244,15 @@ async function updateStorageEstimate() {
 
 let storageInterval: ReturnType<typeof setInterval> | null = null
 
+// Watch workspace tabs changes to update storage estimate
+watch(sortedTabs, () => {
+  updateStorageEstimate()
+}, { deep: false })
+
 onMounted(() => {
   updateStorageEstimate()
-  // Update every 3 seconds
-  storageInterval = setInterval(updateStorageEstimate, 3000)
+  // Update every 30 seconds as a fallback
+  storageInterval = setInterval(updateStorageEstimate, 30000)
 })
 
 onUnmounted(() => {
