@@ -49,7 +49,8 @@
     "from_drop": "Drop {timestamp}",
     "rename_tab": "Rename",
     "duplicate_tab": "Duplicate",
-    "delete_tab": "Delete"
+    "delete_tab": "Delete",
+    "copy_suffix": "Copy"
   },
   "schema": {
     "editor_title": "JSON Schema Editor",

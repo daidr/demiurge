@@ -2,6 +2,7 @@ import type { Tab, Workspace } from '@/db'
 import { acceptHMRUpdate, defineStore } from 'pinia'
 import { uuidv7 } from 'uuidv7'
 import { computed, ref, watchEffect } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useCollectionAll, useCollectionItem, useCollectionQuery } from '@/composables/useCollection'
 import {
   appStateCollection,
@@ -17,6 +18,8 @@ export interface CreateTabOptions {
 }
 
 export const useWorkspaceStore = defineStore('workspace', () => {
+  const { t } = useI18n()
+
   // ========== Reactive Queries ==========
 
   // All workspaces (sorted by createdTime)
@@ -216,7 +219,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     tabsCollection.insert({
       ...tab,
       id: newId,
-      title: `${tab.title} (Copy)`,
+      title: `${tab.title} (${t('tab.copy_suffix')})`,
       createdTime: now,
       updatedTime: now,
     })
