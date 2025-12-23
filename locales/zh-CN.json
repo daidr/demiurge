@@ -50,7 +50,11 @@
     "rename_tab": "重命名",
     "duplicate_tab": "创建副本",
     "delete_tab": "删除",
-    "copy_suffix": "副本"
+    "copy_suffix": "副本",
+    "delete_confirm_title": "确认删除",
+    "delete_confirm_description": "确定要删除标签页「{title}」吗?此操作无法撤销。",
+    "delete_tooltip": "删除标签页",
+    "delete_direct_hint": "按住 {key} 可直接删除"
   },
   "schema": {
     "editor_title": "JSON Schema 编辑器",

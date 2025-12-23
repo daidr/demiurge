@@ -2,6 +2,17 @@
 import type { Tab } from '@/db'
 import { nextTick, ref, useTemplateRef } from 'vue'
 import { useI18n } from 'vue-i18n'
+import BaseTooltip from '@/components/BaseTooltip.vue'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { Button } from '@/components/ui/button'
 import {
   ContextMenu,
@@ -11,6 +22,7 @@ import {
   ContextMenuTrigger,
 } from '@/components/ui/context-menu'
 import { Input } from '@/components/ui/input'
+import { isMac } from '@/utils/platform'
 
 const props = defineProps<{
   tab: Tab
@@ -29,6 +41,8 @@ const { t } = useI18n()
 const isEditing = ref(false)
 const editingTitle = ref('')
 const inputRef = useTemplateRef('inputRef')
+const showDeleteConfirm = ref(false)
+const modKey = isMac() ? '⌘' : 'Ctrl'
 
 function handleSelect() {
   if (!isEditing.value) {
@@ -38,7 +52,18 @@ function handleSelect() {
 
 function handleDelete(e: MouseEvent) {
   e.stopPropagation()
+  // If Ctrl/Cmd is pressed, delete directly without confirmation
+  if (e.ctrlKey || e.metaKey) {
+    emit('delete', props.tab.id)
+  }
+  else {
+    showDeleteConfirm.value = true
+  }
+}
+
+function confirmDelete() {
   emit('delete', props.tab.id)
+  showDeleteConfirm.value = false
 }
 
 function startEditing() {
@@ -75,8 +100,15 @@ function handleDuplicate() {
   emit('duplicate', props.tab.id)
 }
 
-function handleContextDelete() {
-  emit('delete', props.tab.id)
+function handleContextDelete(e: Event) {
+  // If Ctrl/Cmd is pressed, delete directly without confirmation
+  const mouseEvent = e as MouseEvent
+  if (mouseEvent.ctrlKey || mouseEvent.metaKey) {
+    emit('delete', props.tab.id)
+  }
+  else {
+    showDeleteConfirm.value = true
+  }
 }
 </script>
 
@@ -110,15 +142,21 @@ function handleContextDelete() {
         >
           {{ tab.title }}
         </span>
-        <Button
-          v-if="!isEditing"
-          variant="ghost"
-          size="icon"
-          class="size-5 shrink-0 opacity-0 group-hover:opacity-100"
-          @click="handleDelete"
-        >
-          <div class="i-mingcute-close-line text-sm" />
-        </Button>
+        <BaseTooltip v-if="!isEditing" :text="t('tab.delete_tooltip')">
+          <Button
+            variant="ghost"
+            size="icon"
+            class="size-5 shrink-0 opacity-0 group-hover:opacity-100"
+            @click="handleDelete"
+          >
+            <div class="i-mingcute-close-line text-sm" />
+          </Button>
+          <template #kbd>
+            <span class="text-xs text-muted-foreground">
+              {{ t('tab.delete_direct_hint', { key: modKey }) }}
+            </span>
+          </template>
+        </BaseTooltip>
       </div>
     </ContextMenuTrigger>
     <ContextMenuContent>
@@ -137,4 +175,22 @@ function handleContextDelete() {
       </ContextMenuItem>
     </ContextMenuContent>
   </ContextMenu>
+
+  <!-- Delete Confirmation Dialog -->
+  <AlertDialog v-model:open="showDeleteConfirm">
+    <AlertDialogContent>
+      <AlertDialogHeader>
+        <AlertDialogTitle>{{ t('tab.delete_confirm_title') }}</AlertDialogTitle>
+        <AlertDialogDescription>
+          {{ t('tab.delete_confirm_description', { title: tab.title }) }}
+        </AlertDialogDescription>
+      </AlertDialogHeader>
+      <AlertDialogFooter>
+        <AlertDialogCancel>{{ t('common.cancel') }}</AlertDialogCancel>
+        <AlertDialogAction @click="confirmDelete">
+          {{ t('tab.delete_tab') }}
+        </AlertDialogAction>
+      </AlertDialogFooter>
+    </AlertDialogContent>
+  </AlertDialog>
 </template>

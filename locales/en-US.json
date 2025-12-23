@@ -50,7 +50,11 @@
     "rename_tab": "Rename",
     "duplicate_tab": "Duplicate",
     "delete_tab": "Delete",
-    "copy_suffix": "Copy"
+    "copy_suffix": "Copy",
+    "delete_confirm_title": "Confirm Deletion",
+    "delete_confirm_description": "Are you sure you want to delete tab \"{title}\"? This action cannot be undone.",
+    "delete_tooltip": "Delete Tab",
+    "delete_direct_hint": "Hold {key} to delete directly"
   },
   "schema": {
     "editor_title": "JSON Schema Editor",
