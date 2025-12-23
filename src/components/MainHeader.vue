@@ -47,7 +47,7 @@ onUnmounted(() => {
       <Button size="xs" variant="ghost" @click="layoutStore.toggleSidebar">
         <span
           class="text-lg"
-          :class="showSidebar ? 'i-mingcute-layout-top-close-fill' : 'i-mingcute-layout-top-open-line'"
+          :class="showSidebar ? 'i-mingcute-layout-leftbar-close-line' : 'i-mingcute-layout-left-line'"
         />
       </Button>
       <MainMenu :disabled="!isBrowserSupported" />
