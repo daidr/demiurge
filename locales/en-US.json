@@ -46,7 +46,10 @@
     "untitled": "Untitled",
     "create_tab": "New Tab",
     "from_clipboard": "Clipboard {timestamp}",
-    "from_drop": "Drop {timestamp}"
+    "from_drop": "Drop {timestamp}",
+    "rename_tab": "Rename",
+    "duplicate_tab": "Duplicate",
+    "delete_tab": "Delete"
   },
   "schema": {
     "editor_title": "JSON Schema Editor",

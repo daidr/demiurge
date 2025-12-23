@@ -12,6 +12,7 @@ const emit = defineEmits<{
   select: [id: string]
   delete: [id: string]
   rename: [id: string, title: string]
+  duplicate: [id: string]
   reorder: [newOrder: string[]]
 }>()
 
@@ -29,6 +30,10 @@ function handleDelete(id: string) {
 
 function handleRename(id: string, title: string) {
   emit('rename', id, title)
+}
+
+function handleDuplicate(id: string) {
+  emit('duplicate', id)
 }
 
 function handleDragStart(e: DragEvent, tabId: string) {
@@ -116,6 +121,7 @@ function handleDrop(e: DragEvent, targetId: string) {
         @select="handleSelect"
         @delete="handleDelete"
         @rename="handleRename"
+        @duplicate="handleDuplicate"
       />
     </div>
   </div>

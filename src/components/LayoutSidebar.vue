@@ -190,6 +190,13 @@ function handleTabRename(id: string, title: string) {
   workspaceStore.renameTab(id, title)
 }
 
+function handleTabDuplicate(id: string) {
+  const newTabId = workspaceStore.duplicateTab(id)
+  if (newTabId) {
+    workspaceStore.setActiveTab(newTabId)
+  }
+}
+
 function handleCreateTab() {
   if (!activeWorkspaceId.value)
     return
@@ -384,6 +391,7 @@ async function handleClearAllData() {
           @select="handleTabSelect"
           @delete="handleTabDelete"
           @rename="handleTabRename"
+          @duplicate="handleTabDuplicate"
           @reorder="handleTabReorder"
         />
         <div
