@@ -204,6 +204,38 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     )
   }
 
+  function duplicateTab(tabId: string): string | null {
+    const tab = tabsCollection.findOne({ id: tabId })
+    if (!tab)
+      return null
+
+    const newId = uuidv7()
+    const now = Date.now()
+
+    // Insert the duplicated tab
+    tabsCollection.insert({
+      ...tab,
+      id: newId,
+      title: `${tab.title} (Copy)`,
+      createdTime: now,
+      updatedTime: now,
+    })
+
+    // Update workspace's tabOrder to insert after the original tab
+    const workspace = workspacesCollection.findOne({ id: tab.workspaceId })
+    if (workspace) {
+      const originalIndex = workspace.tabOrder.indexOf(tabId)
+      const newOrder = [...workspace.tabOrder]
+      newOrder.splice(originalIndex + 1, 0, newId)
+      workspacesCollection.updateOne(
+        { id: tab.workspaceId },
+        { $set: { tabOrder: newOrder, updatedTime: now } },
+      )
+    }
+
+    return newId
+  }
+
   function deleteTab(tabId: string): void {
     const tab = tabsCollection.findOne({ id: tabId })
     if (!tab)
@@ -321,6 +353,7 @@ export const useWorkspaceStore = defineStore('workspace', () => {
     createTab,
     updateTab,
     renameTab,
+    duplicateTab,
     deleteTab,
     setActiveTab,
     updateTabContent,

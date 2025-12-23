@@ -46,7 +46,10 @@
     "untitled": "未命名",
     "create_tab": "新建标签页",
     "from_clipboard": "自剪贴板 {timestamp}",
-    "from_drop": "拖放 {timestamp}"
+    "from_drop": "拖放 {timestamp}",
+    "rename_tab": "重命名",
+    "duplicate_tab": "创建副本",
+    "delete_tab": "删除"
   },
   "schema": {
     "editor_title": "JSON Schema 编辑器",
