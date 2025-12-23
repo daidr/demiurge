@@ -2,10 +2,13 @@
 import { storeToRefs } from 'pinia'
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import BaseTooltip from '@/components/BaseTooltip.vue'
 import { Button } from '@/components/ui/button'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 import { useLayoutStore } from '@/stores/layout'
 import { useSettingsStore } from '@/stores/settings'
+import { isMac } from '@/utils/platform'
 import { installFunction, showInstallButton } from '@/utils/pwa'
 import ModeToggle from './ModeToggle.vue'
 import MainMenu from './ui/MainMenu.vue'
@@ -36,6 +39,9 @@ onMounted(() => {
 onUnmounted(() => {
   navigator.windowControlsOverlay?.removeEventListener('geometrychange', updateWCOMode)
 })
+
+// Shortcut key display
+const modKey = isMac() ? '⌘' : 'Ctrl'
 </script>
 
 <template>
@@ -44,12 +50,20 @@ onUnmounted(() => {
     :class="{ 'wco-mode': isWCOMode }"
   >
     <div class="header-left ml-1 flex items-center gap-1">
-      <Button size="xs" variant="ghost" @click="layoutStore.toggleSidebar">
-        <span
-          class="text-lg"
-          :class="showSidebar ? 'i-mingcute-layout-leftbar-close-line' : 'i-mingcute-layout-left-line'"
-        />
-      </Button>
+      <BaseTooltip :text="t('menu.toggle_sidebar')">
+        <Button size="xs" variant="ghost" @click="layoutStore.toggleSidebar">
+          <span
+            class="text-lg"
+            :class="showSidebar ? 'i-mingcute-layout-leftbar-close-line' : 'i-mingcute-layout-left-line'"
+          />
+        </Button>
+        <template #kbd>
+          <KbdGroup>
+            <Kbd>{{ modKey }}</Kbd>
+            <Kbd>B</Kbd>
+          </KbdGroup>
+        </template>
+      </BaseTooltip>
       <MainMenu :disabled="!isBrowserSupported" />
     </div>
     <div class="header-right flex gap-1 p-1">
