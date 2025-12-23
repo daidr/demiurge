@@ -1,8 +1,10 @@
 import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
+import type { Schema } from '@/db'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { ROOT_PATH } from '@/components/base/JsonTree/types'
+import { useCollectionItem } from '@/composables/useCollection'
 import { DEFAULTS, INTERVALS } from '@/constants/app'
 import { schemasCollection } from '@/db'
 import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
@@ -51,14 +53,14 @@ export const useToolsStore = defineStore('tools', () => {
   // Current schema ID
   const currentSchemaId = computed(() => activeTabData.value?.schemaId ?? null)
 
+  // Current schema (reactive)
+  const currentSchema = useCollectionItem<Schema, string>(
+    schemasCollection,
+    () => currentSchemaId.value,
+  )
+
   // Current JSON schema content (from schema collection)
-  const currentJsonSchema = computed(() => {
-    const schemaId = currentSchemaId.value
-    if (!schemaId)
-      return ''
-    const schema = schemasCollection.findOne({ id: schemaId })
-    return schema?.content ?? ''
-  })
+  const currentJsonSchema = computed(() => currentSchema.value?.content ?? '')
 
   // ========== Runtime State (not persisted) ==========
 

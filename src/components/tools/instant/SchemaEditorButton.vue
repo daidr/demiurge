@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import type { editor as monacoEditor } from 'monaco-editor'
-import type * as Monaco from 'monaco-editor'
 import { storeToRefs } from 'pinia'
-import { computed, ref, shallowRef, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import BaseTooltip from '@/components/BaseTooltip.vue'
@@ -23,10 +21,10 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
+import { configureJsonSchemaValidation } from '@/composables/useMonacoJsonSchema'
+import { useMonacoModel } from '@/composables/useMonacoModel'
 import { useSchemaStore } from '@/stores/schema'
 import { useToolsStore } from '@/stores/tools'
-
-const monacoRef = shallowRef<typeof Monaco>()
 
 const { t } = useI18n()
 const schemaStore = useSchemaStore()
@@ -49,8 +47,6 @@ const schemaStatus = computed(() => {
 })
 
 const isOpen = ref(false)
-const EditorRef = shallowRef<monacoEditor.IStandaloneCodeEditor>()
-let model: monacoEditor.ITextModel | null = null
 
 // New schema form
 const newSchemaName = ref('')
@@ -59,20 +55,25 @@ const showNewSchemaPopover = ref(false)
 // Editor content - tracks current editing schema content
 const editorContent = computed(() => editingSchema.value?.content ?? '')
 
-// Open the floating window when a schema is selected and has content or edit mode is on
-watch([currentSchemaId, isEditMode], ([schemaId, editMode]) => {
-  if (schemaId && (editMode || currentJsonSchema.value)) {
-    isOpen.value = true
-    // Set the editing schema when opening
-    schemaStore.setEditingSchema(schemaId)
-  }
-})
-
-// Sync editing schema content to editor
-watch(editorContent, (newContent) => {
-  if (model && model.getValue() !== newContent) {
-    model.setValue(newContent || '')
-  }
+// Use Monaco model composable
+const {
+  editorRef,
+  handleEditorMounted,
+  handleEditorUnmounted,
+} = useMonacoModel({
+  content: editorContent,
+  language: 'json',
+  uri: 'internal://demiurge/json-schema.json',
+  onContentChange: (value) => {
+    // Only save changes in edit mode
+    if (isEditMode.value && editingSchemaId.value) {
+      schemaStore.updateSchemaContent(editingSchemaId.value, value)
+    }
+  },
+  onMounted: (_editor, monaco) => {
+    // Configure JSON Schema validation for the schema editor itself
+    configureJsonSchemaValidation(monaco)
+  },
 })
 
 // Editor options based on edit mode
@@ -82,60 +83,10 @@ const editorOptions = computed(() => ({
   readOnly: !isEditMode.value,
 }))
 
-function configureJsonSchemaValidation() {
-  const monaco = monacoRef.value
-  if (!monaco)
-    return
-
-  const jsonDefaults = (monaco.languages as any).json?.jsonDefaults
-  if (!jsonDefaults)
-    return
-
-  jsonDefaults.setDiagnosticsOptions({
-    schemas: [
-      {
-        uri: 'http://json-schema.org/draft-07/schema',
-        fileMatch: ['json-schema.json'],
-      },
-    ],
-    enableSchemaRequest: true,
-    allowComments: true,
-    schemaValidation: 'error',
-    validate: true,
-  })
-}
-
-function onEditorMounted(_editor: monacoEditor.IStandaloneCodeEditor, monaco: typeof Monaco) {
-  monacoRef.value = monaco
-  configureJsonSchemaValidation()
-
-  EditorRef.value = _editor
-  model = monaco.editor.createModel(
-    editorContent.value,
-    'json',
-    monaco.Uri.parse('internal://demiurge/json-schema.json'),
-  )
-  _editor.setModel(model)
-
-  // Only save changes in edit mode
-  _editor.onDidChangeModelContent(() => {
-    if (isEditMode.value && editingSchemaId.value) {
-      schemaStore.updateSchemaContent(editingSchemaId.value, _editor.getValue())
-    }
-  })
-}
-
-function onEditorUnmounted() {
-  if (model) {
-    model.dispose()
-    model = null
-  }
-}
-
 // Update editor read-only state when edit mode changes
 watch(isEditMode, (editMode) => {
-  if (EditorRef.value) {
-    EditorRef.value.updateOptions({ readOnly: !editMode })
+  if (editorRef.value) {
+    editorRef.value.updateOptions({ readOnly: !editMode })
   }
 })
 
@@ -277,8 +228,8 @@ function openSchemaEditor() {
 
     <MonacoEditor
       :options="editorOptions"
-      @mounted="onEditorMounted"
-      @unmounted="onEditorUnmounted"
+      @mounted="handleEditorMounted"
+      @unmounted="handleEditorUnmounted"
     />
   </FloatingWindow>
 </template>
