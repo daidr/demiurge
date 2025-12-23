@@ -1,30 +1,31 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
 import type * as MonacoEditor from 'monaco-editor'
-import { VueMonacoEditor } from '@guolao/vue-monaco-editor'
+import { VueMonacoDiffEditor } from '@guolao/vue-monaco-editor'
 import { useElementBounding } from '@vueuse/core'
 import { onMounted, ref, shallowRef } from 'vue'
 import { useEditorTheme } from '@/composables/useEditorTheme'
 
 const props = defineProps<{
-  options?: editor.IStandaloneEditorConstructionOptions
-  value?: string
+  options?: editor.IStandaloneDiffEditorConstructionOptions
+  original?: string
+  modified?: string
+  language?: string
 }>()
 
 const emit = defineEmits<{
-  'mounted': [editor: editor.IStandaloneCodeEditor, monaco: typeof MonacoEditor]
-  'unmounted': [editor.IStandaloneCodeEditor]
-  'update:value': [string]
+  mounted: [editor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor]
+  unmounted: [editor: editor.IStandaloneDiffEditor]
 }>()
 
 const { editorTheme } = useEditorTheme()
 
-const EditorRef = shallowRef<editor.IStandaloneCodeEditor>()
+const EditorRef = shallowRef<editor.IStandaloneDiffEditor>()
 const ContainerRef = ref<HTMLDivElement | null>(null)
 const OverflowRef = ref<HTMLDivElement | null>(null)
 const { x, y } = useElementBounding(ContainerRef)
 
-function handleEditorMount(editor: editor.IStandaloneCodeEditor, monaco: typeof MonacoEditor) {
+function handleEditorMount(editor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor) {
   EditorRef.value = editor
   emit('mounted', editor, monaco)
 }
@@ -33,10 +34,6 @@ function handleEditorUnmount() {
   if (EditorRef.value) {
     emit('unmounted', EditorRef.value)
   }
-}
-
-function handleValueChange(value: string | undefined) {
-  emit('update:value', value ?? '')
 }
 
 const showEditor = ref(false)
@@ -54,20 +51,13 @@ onMounted(() => {
     />
   </Teleport>
   <div ref="ContainerRef" class="h-full w-full">
-    <VueMonacoEditor
-      v-if="showEditor"
-      class="h-full w-full"
-      :value="props.value"
-      :language="options?.language"
-      :theme="editorTheme"
-      :options="{
+    <VueMonacoDiffEditor
+      v-if="showEditor" class="h-full w-full" :original="props.original" :modified="props.modified"
+      :language="props.language" :theme="editorTheme" :options="{
         ...options,
         automaticLayout: true,
         overflowWidgetsDomNode: OverflowRef ?? undefined,
-      }"
-      @update:value="handleValueChange"
-      @mount="handleEditorMount"
-      @before-unmount="handleEditorUnmount"
+      }" @mount="handleEditorMount" @before-unmount="handleEditorUnmount"
     />
   </div>
 </template>

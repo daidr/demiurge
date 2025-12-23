@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import type { editor as monacoEditor } from 'monaco-editor'
-import { VueMonacoDiffEditor } from '@guolao/vue-monaco-editor'
 import { storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import MonacoDiffEditor from '@/components/base/MonacoDiffEditor.vue'
 import { FloatingWindow } from '@/components/ui/floating-window'
 import { Label } from '@/components/ui/label'
 import {
@@ -13,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import { useEditorTheme } from '@/composables/useEditorTheme'
 import { useWorkspaceStore } from '@/stores/workspace'
 import { getToolsWorker } from '@/utils/tools_service'
 
@@ -31,7 +30,6 @@ const isOpen = computed({
 })
 
 const { t } = useI18n()
-const { editorTheme } = useEditorTheme()
 
 const workspaceStore = useWorkspaceStore()
 const { sortedTabs } = storeToRefs(workspaceStore)
@@ -133,15 +131,12 @@ watch(isOpen, (open) => {
     </template>
 
     <!-- Monaco Diff Editor -->
-    <VueMonacoDiffEditor
+    <MonacoDiffEditor
       v-if="isOpen"
-      class="size-full"
       :original="leftContent"
       :modified="rightContent"
       language="json"
-      :theme="editorTheme"
       :options="{
-        automaticLayout: true,
         readOnly: true,
         renderSideBySide: true,
         useInlineViewWhenSpaceIsLimited: false,
@@ -149,7 +144,7 @@ watch(isOpen, (open) => {
         scrollBeyondLastLine: false,
         fontSize: 13,
       }"
-      @mount="handleDiffEditorMount"
+      @mounted="handleDiffEditorMount"
     />
   </FloatingWindow>
 </template>

@@ -46,8 +46,9 @@ bun run preview   # Preview production build
 src/
 ├── components/
 │   ├── base/              # Low-level components
-│   │   ├── MonacoEditor/  # Monaco code editor wrapper
-│   │   └── JsonTree/      # JSON size tree with virtualization (Reka UI Tree)
+│   │   ├── MonacoEditor.vue      # Monaco code editor wrapper with overflow support
+│   │   ├── MonacoDiffEditor.vue  # Monaco diff editor wrapper with overflow support
+│   │   └── JsonTree/             # JSON size tree with virtualization (Reka UI Tree)
 │   ├── ui/                # Shadcn-style UI components (Reka UI based)
 │   │   ├── tabs/          # Tabs component
 │   │   └── toggle-group/  # ToggleGroup component
@@ -107,6 +108,16 @@ config/                    # PWA manifest config
 
 - `WorkspaceItem`: Manages single workspace with OPFS integration
 - `WorkspaceStatus`: Enum for workspace lifecycle (Uninitialized → Loading → Done/Failed)
+
+### Monaco Editor Integration
+
+Both `MonacoEditor.vue` and `MonacoDiffEditor.vue` handle overflow widgets (autocomplete, hover tooltips, etc.) to prevent clipping by `overflow: hidden` containers:
+
+- **Overflow Container**: Uses `<Teleport>` to mount a container on `<body>`
+- **Position Tracking**: Uses `useElementBounding` to track editor position and sync with the overflow container via `transform`
+- **Configuration**: Sets `overflowWidgetsDomNode` option to redirect Monaco's overlay widgets to the body-mounted container
+
+This ensures autocomplete dropdowns, hover tooltips, and other overlays are never clipped by parent containers with `overflow: hidden`.
 
 ### Component Patterns
 
