@@ -190,6 +190,22 @@ export const useToolsStore = defineStore('tools', () => {
     return paths
   }
 
+  // Collect paths up to a certain depth
+  function getPathsUpToDepth(node: JsonSizeNode, maxDepth: number, currentDepth = 0, paths: Set<string> = new Set()): Set<string> {
+    if (currentDepth >= maxDepth || !node.children || node.children.length === 0) {
+      return paths
+    }
+
+    const key = node.path || ROOT_PATH
+    paths.add(key)
+
+    for (const child of node.children) {
+      getPathsUpToDepth(child, maxDepth, currentDepth + 1, paths)
+    }
+
+    return paths
+  }
+
   function setPlaygroundMode(mode: 'javascript' | 'jsonpath') {
     const tabId = activeTabId.value
     if (!tabId)
@@ -240,12 +256,30 @@ export const useToolsStore = defineStore('tools', () => {
     }
 
     isCalculating.value = true
+    const previousExpanded = expandedPaths.value
     try {
       const worker = await getToolsWorker()
       const tree = await worker.calculateSizeTree(content, flattenEnabled.value)
       sizeTree.value = tree
+
       if (tree) {
-        expandedPaths.value = collectAllPaths(tree)
+        // If there were previously expanded paths, try to preserve them
+        if (previousExpanded.size > 0) {
+          const allPaths = collectAllPaths(tree)
+          const validPaths = new Set<string>()
+          // Only keep paths that still exist in the new tree
+          previousExpanded.forEach((path) => {
+            if (allPaths.has(path)) {
+              validPaths.add(path)
+            }
+          })
+          // If we have valid paths to restore, use them; otherwise expand to depth 2
+          expandedPaths.value = validPaths.size > 0 ? validPaths : getPathsUpToDepth(tree, 2)
+        }
+        else {
+          // No previous expansion state, expand to depth 2 by default
+          expandedPaths.value = getPathsUpToDepth(tree, 2)
+        }
       }
       else {
         expandedPaths.value = new Set()
