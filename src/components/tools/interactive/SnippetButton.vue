@@ -1,18 +1,21 @@
 <script setup lang="ts">
 import type { PlaygroundMode } from '@/db'
+import hotkeys from 'hotkeys-js'
 import { storeToRefs } from 'pinia'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import MonacoEditor from '@/components/base/MonacoEditor.vue'
 import BaseTooltip from '@/components/BaseTooltip.vue'
 import { Button } from '@/components/ui/button'
 import { FloatingWindow } from '@/components/ui/floating-window'
 import { Input } from '@/components/ui/input'
+import { Kbd, KbdGroup } from '@/components/ui/kbd'
 import { Label } from '@/components/ui/label'
 import { Switch } from '@/components/ui/switch'
 import { PlaygroundModeToggle } from '@/components/ui/toggle-group'
 import { useSnippetStore } from '@/stores/snippet'
 import { useToolsStore } from '@/stores/tools'
+import { isMac } from '@/utils/platform'
 
 const { t } = useI18n()
 const snippetStore = useSnippetStore()
@@ -140,6 +143,21 @@ function formatTime(timestamp: number): string {
   // Otherwise show date
   return date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' })
 }
+
+// Shortcut key display
+const modKey = isMac() ? '⌘' : 'Ctrl'
+
+// Register hotkey
+onMounted(() => {
+  hotkeys('command+e, ctrl+e', (e) => {
+    e.preventDefault()
+    openSnippetWindow()
+  })
+})
+
+onUnmounted(() => {
+  hotkeys.unbind('command+e, ctrl+e')
+})
 </script>
 
 <template>
@@ -148,6 +166,12 @@ function formatTime(timestamp: number): string {
     <Button size="xs" variant="ghost" @click="openSnippetWindow">
       <span class="i-mingcute-paper-line" />
     </Button>
+    <template #kbd>
+      <KbdGroup>
+        <Kbd>{{ modKey }}</Kbd>
+        <Kbd>E</Kbd>
+      </KbdGroup>
+    </template>
   </BaseTooltip>
 
   <FloatingWindow

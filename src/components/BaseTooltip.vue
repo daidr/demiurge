@@ -14,7 +14,10 @@ defineProps<{
   <Tooltip>
     <TooltipTrigger><slot /></TooltipTrigger>
     <TooltipContent>
-      <p>{{ text }}</p>
+      <div class="flex items-center gap-2">
+        <span>{{ text }}</span>
+        <slot name="kbd" />
+      </div>
     </TooltipContent>
   </Tooltip>
 </template>
