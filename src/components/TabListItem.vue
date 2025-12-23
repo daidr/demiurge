@@ -12,8 +12,6 @@ import {
 } from '@/components/ui/context-menu'
 import { Input } from '@/components/ui/input'
 
-const { t } = useI18n()
-
 const props = defineProps<{
   tab: Tab
   isActive: boolean
@@ -25,6 +23,8 @@ const emit = defineEmits<{
   rename: [id: string, title: string]
   duplicate: [id: string]
 }>()
+
+const { t } = useI18n()
 
 const isEditing = ref(false)
 const editingTitle = ref('')
@@ -82,7 +82,7 @@ function handleContextDelete() {
 
 <template>
   <ContextMenu>
-    <ContextMenuTrigger as-child>
+    <ContextMenuTrigger as-child :disabled="isEditing">
       <div
         class="group flex cursor-pointer items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors"
         :class="[
