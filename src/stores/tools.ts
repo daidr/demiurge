@@ -3,6 +3,7 @@ import type { JsonSizeNode } from '@/components/base/JsonTree'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { ROOT_PATH } from '@/components/base/JsonTree/types'
+import { DEFAULTS, INTERVALS } from '@/constants/app'
 import { schemasCollection } from '@/db'
 import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
@@ -126,7 +127,7 @@ export const useToolsStore = defineStore('tools', () => {
       if (activeToolTab.value === 'playground' && playgroundAutoRun.value) {
         triggerAutoRun()
       }
-    }, 300)
+    }, INTERVALS.DEBOUNCE_DEFAULT)
   }, { immediate: true })
 
   // Watch for active tool tab changes - calculate on switch to size viewer
@@ -244,7 +245,7 @@ export const useToolsStore = defineStore('tools', () => {
     }
     playgroundDebounceTimer = setTimeout(() => {
       executePlayground()
-    }, 300)
+    }, INTERVALS.DEBOUNCE_DEFAULT)
   }
 
   async function recalculateSizeTree() {
@@ -273,12 +274,12 @@ export const useToolsStore = defineStore('tools', () => {
               validPaths.add(path)
             }
           })
-          // If we have valid paths to restore, use them; otherwise expand to depth 2
-          expandedPaths.value = validPaths.size > 0 ? validPaths : getPathsUpToDepth(tree, 2)
+          // If we have valid paths to restore, use them; otherwise expand to default depth
+          expandedPaths.value = validPaths.size > 0 ? validPaths : getPathsUpToDepth(tree, DEFAULTS.TREE_EXPAND_DEPTH)
         }
         else {
-          // No previous expansion state, expand to depth 2 by default
-          expandedPaths.value = getPathsUpToDepth(tree, 2)
+          // No previous expansion state, expand to default depth
+          expandedPaths.value = getPathsUpToDepth(tree, DEFAULTS.TREE_EXPAND_DEPTH)
         }
       }
       else {

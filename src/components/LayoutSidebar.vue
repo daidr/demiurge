@@ -31,6 +31,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
+import { INTERVALS } from '@/constants/app'
 import { useLayoutStore } from '@/stores/layout'
 import { useSettingsStore } from '@/stores/settings'
 import { useWorkspaceStore } from '@/stores/workspace'
@@ -252,7 +253,7 @@ watch(sortedTabs, () => {
 onMounted(() => {
   updateStorageEstimate()
   // Update every 30 seconds as a fallback
-  storageInterval = setInterval(updateStorageEstimate, 30000)
+  storageInterval = setInterval(updateStorageEstimate, INTERVALS.STORAGE_POLL)
 })
 
 onUnmounted(() => {
