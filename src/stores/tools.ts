@@ -97,8 +97,8 @@ export const useToolsStore = defineStore('tools', () => {
       isExecuting: false,
       executionTime: null,
     }
-    // Recalculate size tree when tab changes
-    if (activeTabData.value?.content) {
+    // Recalculate size tree only if size viewer is active
+    if (activeTabData.value?.content && activeToolTab.value === 'size-viewer') {
       recalculateSizeTree()
     }
   })
@@ -108,18 +108,36 @@ export const useToolsStore = defineStore('tools', () => {
     if (debounceTimer) {
       clearTimeout(debounceTimer)
     }
-    // For initial load with existing content, calculate immediately
-    if (newContent && !sizeTree.value) {
+    // For initial load with existing content, calculate immediately if needed
+    if (newContent && !sizeTree.value && activeToolTab.value === 'size-viewer') {
       recalculateSizeTree()
+    }
+    if (newContent && playgroundAutoRun.value && activeToolTab.value === 'playground') {
       triggerAutoRun()
       return
     }
     // For subsequent changes, debounce
     debounceTimer = setTimeout(() => {
-      recalculateSizeTree()
-      triggerAutoRun()
+      // Only recalculate size tree if size viewer is active
+      if (activeToolTab.value === 'size-viewer') {
+        recalculateSizeTree()
+      }
+      // Only trigger auto-run if playground is active and auto-run is enabled
+      if (activeToolTab.value === 'playground' && playgroundAutoRun.value) {
+        triggerAutoRun()
+      }
     }, 300)
   }, { immediate: true })
+
+  // Watch for active tool tab changes - calculate on switch to size viewer
+  watch(activeToolTab, (newTab, oldTab) => {
+    if (newTab === 'size-viewer' && oldTab !== 'size-viewer') {
+      // Switched to size viewer, calculate if not already calculated
+      if (!sizeTree.value && currentJsonContent.value.trim()) {
+        recalculateSizeTree()
+      }
+    }
+  })
 
   // Watch for flatten changes
   watch(flattenEnabled, () => {
