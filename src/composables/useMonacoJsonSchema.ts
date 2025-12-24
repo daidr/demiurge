@@ -53,8 +53,8 @@ export function useMonacoJsonSchema(options: JsonSchemaOptions) {
 
         jsonDefaults.setDiagnosticsOptions({
           validate: true,
-          enableSchemaRequest: true,
-          allowComments: true,
+          enableSchemaRequest: false,
+          allowComments: false,
           schemaValidation: 'error',
           schemas: [
             {
@@ -69,8 +69,8 @@ export function useMonacoJsonSchema(options: JsonSchemaOptions) {
         // No schema provided, use default validation
         jsonDefaults.setDiagnosticsOptions({
           validate: true,
-          enableSchemaRequest: true,
-          allowComments: true,
+          enableSchemaRequest: false,
+          allowComments: false,
           schemaValidation: 'error',
           schemas: [],
         })
@@ -80,8 +80,8 @@ export function useMonacoJsonSchema(options: JsonSchemaOptions) {
       // Invalid JSON schema, fall back to default validation
       jsonDefaults.setDiagnosticsOptions({
         validate: true,
-        enableSchemaRequest: true,
-        allowComments: true,
+        enableSchemaRequest: false,
+        allowComments: false,
         schemaValidation: 'error',
         schemas: [],
       })
@@ -146,8 +146,8 @@ export function configureJsonSchemaValidation(monaco: typeof Monaco | undefined)
   jsonDefaults.setDiagnosticsOptions({
     ...existingOptions,
     schemas,
-    enableSchemaRequest: true,
-    allowComments: true,
+    enableSchemaRequest: false,
+    allowComments: false,
     schemaValidation: 'error',
     validate: true,
   })
