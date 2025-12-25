@@ -188,7 +188,8 @@
     "next_diff": "下一个差异",
     "from_tab": "从标签页",
     "custom_input": "自定义输入",
-    "edit_directly": "直接在编辑器中编辑"
+    "edit_directly": "直接在编辑器中编辑",
+    "format_and_sort": "格式化并排序"
   },
   "theme": {
     "light": "浅色模式",

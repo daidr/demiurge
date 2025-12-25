@@ -192,18 +192,74 @@ function handleDiffEditorMount(editor: monacoEditor.IStandaloneDiffEditor) {
   diffEditorRef.value = editor
 }
 
-// Diff navigation
+// Diff navigation - track current diff index
+const currentDiffIndex = ref(-1)
+
 function goToNextDiff() {
-  if (diffEditorRef.value) {
-    const modifiedEditor = diffEditorRef.value.getModifiedEditor()
-    modifiedEditor.trigger('keyboard', 'editor.action.diffReview.next', {})
+  if (!diffEditorRef.value)
+    return
+
+  const lineChanges = diffEditorRef.value.getLineChanges()
+  if (!lineChanges || lineChanges.length === 0)
+    return
+
+  // Find next diff
+  const modifiedEditor = diffEditorRef.value.getModifiedEditor()
+  const currentLine = modifiedEditor.getPosition()?.lineNumber ?? 0
+
+  // Find the next change after current position
+  let nextIndex = lineChanges.findIndex(change =>
+    (change.modifiedStartLineNumber ?? change.modifiedEndLineNumber) > currentLine,
+  )
+
+  if (nextIndex === -1) {
+    // Wrap around to first change
+    nextIndex = 0
+  }
+
+  const nextChange = lineChanges[nextIndex]
+  if (nextChange) {
+    const targetLine = nextChange.modifiedStartLineNumber || nextChange.modifiedEndLineNumber
+    modifiedEditor.revealLineInCenter(targetLine)
+    modifiedEditor.setPosition({ lineNumber: targetLine, column: 1 })
+    modifiedEditor.focus()
+    currentDiffIndex.value = nextIndex
   }
 }
 
 function goToPreviousDiff() {
-  if (diffEditorRef.value) {
-    const modifiedEditor = diffEditorRef.value.getModifiedEditor()
-    modifiedEditor.trigger('keyboard', 'editor.action.diffReview.prev', {})
+  if (!diffEditorRef.value)
+    return
+
+  const lineChanges = diffEditorRef.value.getLineChanges()
+  if (!lineChanges || lineChanges.length === 0)
+    return
+
+  const modifiedEditor = diffEditorRef.value.getModifiedEditor()
+  const currentLine = modifiedEditor.getPosition()?.lineNumber ?? Infinity
+
+  // Find the previous change before current position
+  let prevIndex = -1
+  for (let i = lineChanges.length - 1; i >= 0; i--) {
+    const change = lineChanges[i]
+    if (change && (change.modifiedStartLineNumber ?? change.modifiedEndLineNumber) < currentLine) {
+      prevIndex = i
+      break
+    }
+  }
+
+  if (prevIndex === -1) {
+    // Wrap around to last change
+    prevIndex = lineChanges.length - 1
+  }
+
+  const prevChange = lineChanges[prevIndex]
+  if (prevChange) {
+    const targetLine = prevChange.modifiedStartLineNumber || prevChange.modifiedEndLineNumber
+    modifiedEditor.revealLineInCenter(targetLine)
+    modifiedEditor.setPosition({ lineNumber: targetLine, column: 1 })
+    modifiedEditor.focus()
+    currentDiffIndex.value = prevIndex
   }
 }
 
@@ -297,6 +353,27 @@ whenever(() => isOpen.value && keys.F8?.value, () => {
 whenever(() => isOpen.value && keys['Shift+F8']?.value, () => {
   goToPreviousDiff()
 })
+
+// Format and sort JSON for custom input mode
+async function formatAndSortLeft() {
+  if (leftSourceMode.value === 'custom' && leftRawContent.value) {
+    const worker = await getToolsWorker()
+    const sorted = await worker.sortJson(leftRawContent.value)
+    if (sorted) {
+      leftRawContent.value = sorted
+    }
+  }
+}
+
+async function formatAndSortRight() {
+  if (rightSourceMode.value === 'custom' && rightRawContent.value) {
+    const worker = await getToolsWorker()
+    const sorted = await worker.sortJson(rightRawContent.value)
+    if (sorted) {
+      rightRawContent.value = sorted
+    }
+  }
+}
 
 // Format value for display
 function formatValue(value: unknown): string {
@@ -406,6 +483,20 @@ watch(isOpen, (open) => {
               </TooltipContent>
             </Tooltip>
           </div>
+          <!-- Format and sort button (only in custom mode) -->
+          <Tooltip v-if="leftSourceMode === 'custom'">
+            <TooltipTrigger as-child>
+              <button
+                class="text-muted-foreground hover:text-foreground flex size-6 shrink-0 items-center justify-center rounded transition-colors"
+                @click="formatAndSortLeft"
+              >
+                <span class="i-mingcute-sort-ascending-line size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              {{ t('diff.format_and_sort') }}
+            </TooltipContent>
+          </Tooltip>
           <!-- Tab selector (only in tab mode) -->
           <Select v-if="leftSourceMode === 'tab'" v-model="leftTabId">
             <SelectTrigger class="h-6 flex-1 text-xs">
@@ -457,6 +548,20 @@ watch(isOpen, (open) => {
               </TooltipContent>
             </Tooltip>
           </div>
+          <!-- Format and sort button (only in custom mode) -->
+          <Tooltip v-if="rightSourceMode === 'custom'">
+            <TooltipTrigger as-child>
+              <button
+                class="text-muted-foreground hover:text-foreground flex size-6 shrink-0 items-center justify-center rounded transition-colors"
+                @click="formatAndSortRight"
+              >
+                <span class="i-mingcute-sort-ascending-line size-4" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent side="bottom">
+              {{ t('diff.format_and_sort') }}
+            </TooltipContent>
+          </Tooltip>
           <!-- Tab selector (only in tab mode) -->
           <Select v-if="rightSourceMode === 'tab'" v-model="rightTabId">
             <SelectTrigger class="h-6 flex-1 text-xs">

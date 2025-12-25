@@ -188,7 +188,8 @@
     "next_diff": "Next Difference",
     "from_tab": "From Tab",
     "custom_input": "Custom Input",
-    "edit_directly": "Edit directly in editor"
+    "edit_directly": "Edit directly in editor",
+    "format_and_sort": "Format & Sort"
   },
   "theme": {
     "light": "Light Mode",
