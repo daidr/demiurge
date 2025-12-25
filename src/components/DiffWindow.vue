@@ -609,6 +609,9 @@ watch(isOpen, (open) => {
           </Tooltip>
         </div>
 
+        <!-- Spacer for diff list panel alignment -->
+        <div v-if="showDiffList" class="w-34 shrink-0" />
+
         <!-- Toggle diff list button -->
         <Tooltip>
           <TooltipTrigger as-child>
