@@ -186,6 +186,10 @@ class ToolsWorker {
     }
   }
 
+  calculateJsonDiff(leftJson: string, rightJson: string): DiffResult | null {
+    return calculateJsonDiff(leftJson, rightJson)
+  }
+
   async executePlayground(
     jsonString: string,
     expression: string,
@@ -387,6 +391,190 @@ function calculateTypeStatistics(value: unknown): TypeStatistics {
   stats.keys.duplicates = duplicates
 
   return stats
+}
+
+// JSON Diff types and calculation
+export type DiffChangeType = 'added' | 'removed' | 'modified' | 'type_changed'
+
+export interface DiffChange {
+  /** The type of change */
+  type: DiffChangeType
+  /** JSONPath to the changed value (e.g., "$.users[0].name") */
+  path: string
+  /** Old value (for removed/modified) */
+  oldValue?: unknown
+  /** New value (for added/modified) */
+  newValue?: unknown
+  /** Old type (for type_changed) */
+  oldType?: string
+  /** New type (for type_changed) */
+  newType?: string
+}
+
+export interface DiffResult {
+  /** List of all changes */
+  changes: DiffChange[]
+  /** Statistics */
+  stats: {
+    added: number
+    removed: number
+    modified: number
+    typeChanged: number
+    total: number
+  }
+}
+
+function getValueType(value: unknown): string {
+  if (value === null)
+    return 'null'
+  if (Array.isArray(value))
+    return 'array'
+  return typeof value
+}
+
+function buildJsonPath(segments: (string | number)[]): string {
+  if (segments.length === 0)
+    return '$'
+  let result = '$'
+  for (const seg of segments) {
+    if (typeof seg === 'number') {
+      result += `[${seg}]`
+    }
+    else if (/^[a-z_$][\w$]*$/i.test(seg)) {
+      result += `.${seg}`
+    }
+    else {
+      result += `["${seg.replace(/"/g, '\\"')}"]`
+    }
+  }
+  return result
+}
+
+function calculateJsonDiffInternal(
+  oldVal: unknown,
+  newVal: unknown,
+  pathSegments: (string | number)[],
+  changes: DiffChange[],
+): void {
+  const oldType = getValueType(oldVal)
+  const newType = getValueType(newVal)
+  const path = buildJsonPath(pathSegments)
+
+  // Both undefined - no change
+  if (oldVal === undefined && newVal === undefined) {
+    return
+  }
+
+  // Added
+  if (oldVal === undefined && newVal !== undefined) {
+    changes.push({
+      type: 'added',
+      path,
+      newValue: newVal,
+    })
+    return
+  }
+
+  // Removed
+  if (oldVal !== undefined && newVal === undefined) {
+    changes.push({
+      type: 'removed',
+      path,
+      oldValue: oldVal,
+    })
+    return
+  }
+
+  // Type changed
+  if (oldType !== newType) {
+    changes.push({
+      type: 'type_changed',
+      path,
+      oldValue: oldVal,
+      newValue: newVal,
+      oldType,
+      newType,
+    })
+    return
+  }
+
+  // Both are arrays
+  if (Array.isArray(oldVal) && Array.isArray(newVal)) {
+    const maxLen = Math.max(oldVal.length, newVal.length)
+    for (let i = 0; i < maxLen; i++) {
+      calculateJsonDiffInternal(
+        oldVal[i],
+        newVal[i],
+        [...pathSegments, i],
+        changes,
+      )
+    }
+    return
+  }
+
+  // Both are objects
+  if (oldType === 'object' && newType === 'object' && oldVal !== null && newVal !== null) {
+    const oldObj = oldVal as Record<string, unknown>
+    const newObj = newVal as Record<string, unknown>
+    const allKeys = new Set([...Object.keys(oldObj), ...Object.keys(newObj)])
+
+    for (const key of allKeys) {
+      calculateJsonDiffInternal(
+        oldObj[key],
+        newObj[key],
+        [...pathSegments, key],
+        changes,
+      )
+    }
+    return
+  }
+
+  // Primitives - check if modified
+  if (oldVal !== newVal) {
+    changes.push({
+      type: 'modified',
+      path,
+      oldValue: oldVal,
+      newValue: newVal,
+    })
+  }
+}
+
+function calculateJsonDiff(leftJson: string, rightJson: string): DiffResult | null {
+  try {
+    const leftParsed = JSON.parse(leftJson)
+    const rightParsed = JSON.parse(rightJson)
+
+    const changes: DiffChange[] = []
+    calculateJsonDiffInternal(leftParsed, rightParsed, [], changes)
+
+    // Sort changes: removed first, then modified, then added
+    const typeOrder: Record<DiffChangeType, number> = {
+      removed: 0,
+      type_changed: 1,
+      modified: 2,
+      added: 3,
+    }
+    changes.sort((a, b) => {
+      const orderDiff = typeOrder[a.type] - typeOrder[b.type]
+      if (orderDiff !== 0)
+        return orderDiff
+      return a.path.localeCompare(b.path)
+    })
+
+    const stats = {
+      added: changes.filter(c => c.type === 'added').length,
+      removed: changes.filter(c => c.type === 'removed').length,
+      modified: changes.filter(c => c.type === 'modified').length,
+      typeChanged: changes.filter(c => c.type === 'type_changed').length,
+      total: changes.length,
+    }
+
+    return { changes, stats }
+  }
+  catch {
+    return null
+  }
 }
 
 export type { ToolsWorker as TToolsWorker }

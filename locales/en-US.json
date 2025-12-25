@@ -173,7 +173,22 @@
     "title": "JSON Diff",
     "left_tab": "Left",
     "right_tab": "Right",
-    "select_tab": "Select a tab"
+    "select_tab": "Select a tab",
+    "toggle_list": "Toggle Changes List",
+    "toggle_input": "Toggle Input Panel",
+    "no_changes": "No changes",
+    "calculating": "Calculating...",
+    "select_tabs_hint": "Select tabs to compare",
+    "old_value": "Old",
+    "new_value": "New",
+    "type_change": "Type changed",
+    "custom_json": "Custom JSON",
+    "paste_json": "Paste JSON here",
+    "prev_diff": "Previous Difference",
+    "next_diff": "Next Difference",
+    "from_tab": "From Tab",
+    "custom_input": "Custom Input",
+    "edit_directly": "Edit directly in editor"
   },
   "theme": {
     "light": "Light Mode",

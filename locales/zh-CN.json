@@ -173,7 +173,22 @@
     "title": "JSON 对比",
     "left_tab": "左侧",
     "right_tab": "右侧",
-    "select_tab": "选择标签页"
+    "select_tab": "选择标签页",
+    "toggle_list": "切换差异列表",
+    "toggle_input": "切换输入面板",
+    "no_changes": "无差异",
+    "calculating": "计算中...",
+    "select_tabs_hint": "请选择标签页进行对比",
+    "old_value": "旧值",
+    "new_value": "新值",
+    "type_change": "类型变更",
+    "custom_json": "自定义 JSON",
+    "paste_json": "在此粘贴 JSON",
+    "prev_diff": "上一个差异",
+    "next_diff": "下一个差异",
+    "from_tab": "从标签页",
+    "custom_input": "自定义输入",
+    "edit_directly": "直接在编辑器中编辑"
   },
   "theme": {
     "light": "浅色模式",

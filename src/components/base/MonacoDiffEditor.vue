@@ -3,7 +3,7 @@ import type { editor } from 'monaco-editor'
 import type * as MonacoEditor from 'monaco-editor'
 import { VueMonacoDiffEditor } from '@guolao/vue-monaco-editor'
 import { useElementBounding } from '@vueuse/core'
-import { onMounted, ref, shallowRef } from 'vue'
+import { onMounted, ref, shallowRef, watch } from 'vue'
 import { useEditorTheme } from '@/composables/useEditorTheme'
 
 const props = defineProps<{
@@ -11,11 +11,17 @@ const props = defineProps<{
   original?: string
   modified?: string
   language?: string
+  /** Whether the original (left) editor is editable */
+  originalEditable?: boolean
+  /** Whether the modified (right) editor is editable */
+  modifiedEditable?: boolean
 }>()
 
 const emit = defineEmits<{
-  mounted: [editor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor]
-  unmounted: [editor: editor.IStandaloneDiffEditor]
+  'mounted': [editor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor]
+  'unmounted': [editor: editor.IStandaloneDiffEditor]
+  'update:original': [value: string]
+  'update:modified': [value: string]
 }>()
 
 const { editorTheme } = useEditorTheme()
@@ -25,9 +31,28 @@ const ContainerRef = ref<HTMLDivElement | null>(null)
 const OverflowRef = ref<HTMLDivElement | null>(null)
 const { x, y } = useElementBounding(ContainerRef)
 
-function handleEditorMount(editor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor) {
-  EditorRef.value = editor
-  emit('mounted', editor, monaco)
+function handleEditorMount(diffEditor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor) {
+  EditorRef.value = diffEditor
+
+  // Set up content change listeners for two-way binding
+  const originalEditor = diffEditor.getOriginalEditor()
+  const modifiedEditor = diffEditor.getModifiedEditor()
+
+  originalEditor.onDidChangeModelContent(() => {
+    if (props.originalEditable) {
+      const value = originalEditor.getValue()
+      emit('update:original', value)
+    }
+  })
+
+  modifiedEditor.onDidChangeModelContent(() => {
+    if (props.modifiedEditable) {
+      const value = modifiedEditor.getValue()
+      emit('update:modified', value)
+    }
+  })
+
+  emit('mounted', diffEditor, monaco)
 }
 
 function handleEditorUnmount() {
@@ -35,6 +60,21 @@ function handleEditorUnmount() {
     emit('unmounted', EditorRef.value)
   }
 }
+
+// Watch for editable state changes and update editor options
+watch(() => props.originalEditable, (editable) => {
+  if (EditorRef.value) {
+    const originalEditor = EditorRef.value.getOriginalEditor()
+    originalEditor.updateOptions({ readOnly: !editable })
+  }
+})
+
+watch(() => props.modifiedEditable, (editable) => {
+  if (EditorRef.value) {
+    const modifiedEditor = EditorRef.value.getModifiedEditor()
+    modifiedEditor.updateOptions({ readOnly: !editable })
+  }
+})
 
 const showEditor = ref(false)
 onMounted(() => {
