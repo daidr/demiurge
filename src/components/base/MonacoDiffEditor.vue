@@ -2,7 +2,6 @@
 import type { editor } from 'monaco-editor'
 import type * as MonacoEditor from 'monaco-editor'
 import { VueMonacoDiffEditor } from '@guolao/vue-monaco-editor'
-import { useElementBounding } from '@vueuse/core'
 import { onMounted, ref, shallowRef, watch } from 'vue'
 import { useEditorTheme } from '@/composables/useEditorTheme'
 
@@ -27,9 +26,7 @@ const emit = defineEmits<{
 const { editorTheme } = useEditorTheme()
 
 const EditorRef = shallowRef<editor.IStandaloneDiffEditor>()
-const ContainerRef = ref<HTMLDivElement | null>(null)
 const OverflowRef = ref<HTMLDivElement | null>(null)
-const { x, y } = useElementBounding(ContainerRef)
 
 function handleEditorMount(diffEditor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor) {
   EditorRef.value = diffEditor
@@ -38,18 +35,18 @@ function handleEditorMount(diffEditor: editor.IStandaloneDiffEditor, monaco: typ
   const originalEditor = diffEditor.getOriginalEditor()
   const modifiedEditor = diffEditor.getModifiedEditor()
 
+  // Set initial readOnly state based on props
+  originalEditor.updateOptions({ readOnly: !props.originalEditable })
+  modifiedEditor.updateOptions({ readOnly: !props.modifiedEditable })
+
   originalEditor.onDidChangeModelContent(() => {
-    if (props.originalEditable) {
-      const value = originalEditor.getValue()
-      emit('update:original', value)
-    }
+    const value = originalEditor.getValue()
+    emit('update:original', value)
   })
 
   modifiedEditor.onDidChangeModelContent(() => {
-    if (props.modifiedEditable) {
-      const value = modifiedEditor.getValue()
-      emit('update:modified', value)
-    }
+    const value = modifiedEditor.getValue()
+    emit('update:modified', value)
   })
 
   emit('mounted', diffEditor, monaco)
@@ -84,13 +81,9 @@ onMounted(() => {
 
 <template>
   <Teleport to="body">
-    <div
-      ref="OverflowRef" class="monaco-editor-overflows monaco-editor w-full" :style="{
-        transform: `translate(${x}px, ${y}px)`,
-      }"
-    />
+    <div ref="OverflowRef" class="monaco-editor-overflows monaco-editor w-full" />
   </Teleport>
-  <div ref="ContainerRef" class="h-full w-full">
+  <div class="h-full w-full">
     <VueMonacoDiffEditor
       v-if="showEditor" class="h-full w-full" :original="props.original" :modified="props.modified"
       :language="props.language" :theme="editorTheme" :options="{

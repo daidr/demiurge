@@ -146,20 +146,22 @@ function handleRightContentChange(value: string) {
 }
 
 // Watch source mode changes
-watch(leftSourceMode, (newMode, oldMode) => {
+watch(leftSourceMode, async (newMode, oldMode) => {
   if (newMode === 'custom' && oldMode === 'tab') {
     // Switching to custom mode - keep current content for editing
-    // Content is already in leftRawContent
+    // Content is already in leftRawContent, update formatted content immediately
+    leftFormattedContent.value = await formatJson(leftRawContent.value)
   }
   else {
     updateLeftContent()
   }
 })
 
-watch(rightSourceMode, (newMode, oldMode) => {
+watch(rightSourceMode, async (newMode, oldMode) => {
   if (newMode === 'custom' && oldMode === 'tab') {
     // Switching to custom mode - keep current content for editing
-    // Content is already in rightRawContent
+    // Content is already in rightRawContent, update formatted content immediately
+    rightFormattedContent.value = await formatJson(rightRawContent.value)
   }
   else {
     updateRightContent()
