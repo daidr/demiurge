@@ -7,13 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { useToolsStore } from '@/stores/tools'
 import JsonPlayground from './interactive/JsonPlayground.vue'
 import JsonSizeViewer from './interactive/JsonSizeViewer.vue'
+import TypeStatistics from './interactive/TypeStatistics.vue'
 
 const { t } = useI18n()
 const toolsStore = useToolsStore()
 const { activeToolTab } = storeToRefs(toolsStore)
 
 function handleTabChange(value: StringOrNumber) {
-  toolsStore.setActiveToolTab(value as 'size-viewer' | 'playground')
+  toolsStore.setActiveToolTab(value as 'size-viewer' | 'playground' | 'type-stats')
 }
 </script>
 
@@ -30,6 +31,10 @@ function handleTabChange(value: StringOrNumber) {
             <span class="i-mingcute-terminal-box-line" />
             <span>{{ t('tools.playground') }}</span>
           </TabsTrigger>
+          <TabsTrigger value="type-stats" class="gap-1 text-xs h-6 px-2">
+            <span class="i-mingcute-chart-bar-line" />
+            <span>{{ t('tools.type_stats') }}</span>
+          </TabsTrigger>
         </TabsList>
       </PanelHeader>
 
@@ -39,6 +44,10 @@ function handleTabChange(value: StringOrNumber) {
 
       <TabsContent value="playground" class="flex-grow overflow-hidden p-2 mt-0 min-h-0">
         <JsonPlayground />
+      </TabsContent>
+
+      <TabsContent value="type-stats" class="flex-grow overflow-hidden p-2 mt-0 min-h-0">
+        <TypeStatistics />
       </TabsContent>
     </Tabs>
   </div>

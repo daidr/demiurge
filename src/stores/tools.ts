@@ -1,6 +1,7 @@
 import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
 import type { Schema } from '@/db'
+import type { TypeStatistics } from '@/utils/tools_worker'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { ROOT_PATH } from '@/components/base/JsonTree/types'
@@ -11,7 +12,7 @@ import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
 import { useWorkspaceStore } from './workspace'
 
-export type ToolTab = 'size-viewer' | 'playground'
+export type ToolTab = 'size-viewer' | 'playground' | 'type-stats'
 
 // Re-export types from db for convenience
 export type { InteractiveTool, PlaygroundMode, SizeViewerMode } from '@/db'
@@ -80,6 +81,10 @@ export const useToolsStore = defineStore('tools', () => {
     executionTime: null,
   })
 
+  // Type Statistics runtime state
+  const typeStats = ref<TypeStatistics | null>(null)
+  const isCalculatingTypeStats = ref<boolean>(false)
+
   // Editor reference (set by LayoutJsonEditor)
   const editorRef = shallowRef<editor.IStandaloneCodeEditor | null>(null)
 
@@ -100,9 +105,15 @@ export const useToolsStore = defineStore('tools', () => {
       isExecuting: false,
       executionTime: null,
     }
-    // Recalculate size tree only if size viewer is active
-    if (activeTabData.value?.content && activeToolTab.value === 'size-viewer') {
-      recalculateSizeTree()
+    typeStats.value = null
+    // Recalculate based on active tool tab
+    if (activeTabData.value?.content) {
+      if (activeToolTab.value === 'size-viewer') {
+        recalculateSizeTree()
+      }
+      else if (activeToolTab.value === 'type-stats') {
+        recalculateTypeStats()
+      }
     }
   })
 
@@ -115,6 +126,9 @@ export const useToolsStore = defineStore('tools', () => {
     if (newContent && !sizeTree.value && activeToolTab.value === 'size-viewer') {
       recalculateSizeTree()
     }
+    if (newContent && !typeStats.value && activeToolTab.value === 'type-stats') {
+      recalculateTypeStats()
+    }
     if (newContent && playgroundAutoRun.value && activeToolTab.value === 'playground') {
       triggerAutoRun()
       return
@@ -125,6 +139,10 @@ export const useToolsStore = defineStore('tools', () => {
       if (activeToolTab.value === 'size-viewer') {
         recalculateSizeTree()
       }
+      // Only recalculate type stats if type-stats is active
+      if (activeToolTab.value === 'type-stats') {
+        recalculateTypeStats()
+      }
       // Only trigger auto-run if playground is active and auto-run is enabled
       if (activeToolTab.value === 'playground' && playgroundAutoRun.value) {
         triggerAutoRun()
@@ -132,12 +150,18 @@ export const useToolsStore = defineStore('tools', () => {
     }, INTERVALS.DEBOUNCE_DEFAULT)
   }, { immediate: true })
 
-  // Watch for active tool tab changes - calculate on switch to size viewer
+  // Watch for active tool tab changes - calculate on switch
   watch(activeToolTab, (newTab, oldTab) => {
     if (newTab === 'size-viewer' && oldTab !== 'size-viewer') {
       // Switched to size viewer, calculate if not already calculated
       if (!sizeTree.value && currentJsonContent.value.trim()) {
         recalculateSizeTree()
+      }
+    }
+    if (newTab === 'type-stats' && oldTab !== 'type-stats') {
+      // Switched to type stats, calculate if not already calculated
+      if (!typeStats.value && currentJsonContent.value.trim()) {
+        recalculateTypeStats()
       }
     }
   })
@@ -297,6 +321,27 @@ export const useToolsStore = defineStore('tools', () => {
     }
   }
 
+  async function recalculateTypeStats() {
+    const content = currentJsonContent.value
+    if (!content.trim()) {
+      typeStats.value = null
+      return
+    }
+
+    isCalculatingTypeStats.value = true
+    try {
+      const worker = await getToolsWorker()
+      const stats = await worker.calculateTypeStatistics(content)
+      typeStats.value = stats
+    }
+    catch {
+      typeStats.value = null
+    }
+    finally {
+      isCalculatingTypeStats.value = false
+    }
+  }
+
   function setCurrentJsonContent(content: string) {
     const tabId = activeTabId.value
     if (!tabId)
@@ -404,6 +449,8 @@ export const useToolsStore = defineStore('tools', () => {
     isCalculating,
     isSorting,
     playground,
+    typeStats,
+    isCalculatingTypeStats,
 
     // Actions
     setActiveToolTab,

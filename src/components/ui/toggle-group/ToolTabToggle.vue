@@ -19,7 +19,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 function handleChange(value: string | string[]) {
-  if (typeof value === 'string' && (value === 'size-viewer' || value === 'playground')) {
+  if (typeof value === 'string' && (value === 'size-viewer' || value === 'playground' || value === 'type-stats')) {
     emit('update:modelValue', value)
   }
 }
@@ -39,6 +39,10 @@ function handleChange(value: string | string[]) {
     <ToggleGroupItem value="playground" class="gap-1">
       <span class="i-mingcute-terminal-box-line" />
       {{ t('tools.playground') }}
+    </ToggleGroupItem>
+    <ToggleGroupItem value="type-stats" class="gap-1">
+      <span class="i-mingcute-chart-bar-line" />
+      {{ t('tools.type_stats') }}
     </ToggleGroupItem>
   </ToggleGroup>
 </template>

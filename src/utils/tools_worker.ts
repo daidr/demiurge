@@ -142,6 +142,19 @@ function sortJsonKeys(obj: unknown): unknown {
 }
 
 class ToolsWorker {
+  calculateTypeStatistics(jsonString: string): TypeStatistics | null {
+    if (!jsonString.trim()) {
+      return null
+    }
+    try {
+      const parsed = JSON.parse(jsonString)
+      return calculateTypeStatistics(parsed)
+    }
+    catch {
+      return null
+    }
+  }
+
   calculateSizeTree(jsonString: string, flatten: boolean): JsonSizeNode | null {
     if (!jsonString.trim()) {
       return null
@@ -205,6 +218,175 @@ class ToolsWorker {
       return { result: null, error: e instanceof Error ? e.message : String(e) }
     }
   }
+}
+
+// Type Statistics types and calculation
+export interface TypeStatistics {
+  totalNodes: number
+  maxDepth: number
+  types: {
+    object: number
+    array: number
+    string: number
+    number: number
+    boolean: number
+    null: number
+  }
+  keys: {
+    total: number
+    unique: number
+    duplicates: Map<string, number> | Record<string, number>
+  }
+  arrays: {
+    count: number
+    totalElements: number
+    maxLength: number
+    avgLength: number
+  }
+  strings: {
+    count: number
+    totalLength: number
+    maxLength: number
+    avgLength: number
+    emptyCount: number
+  }
+  numbers: {
+    count: number
+    min: number | null
+    max: number | null
+    hasFloat: boolean
+    hasNegative: boolean
+  }
+}
+
+function calculateTypeStatistics(value: unknown): TypeStatistics {
+  const stats: TypeStatistics = {
+    totalNodes: 0,
+    maxDepth: 0,
+    types: {
+      object: 0,
+      array: 0,
+      string: 0,
+      number: 0,
+      boolean: 0,
+      null: 0,
+    },
+    keys: {
+      total: 0,
+      unique: 0,
+      duplicates: {},
+    },
+    arrays: {
+      count: 0,
+      totalElements: 0,
+      maxLength: 0,
+      avgLength: 0,
+    },
+    strings: {
+      count: 0,
+      totalLength: 0,
+      maxLength: 0,
+      avgLength: 0,
+      emptyCount: 0,
+    },
+    numbers: {
+      count: 0,
+      min: null,
+      max: null,
+      hasFloat: false,
+      hasNegative: false,
+    },
+  }
+
+  const keyCount: Record<string, number> = {}
+
+  function traverse(val: unknown, depth: number): void {
+    stats.totalNodes++
+    stats.maxDepth = Math.max(stats.maxDepth, depth)
+
+    if (val === null) {
+      stats.types.null++
+      return
+    }
+
+    if (Array.isArray(val)) {
+      stats.types.array++
+      stats.arrays.count++
+      stats.arrays.totalElements += val.length
+      stats.arrays.maxLength = Math.max(stats.arrays.maxLength, val.length)
+
+      for (const item of val) {
+        traverse(item, depth + 1)
+      }
+      return
+    }
+
+    if (typeof val === 'object') {
+      stats.types.object++
+      const keys = Object.keys(val as Record<string, unknown>)
+      stats.keys.total += keys.length
+
+      for (const key of keys) {
+        keyCount[key] = (keyCount[key] || 0) + 1
+        traverse((val as Record<string, unknown>)[key], depth + 1)
+      }
+      return
+    }
+
+    if (typeof val === 'string') {
+      stats.types.string++
+      stats.strings.count++
+      stats.strings.totalLength += val.length
+      stats.strings.maxLength = Math.max(stats.strings.maxLength, val.length)
+      if (val.length === 0) {
+        stats.strings.emptyCount++
+      }
+      return
+    }
+
+    if (typeof val === 'number') {
+      stats.types.number++
+      stats.numbers.count++
+      if (stats.numbers.min === null || val < stats.numbers.min) {
+        stats.numbers.min = val
+      }
+      if (stats.numbers.max === null || val > stats.numbers.max) {
+        stats.numbers.max = val
+      }
+      if (!Number.isInteger(val)) {
+        stats.numbers.hasFloat = true
+      }
+      if (val < 0) {
+        stats.numbers.hasNegative = true
+      }
+      return
+    }
+
+    if (typeof val === 'boolean') {
+      stats.types.boolean++
+    }
+  }
+
+  traverse(value, 0)
+
+  // Calculate averages and key statistics
+  if (stats.arrays.count > 0) {
+    stats.arrays.avgLength = stats.arrays.totalElements / stats.arrays.count
+  }
+  if (stats.strings.count > 0) {
+    stats.strings.avgLength = stats.strings.totalLength / stats.strings.count
+  }
+
+  stats.keys.unique = Object.keys(keyCount).length
+  const duplicates: Record<string, number> = {}
+  for (const [key, count] of Object.entries(keyCount)) {
+    if (count > 1) {
+      duplicates[key] = count
+    }
+  }
+  stats.keys.duplicates = duplicates
+
+  return stats
 }
 
 export type { ToolsWorker as TToolsWorker }
