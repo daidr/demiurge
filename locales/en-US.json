@@ -158,6 +158,10 @@
     "dark": "Dark Mode",
     "system": "System"
   },
+  "breadcrumb": {
+    "copy_path": "Copy JSONPath",
+    "copied": "Copied!"
+  },
   "settings": {
     "title": "Preferences",
     "language": "Language",

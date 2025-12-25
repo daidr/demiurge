@@ -158,6 +158,10 @@
     "dark": "深色模式",
     "system": "跟随系统"
   },
+  "breadcrumb": {
+    "copy_path": "复制 JSONPath",
+    "copied": "已复制!"
+  },
   "settings": {
     "title": "首选项",
     "language": "语言",

@@ -11,7 +11,7 @@ export interface JsonPosition {
 
 /**
  * Parse a path string into segments
- * Handles both dot notation (a.b.c) and bracket notation (a[0].b)
+ * Handles both dot notation (a.b.c, a.0.b) and bracket notation (a[0].b)
  */
 function parsePathSegments(path: string): (string | number)[] {
   if (!path)
@@ -21,21 +21,29 @@ function parsePathSegments(path: string): (string | number)[] {
   let current = ''
   let i = 0
 
+  function pushSegment(seg: string) {
+    if (!seg)
+      return
+    // Check if segment is a pure integer (array index)
+    if (/^\d+$/.test(seg)) {
+      segments.push(Number.parseInt(seg, 10))
+    }
+    else {
+      segments.push(seg)
+    }
+  }
+
   while (i < path.length) {
     const char = path[i]
 
     if (char === '.') {
-      if (current) {
-        segments.push(current)
-        current = ''
-      }
+      pushSegment(current)
+      current = ''
       i++
     }
     else if (char === '[') {
-      if (current) {
-        segments.push(current)
-        current = ''
-      }
+      pushSegment(current)
+      current = ''
       i++
       // Parse the index
       let indexStr = ''
@@ -52,9 +60,7 @@ function parsePathSegments(path: string): (string | number)[] {
     }
   }
 
-  if (current) {
-    segments.push(current)
-  }
+  pushSegment(current)
 
   return segments
 }
