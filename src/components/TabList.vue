@@ -101,10 +101,12 @@ function handleDrop(e: DragEvent, targetId: string) {
     return
   }
 
-  // Remove dragged item and insert at target position
+  // Remove dragged item and insert after target
   const newOrder = [...currentOrder]
   newOrder.splice(draggedIndex, 1)
-  newOrder.splice(targetIndex, 0, draggedId.value)
+  // Insert after target (adjust index if dragged was before target)
+  const insertIndex = draggedIndex < targetIndex ? targetIndex : targetIndex + 1
+  newOrder.splice(insertIndex, 0, draggedId.value)
 
   emit('reorder', newOrder)
 
@@ -154,9 +156,10 @@ function handleDrop(e: DragEvent, targetId: string) {
   display: none;
   position: absolute;
   inset-inline: 0;
-  top: 0;
+  bottom: -1px;
   height: 2px;
   background-color: hsl(var(--primary));
+  pointer-events: none;
 }
 
 .tab-drag-item.drag-over .drop-indicator {
