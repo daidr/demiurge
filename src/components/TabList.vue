@@ -56,6 +56,13 @@ function handleDuplicate(id: string) {
 }
 
 function handleDragStart(e: DragEvent, tabId: string) {
+  // Prevent drag when interacting with input elements (allow text selection)
+  const target = e.target as HTMLElement
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable) {
+    e.preventDefault()
+    return
+  }
+
   draggedId.value = tabId
   if (e.dataTransfer) {
     e.dataTransfer.effectAllowed = 'move'
