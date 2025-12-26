@@ -89,6 +89,16 @@ export const useToolsStore = defineStore('tools', () => {
 
   // ========== Debounced recalculation functions ==========
 
+  // Immediate recalculation (for initial load and tab switch)
+  function recalculateImmediate() {
+    if (activeToolTab.value === 'size-viewer') {
+      recalculateSizeTree()
+    }
+    else if (activeToolTab.value === 'type-stats') {
+      recalculateTypeStats()
+    }
+  }
+
   // Debounced content change handler - recalculates based on active tool
   const debouncedRecalculate = useDebounceFn(() => {
     if (activeToolTab.value === 'size-viewer') {
@@ -104,32 +114,42 @@ export const useToolsStore = defineStore('tools', () => {
 
   // ========== Watchers for recalculation ==========
 
-  // Watch for tab changes to reset runtime state
-  watch(activeTabId, () => {
-    sizeTree.value = null
-    expandedPaths.value = new Set()
-    playground.value = {
-      result: null,
-      error: null,
-      isExecuting: false,
-      executionTime: null,
-    }
-    typeStats.value = null
-    // Recalculate based on active tool tab
-    if (activeTabData.value?.content) {
-      if (activeToolTab.value === 'size-viewer') {
-        recalculateSizeTree()
+  // Flag to track tab switching for immediate calculation
+  let isTabSwitching = false
+
+  // Watch for tab changes to reset runtime state and mark switching
+  watch(activeTabId, (_newId, oldId) => {
+    // Only reset state when switching tabs (not on initial load)
+    if (oldId !== undefined) {
+      isTabSwitching = true
+      sizeTree.value = null
+      expandedPaths.value = new Set()
+      playground.value = {
+        result: null,
+        error: null,
+        isExecuting: false,
+        executionTime: null,
       }
-      else if (activeToolTab.value === 'type-stats') {
-        recalculateTypeStats()
-      }
+      typeStats.value = null
     }
   })
 
-  // Watch for content changes (debounced recalculation)
-  watch(currentJsonContent, () => {
-    debouncedRecalculate()
-  })
+  // Watch for content changes (handles both initial load and content edits)
+  // Initial load: immediate triggers calculation
+  // Tab switch: content changes, triggers immediate calculation
+  // Content edit: debounced calculation
+  watch(currentJsonContent, (_newContent, oldContent) => {
+    // Initial load: oldContent is undefined
+    // Tab switch: isTabSwitching flag is set
+    if (oldContent === undefined || isTabSwitching) {
+      isTabSwitching = false
+      recalculateImmediate()
+    }
+    else {
+      // Content edit within same tab: use debounced recalculation
+      debouncedRecalculate()
+    }
+  }, { immediate: true })
 
   // Watch for active tool tab changes - calculate on switch
   watch(activeToolTab, (newTab, oldTab) => {
