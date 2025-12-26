@@ -9,7 +9,7 @@ export interface Workspace {
 }
 
 // Tab Collection Types
-export type InteractiveTool = 'size-viewer' | 'playground'
+export type InteractiveTool = 'size-viewer' | 'playground' | 'type-stats'
 export type SizeViewerMode = 'tree' | 'sunburst'
 export type PlaygroundMode = 'javascript' | 'jsonpath'
 

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { AcceptableValue } from 'reka-ui'
 import type { ToggleGroupSize } from './ToggleGroup.vue'
 import type { PlaygroundMode } from '@/db'
 import { ToggleGroup, ToggleGroupItem } from '.'
@@ -19,7 +20,7 @@ const emit = defineEmits<{
   'update:modelValue': [value: PlaygroundMode]
 }>()
 
-function handleChange(value: string | string[]) {
+function handleChange(value: AcceptableValue) {
   if (typeof value === 'string' && (value === 'javascript' || value === 'jsonpath')) {
     emit('update:modelValue', value)
   }

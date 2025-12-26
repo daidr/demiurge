@@ -1,6 +1,6 @@
 import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
-import type { Schema } from '@/db'
+import type { InteractiveTool, Schema } from '@/db'
 import type { TypeStatistics } from '@/utils/tools_worker'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
@@ -11,8 +11,6 @@ import { schemasCollection } from '@/db'
 import { findJsonPathPosition } from '@/utils/jsonPathToPosition'
 import { getToolsWorker } from '@/utils/tools_service'
 import { useWorkspaceStore } from './workspace'
-
-export type ToolTab = 'size-viewer' | 'playground' | 'type-stats'
 
 // Re-export types from db for convenience
 export type { InteractiveTool, PlaygroundMode, SizeViewerMode } from '@/db'
@@ -173,7 +171,7 @@ export const useToolsStore = defineStore('tools', () => {
 
   // ========== Actions ==========
 
-  function setActiveToolTab(tab: ToolTab) {
+  function setActiveToolTab(tab: InteractiveTool) {
     const tabId = activeTabId.value
     if (!tabId)
       return

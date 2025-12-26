@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import type { AcceptableValue } from 'reka-ui'
 import type { ToggleGroupSize } from './ToggleGroup.vue'
-import type { ToolTab } from '@/stores/tools'
+import type { InteractiveTool } from '@/stores/tools'
 import { useI18n } from 'vue-i18n'
 import { ToggleGroup, ToggleGroupItem } from '.'
 
 withDefaults(defineProps<{
-  modelValue?: ToolTab
+  modelValue?: InteractiveTool
   size?: ToggleGroupSize
 }>(), {
   modelValue: 'size-viewer',
@@ -13,12 +14,12 @@ withDefaults(defineProps<{
 })
 
 const emit = defineEmits<{
-  'update:modelValue': [value: ToolTab]
+  'update:modelValue': [value: InteractiveTool]
 }>()
 
 const { t } = useI18n()
 
-function handleChange(value: string | string[]) {
+function handleChange(value: AcceptableValue) {
   if (typeof value === 'string' && (value === 'size-viewer' || value === 'playground' || value === 'type-stats')) {
     emit('update:modelValue', value)
   }
