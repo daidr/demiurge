@@ -165,7 +165,7 @@ function handleDrop(e: DragEvent, targetId: string) {
   inset-inline: 0;
   bottom: -1px;
   height: 2px;
-  background-color: hsl(var(--primary));
+  background-color: oklch(var(--primary));
   pointer-events: none;
 }
 
