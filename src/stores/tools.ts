@@ -115,23 +115,12 @@ export const useToolsStore = defineStore('tools', () => {
     }
   })
 
-  // Watch for content changes (immediate: true ensures initial calculation from store)
-  watch(currentJsonContent, (newContent) => {
+  // Watch for content changes (debounced recalculation)
+  // Note: Initial calculation on tab switch is handled by activeTabId watcher
+  watch(currentJsonContent, () => {
     if (debounceTimer) {
       clearTimeout(debounceTimer)
     }
-    // For initial load with existing content, calculate immediately if needed
-    if (newContent && !sizeTree.value && activeToolTab.value === 'size-viewer') {
-      recalculateSizeTree()
-    }
-    if (newContent && !typeStats.value && activeToolTab.value === 'type-stats') {
-      recalculateTypeStats()
-    }
-    if (newContent && playgroundAutoRun.value && activeToolTab.value === 'playground') {
-      triggerAutoRun()
-      return
-    }
-    // For subsequent changes, debounce
     debounceTimer = setTimeout(() => {
       // Only recalculate size tree if size viewer is active
       if (activeToolTab.value === 'size-viewer') {
@@ -146,7 +135,7 @@ export const useToolsStore = defineStore('tools', () => {
         triggerAutoRun()
       }
     }, INTERVALS.DEBOUNCE_DEFAULT)
-  }, { immediate: true })
+  })
 
   // Watch for active tool tab changes - calculate on switch
   watch(activeToolTab, (newTab, oldTab) => {
