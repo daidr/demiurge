@@ -208,15 +208,15 @@ onUnmounted(() => {
         <div
           ref="windowRef"
           :class="cn(
-            'absolute bg-background border border-border rounded-lg shadow-xl flex flex-col overflow-hidden',
+            'absolute left-0 top-0 bg-background border border-border rounded-lg shadow-xl flex flex-col overflow-hidden',
             (isDragging || isResizing) && 'select-none',
             props.class,
           )"
           :style="{
-            left: `${position.x}px`,
-            top: `${position.y}px`,
+            transform: `translate3d(${position.x}px, ${position.y}px, 0)`,
             width: `${size.width}px`,
             height: `${size.height}px`,
+            willChange: (isDragging || isResizing) ? 'transform' : 'auto',
           }"
         >
           <!-- Title bar -->
