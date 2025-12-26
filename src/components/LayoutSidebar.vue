@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { useDebounceFn } from '@vueuse/core'
 import { storeToRefs } from 'pinia'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
@@ -243,17 +244,20 @@ async function updateStorageEstimate() {
   }
 }
 
+// Debounced version to avoid frequent API calls when tabs change rapidly
+const debouncedUpdateStorageEstimate = useDebounceFn(updateStorageEstimate, 2000)
+
 let storageInterval: ReturnType<typeof setInterval> | null = null
 
-// Watch workspace tabs changes to update storage estimate
+// Watch workspace tabs changes to update storage estimate (debounced)
 watch(sortedTabs, () => {
-  updateStorageEstimate()
+  debouncedUpdateStorageEstimate()
 }, { deep: false })
 
 onMounted(() => {
   updateStorageEstimate()
-  // Update every 30 seconds as a fallback
-  storageInterval = setInterval(updateStorageEstimate, INTERVALS.STORAGE_POLL)
+  // Update every 60 seconds as a fallback (reduced from 30s)
+  storageInterval = setInterval(updateStorageEstimate, INTERVALS.STORAGE_POLL * 2)
 })
 
 onUnmounted(() => {

@@ -57,10 +57,21 @@ export function useMonacoModel(options: MonacoModelOptions): MonacoModelReturn {
   const monacoRef = shallowRef<typeof Monaco>()
   let model: editor.ITextModel | null = null
 
+  // Flag to prevent feedback loop when content changes from editor
+  let isUpdatingFromEditor = false
+
   // Watch for external content changes and sync to editor
   watch(content, (newContent) => {
-    if (model && model.getValue() !== newContent) {
-      model.setValue(newContent || '')
+    // Skip if the change originated from the editor itself
+    if (isUpdatingFromEditor)
+      return
+
+    if (model) {
+      const currentValue = model.getValue()
+      // Quick length check before full string comparison
+      if (currentValue.length !== newContent.length || currentValue !== newContent) {
+        model.setValue(newContent || '')
+      }
     }
   })
 
@@ -81,8 +92,14 @@ export function useMonacoModel(options: MonacoModelOptions): MonacoModelReturn {
     // Listen for content changes
     if (onContentChange) {
       editor.onDidChangeModelContent(() => {
+        // Set flag to prevent watch from triggering setValue
+        isUpdatingFromEditor = true
         const value = editor.getValue()
         onContentChange(value)
+        // Reset flag after microtask to allow watch to complete
+        queueMicrotask(() => {
+          isUpdatingFromEditor = false
+        })
       })
     }
 

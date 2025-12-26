@@ -2,6 +2,7 @@ import type { editor } from 'monaco-editor'
 import type { JsonSizeNode } from '@/components/base/JsonTree'
 import type { InteractiveTool, Schema } from '@/db'
 import type { TypeStatistics } from '@/utils/tools_worker'
+import { useDebounceFn } from '@vueuse/core'
 import { acceptHMRUpdate, defineStore, storeToRefs } from 'pinia'
 import { computed, ref, shallowRef, watch } from 'vue'
 import { ROOT_PATH } from '@/components/base/JsonTree/types'
@@ -86,10 +87,20 @@ export const useToolsStore = defineStore('tools', () => {
   // Editor reference (set by LayoutJsonEditor)
   const editorRef = shallowRef<editor.IStandaloneCodeEditor | null>(null)
 
-  // Debounce timer for content changes
-  let debounceTimer: ReturnType<typeof setTimeout> | null = null
-  // Debounce timer for playground auto-run
-  let playgroundDebounceTimer: ReturnType<typeof setTimeout> | null = null
+  // ========== Debounced recalculation functions ==========
+
+  // Debounced content change handler - recalculates based on active tool
+  const debouncedRecalculate = useDebounceFn(() => {
+    if (activeToolTab.value === 'size-viewer') {
+      recalculateSizeTree()
+    }
+    if (activeToolTab.value === 'type-stats') {
+      recalculateTypeStats()
+    }
+    if (activeToolTab.value === 'playground' && playgroundAutoRun.value) {
+      executePlayground()
+    }
+  }, INTERVALS.DEBOUNCE_DEFAULT)
 
   // ========== Watchers for recalculation ==========
 
@@ -116,25 +127,8 @@ export const useToolsStore = defineStore('tools', () => {
   })
 
   // Watch for content changes (debounced recalculation)
-  // Note: Initial calculation on tab switch is handled by activeTabId watcher
   watch(currentJsonContent, () => {
-    if (debounceTimer) {
-      clearTimeout(debounceTimer)
-    }
-    debounceTimer = setTimeout(() => {
-      // Only recalculate size tree if size viewer is active
-      if (activeToolTab.value === 'size-viewer') {
-        recalculateSizeTree()
-      }
-      // Only recalculate type stats if type-stats is active
-      if (activeToolTab.value === 'type-stats') {
-        recalculateTypeStats()
-      }
-      // Only trigger auto-run if playground is active and auto-run is enabled
-      if (activeToolTab.value === 'playground' && playgroundAutoRun.value) {
-        triggerAutoRun()
-      }
-    }, INTERVALS.DEBOUNCE_DEFAULT)
+    debouncedRecalculate()
   })
 
   // Watch for active tool tab changes - calculate on switch
@@ -248,17 +242,16 @@ export const useToolsStore = defineStore('tools', () => {
     }
   }
 
+  // Debounced playground execution
+  const debouncedExecutePlayground = useDebounceFn(() => {
+    executePlayground()
+  }, INTERVALS.DEBOUNCE_DEFAULT)
+
   function triggerAutoRun() {
     if (!playgroundAutoRun.value || !playgroundExpression.value.trim()) {
       return
     }
-
-    if (playgroundDebounceTimer) {
-      clearTimeout(playgroundDebounceTimer)
-    }
-    playgroundDebounceTimer = setTimeout(() => {
-      executePlayground()
-    }, INTERVALS.DEBOUNCE_DEFAULT)
+    debouncedExecutePlayground()
   }
 
   async function recalculateSizeTree() {

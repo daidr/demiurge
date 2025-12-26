@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { Tab } from '@/db'
-import { ref } from 'vue'
+import { ref, watchEffect } from 'vue'
 import TabListItem from './TabListItem.vue'
 
 const props = defineProps<{
@@ -16,9 +16,28 @@ const emit = defineEmits<{
   reorder: [newOrder: string[]]
 }>()
 
-// Drag state
+// Container ref for DOM-based class updates
+const containerRef = ref<HTMLDivElement | null>(null)
+
+// Drag state - using raw values to avoid triggering Vue re-renders
 const draggedId = ref<string | null>(null)
 const dragOverId = ref<string | null>(null)
+
+// Use watchEffect to directly update DOM classes instead of reactive bindings
+// This avoids re-rendering all tab items when drag state changes
+watchEffect(() => {
+  if (!containerRef.value)
+    return
+
+  const items = containerRef.value.querySelectorAll('[data-tab-id]')
+  items.forEach((el) => {
+    const tabId = el.getAttribute('data-tab-id')
+    // Update dragging state
+    el.classList.toggle('is-dragging', tabId === draggedId.value)
+    // Update drag-over state
+    el.classList.toggle('drag-over', tabId === dragOverId.value && tabId !== draggedId.value)
+  })
+})
 
 function handleSelect(id: string) {
   emit('select', id)
@@ -95,26 +114,21 @@ function handleDrop(e: DragEvent, targetId: string) {
 </script>
 
 <template>
-  <div class="flex flex-col gap-0.5">
+  <div ref="containerRef" class="flex flex-col gap-0.5">
     <div
       v-for="tab in tabs"
       :key="tab.id"
+      :data-tab-id="tab.id"
       draggable="true"
-      class="relative"
-      :class="{
-        'opacity-50': draggedId === tab.id,
-      }"
+      class="tab-drag-item relative"
       @dragstart="handleDragStart($event, tab.id)"
       @dragend="handleDragEnd"
       @dragover="handleDragOver($event, tab.id)"
       @dragleave="handleDragLeave"
       @drop="handleDrop($event, tab.id)"
     >
-      <!-- Drop indicator -->
-      <div
-        v-if="dragOverId === tab.id && draggedId !== tab.id"
-        class="bg-primary absolute inset-x-0 top-0 h-0.5"
-      />
+      <!-- Drop indicator - controlled via CSS -->
+      <div class="drop-indicator" />
       <TabListItem
         :tab="tab"
         :is-active="activeTabId === tab.id"
@@ -126,3 +140,26 @@ function handleDrop(e: DragEvent, targetId: string) {
     </div>
   </div>
 </template>
+
+<style scoped>
+.tab-drag-item {
+  transition: opacity 0.1s ease;
+}
+
+.tab-drag-item.is-dragging {
+  opacity: 0.5;
+}
+
+.drop-indicator {
+  display: none;
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  height: 2px;
+  background-color: hsl(var(--primary));
+}
+
+.tab-drag-item.drag-over .drop-indicator {
+  display: block;
+}
+</style>

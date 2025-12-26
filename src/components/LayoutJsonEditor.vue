@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import type { editor } from 'monaco-editor'
 import type { JsonPathSegment } from '@/utils/positionToJsonPath'
+import { useDebounceFn } from '@vueuse/core'
 import { computed, onUnmounted, ref } from 'vue'
 import { useMonacoJsonSchema } from '@/composables/useMonacoJsonSchema'
 import { useMonacoModel } from '@/composables/useMonacoModel'
+import { INTERVALS } from '@/constants/app'
 import { useToolsStore } from '@/stores/tools'
 import { getJsonPathAtPosition } from '@/utils/positionToJsonPath'
 import JsonPathBreadcrumb from './base/JsonPathBreadcrumb.vue'
@@ -45,6 +47,12 @@ function updateBreadcrumb(editorInstance: editor.IStandaloneCodeEditor) {
   }
 }
 
+// Debounced version of updateBreadcrumb to reduce JSON parsing overhead
+const debouncedUpdateBreadcrumb = useDebounceFn(
+  (editorInstance: editor.IStandaloneCodeEditor) => updateBreadcrumb(editorInstance),
+  INTERVALS.CURSOR_DEBOUNCE,
+)
+
 function handleBreadcrumbNavigate(path: string) {
   toolsStore.navigateToJsonPath(path)
 }
@@ -63,11 +71,11 @@ const {
   },
   onMounted: (editorInstance) => {
     toolsStore.setEditorRef(editorInstance)
-    // Subscribe to cursor position changes
+    // Subscribe to cursor position changes with debounce
     cursorDisposable = editorInstance.onDidChangeCursorPosition(() => {
-      updateBreadcrumb(editorInstance)
+      debouncedUpdateBreadcrumb(editorInstance)
     })
-    // Initial breadcrumb update
+    // Initial breadcrumb update (immediate, no debounce)
     updateBreadcrumb(editorInstance)
   },
   onUnmounted: () => {

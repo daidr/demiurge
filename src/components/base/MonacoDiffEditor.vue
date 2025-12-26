@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import type { editor } from 'monaco-editor'
+import type { editor, IDisposable } from 'monaco-editor'
 import type * as MonacoEditor from 'monaco-editor'
 import { VueMonacoDiffEditor } from '@guolao/vue-monaco-editor'
 import { onMounted, ref, shallowRef, watch } from 'vue'
@@ -28,6 +28,9 @@ const { editorTheme } = useEditorTheme()
 const EditorRef = shallowRef<editor.IStandaloneDiffEditor>()
 const OverflowRef = ref<HTMLDivElement | null>(null)
 
+// Store disposables to prevent memory leaks
+const disposables: IDisposable[] = []
+
 function handleEditorMount(diffEditor: editor.IStandaloneDiffEditor, monaco: typeof MonacoEditor) {
   EditorRef.value = diffEditor
 
@@ -39,20 +42,29 @@ function handleEditorMount(diffEditor: editor.IStandaloneDiffEditor, monaco: typ
   originalEditor.updateOptions({ readOnly: !props.originalEditable })
   modifiedEditor.updateOptions({ readOnly: !props.modifiedEditable })
 
-  originalEditor.onDidChangeModelContent(() => {
-    const value = originalEditor.getValue()
-    emit('update:original', value)
-  })
+  // Save disposables to clean up on unmount
+  disposables.push(
+    originalEditor.onDidChangeModelContent(() => {
+      const value = originalEditor.getValue()
+      emit('update:original', value)
+    }),
+  )
 
-  modifiedEditor.onDidChangeModelContent(() => {
-    const value = modifiedEditor.getValue()
-    emit('update:modified', value)
-  })
+  disposables.push(
+    modifiedEditor.onDidChangeModelContent(() => {
+      const value = modifiedEditor.getValue()
+      emit('update:modified', value)
+    }),
+  )
 
   emit('mounted', diffEditor, monaco)
 }
 
 function handleEditorUnmount() {
+  // Dispose all event listeners to prevent memory leaks
+  disposables.forEach(d => d.dispose())
+  disposables.length = 0
+
   if (EditorRef.value) {
     emit('unmounted', EditorRef.value)
   }

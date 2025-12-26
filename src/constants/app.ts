@@ -10,6 +10,8 @@ export const INTERVALS = {
   DEBOUNCE_DEFAULT: 300,
   /** Search input debounce - 150ms */
   DEBOUNCE_SEARCH: 150,
+  /** Cursor position update debounce - 100ms */
+  CURSOR_DEBOUNCE: 100,
 } as const
 
 // UI size constants (in pixels or percentages)

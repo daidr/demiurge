@@ -5,7 +5,7 @@ import { registerAnimate, registerBrowserEnv, registerDomTooltipHandler, registe
 import darkTheme from '@visactor/vchart-theme/public/dark.json'
 import lightTheme from '@visactor/vchart-theme/public/light.json'
 import { VChart } from '@visactor/vchart/esm/core'
-import { computed, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
+import { computed, markRaw, onMounted, onUnmounted, ref, shallowRef, watch } from 'vue'
 import { useEditorTheme } from '@/composables/useEditorTheme'
 import { cn } from '@/lib/utils'
 
@@ -193,10 +193,11 @@ function createChart() {
     },
   } satisfies ISunburstChartSpec
 
-  chartInstance.value = new VChart(spec, {
+  // Use markRaw to prevent Vue from making VChart instance reactive
+  chartInstance.value = markRaw(new VChart(spec, {
     dom: containerRef.value,
     theme: isDark.value ? 'dark' : 'light',
-  })
+  }))
   chartInstance.value.renderSync()
 
   // Add click event listener for Alt+Click navigation
@@ -229,13 +230,17 @@ onUnmounted(() => {
   }
 })
 
+// Watch for node reference changes (not deep)
+// The parent component provides a new node object when data changes
 watch(() => props.node, () => {
   createChart()
-}, { deep: true })
+})
 
-// Watch for theme changes
-watch(isDark, () => {
-  createChart()
+// Watch for theme changes - use VChart's theme API instead of recreating
+watch(isDark, (dark) => {
+  if (chartInstance.value) {
+    chartInstance.value.setCurrentTheme(dark ? 'dark' : 'light')
+  }
 })
 </script>
 

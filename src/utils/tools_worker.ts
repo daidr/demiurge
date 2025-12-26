@@ -81,46 +81,98 @@ function flattenJson(obj: unknown): unknown {
   }
 }
 
-function buildSizeTree(key: string, path: string, value: unknown, totalSize: number): JsonSizeNode {
-  const stringified = JSON.stringify(value)
-  const size = getByteSize(stringified)
+// Internal result type for optimized tree building
+interface BuildResult {
+  node: JsonSizeNode
+  size: number
+}
+
+/**
+ * Optimized single-pass tree building with size calculation.
+ * Avoids multiple JSON.stringify calls by calculating size during traversal.
+ */
+function buildSizeTreeOptimized(key: string, path: string, value: unknown): BuildResult {
   const type = getJsonType(value)
-  const percentage = totalSize > 0 ? (size / totalSize) * 100 : 0
+
+  let size = 0
+  let children: JsonSizeNode[] | undefined
+
+  if (type === 'object' && value !== null) {
+    const obj = value as Record<string, unknown>
+    const keys = Object.keys(obj)
+    const childResults: BuildResult[] = []
+
+    // Base overhead: {} = 2 bytes
+    size = 2
+
+    for (let i = 0; i < keys.length; i++) {
+      const childKey = keys[i]
+      const childPath = path ? `${path}.${childKey}` : childKey
+      const result = buildSizeTreeOptimized(childKey, childPath, obj[childKey])
+      childResults.push(result)
+
+      // Key size (with quotes) + colon + value size
+      size += getByteSize(JSON.stringify(childKey)) + 1 + result.size
+
+      // Comma between entries (not before first)
+      if (i > 0)
+        size += 1
+    }
+
+    // Sort children by size descending
+    childResults.sort((a, b) => b.size - a.size)
+    children = childResults.map(r => r.node)
+  }
+  else if (type === 'array') {
+    const arr = value as unknown[]
+    const childResults: BuildResult[] = []
+
+    // Base overhead: [] = 2 bytes
+    size = 2
+
+    for (let i = 0; i < arr.length; i++) {
+      const childPath = path ? `${path}[${i}]` : `[${i}]`
+      const result = buildSizeTreeOptimized(`[${i}]`, childPath, arr[i])
+      childResults.push(result)
+
+      size += result.size
+
+      // Comma between entries (not before first)
+      if (i > 0)
+        size += 1
+    }
+
+    // Sort children by size descending
+    childResults.sort((a, b) => b.size - a.size)
+    children = childResults.map(r => r.node)
+  }
+  else {
+    // Primitives: calculate size directly
+    size = getByteSize(JSON.stringify(value))
+  }
 
   const node: JsonSizeNode = {
     key,
     path,
     size,
-    percentage,
+    percentage: 0, // Will be calculated after total size is known
     type,
+    children: children?.length ? children : undefined,
   }
 
-  if (type === 'object' && value !== null) {
-    const obj = value as Record<string, unknown>
-    const children: JsonSizeNode[] = []
-    for (const childKey of Object.keys(obj)) {
-      const childPath = path ? `${path}.${childKey}` : childKey
-      children.push(buildSizeTree(childKey, childPath, obj[childKey], totalSize))
-    }
-    children.sort((a, b) => b.size - a.size)
-    if (children.length > 0) {
-      node.children = children
-    }
-  }
-  else if (type === 'array') {
-    const arr = value as unknown[]
-    const children: JsonSizeNode[] = []
-    for (let i = 0; i < arr.length; i++) {
-      const childPath = path ? `${path}[${i}]` : `[${i}]`
-      children.push(buildSizeTree(`[${i}]`, childPath, arr[i], totalSize))
-    }
-    children.sort((a, b) => b.size - a.size)
-    if (children.length > 0) {
-      node.children = children
-    }
-  }
+  return { node, size }
+}
 
-  return node
+/**
+ * Calculate percentages for all nodes after total size is known.
+ */
+function calculatePercentages(node: JsonSizeNode, totalSize: number): void {
+  node.percentage = totalSize > 0 ? (node.size / totalSize) * 100 : 0
+  if (node.children) {
+    for (const child of node.children) {
+      calculatePercentages(child, totalSize)
+    }
+  }
 }
 
 // Sort JSON keys alphabetically (recursive)
@@ -164,8 +216,12 @@ class ToolsWorker {
       if (flatten) {
         parsed = flattenJson(parsed)
       }
-      const totalSize = getByteSize(JSON.stringify(parsed))
-      return buildSizeTree('root', '', parsed, totalSize)
+
+      // Use optimized single-pass tree building
+      const { node, size } = buildSizeTreeOptimized('root', '', parsed)
+      calculatePercentages(node, size)
+
+      return node
     }
     catch {
       return null
