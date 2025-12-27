@@ -73,6 +73,37 @@ const showSettingWindow = ref(false)
 // DiffWindow state
 const showDiffWindow = ref(false)
 
+// Menubar open state (controlled by v-model)
+const openMenu = ref('')
+
+// Track Alt key state for showing access key hints
+const isAltPressed = ref(false)
+
+function handleKeyDown(e: KeyboardEvent) {
+  if (e.key === 'Alt') {
+    isAltPressed.value = true
+  }
+}
+
+function handleKeyUp(e: KeyboardEvent) {
+  if (e.key === 'Alt') {
+    isAltPressed.value = false
+  }
+}
+
+// Functions to open specific menus via hotkey
+function openFileMenu() {
+  openMenu.value = 'file'
+}
+
+function openViewMenu() {
+  openMenu.value = 'view'
+}
+
+function openToolsMenu() {
+  openMenu.value = 'tools'
+}
+
 function toggleSidePanel() {
   layoutStore.toggleSidebar()
 }
@@ -185,6 +216,13 @@ onMounted(() => {
   if (!isPWA)
     return
 
+  // Track Alt key for access key hints
+  window.addEventListener('keydown', handleKeyDown)
+  window.addEventListener('keyup', handleKeyUp)
+  window.addEventListener('blur', () => {
+    isAltPressed.value = false
+  })
+
   hotkeys('command+t, ctrl+t', (e) => {
     e.preventDefault()
     toggleToolPanel()
@@ -219,6 +257,23 @@ onMounted(() => {
     handleRemoveWorkspace()
     return false
   })
+
+  // Alt+F/V/T to open menus (PWA only)
+  hotkeys('alt+f', (e) => {
+    e.preventDefault()
+    openFileMenu()
+    return false
+  })
+  hotkeys('alt+v', (e) => {
+    e.preventDefault()
+    openViewMenu()
+    return false
+  })
+  hotkeys('alt+t', (e) => {
+    e.preventDefault()
+    openToolsMenu()
+    return false
+  })
 })
 
 onUnmounted(() => {
@@ -230,6 +285,9 @@ onUnmounted(() => {
   if (!isPWA)
     return
 
+  window.removeEventListener('keydown', handleKeyDown)
+  window.removeEventListener('keyup', handleKeyUp)
+
   hotkeys.unbind('command+t, ctrl+t')
   hotkeys.unbind('command+shift+n, ctrl+shift+n')
   hotkeys.unbind('command+n, ctrl+n')
@@ -237,12 +295,15 @@ onUnmounted(() => {
   hotkeys.unbind('command+alt+o, ctrl+alt+o')
   hotkeys.unbind('command+w, ctrl+w')
   hotkeys.unbind('command+shift+w, ctrl+shift+w')
+  hotkeys.unbind('alt+f')
+  hotkeys.unbind('alt+v')
+  hotkeys.unbind('alt+t')
 })
 </script>
 
 <template>
-  <Menubar>
-    <MenubarMenu>
+  <Menubar v-model="openMenu">
+    <MenubarMenu value="logo">
       <LogoMenubarTrigger />
       <MenubarContent>
         <MenubarItem @click="showSettingWindow = true">
@@ -262,8 +323,12 @@ onUnmounted(() => {
       :workspace-id="activeWorkspaceId"
       :workspace-title="activeWorkspaceTitle"
     />
-    <MenubarMenu v-if="!disabled">
-      <MenubarTrigger>{{ t('menu.file') }}</MenubarTrigger>
+    <MenubarMenu v-if="!disabled" value="file">
+      <MenubarTrigger>
+        {{ t('menu.file') }}<template v-if="isPWA">
+          (<span :class="{ underline: isAltPressed }">F</span>)
+        </template>
+      </MenubarTrigger>
       <MenubarContent>
         <MenubarItem @click="showNewWorkspaceDialog = true">
           {{ t('menu.new_workspace') }} <MenubarShortcut v-if="isPWA">
@@ -306,9 +371,11 @@ onUnmounted(() => {
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
-    <MenubarMenu v-if="!disabled">
+    <MenubarMenu v-if="!disabled" value="view">
       <MenubarTrigger :disabled="disabled">
-        {{ t('menu.view') }}
+        {{ t('menu.view') }}<template v-if="isPWA">
+          (<span :class="{ underline: isAltPressed }">V</span>)
+        </template>
       </MenubarTrigger>
       <MenubarContent>
         <MenubarItem @click="toggleSidePanel">
@@ -321,8 +388,12 @@ onUnmounted(() => {
         </MenubarItem>
       </MenubarContent>
     </MenubarMenu>
-    <MenubarMenu v-if="!disabled">
-      <MenubarTrigger>{{ t('menu.tools') }}</MenubarTrigger>
+    <MenubarMenu v-if="!disabled" value="tools">
+      <MenubarTrigger>
+        {{ t('menu.tools') }}<template v-if="isPWA">
+          (<span :class="{ underline: isAltPressed }">T</span>)
+        </template>
+      </MenubarTrigger>
       <MenubarContent>
         <MenubarItem :disabled="isDiffDisabled" @click="showDiffWindow = true">
           {{ t('menu.json_diff') }}
