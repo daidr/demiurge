@@ -19,10 +19,11 @@ if (import.meta.env.DEV) {
 }
 
 // 配置 Monaco Editor 使用 CDN 加载
-const MONACO_VERSION = '0.55.0'
+const MONACO_VERSION = '0.55.1'
 // const CDN_BASE = `https://registry.npmmirror.com/monaco-editor/${MONACO_VERSION}/files`
 // const CDN_BASE = `https://cdn.jsdelivr.net/npm/monaco-editor@${MONACO_VERSION}`
-const CDN_BASE = `https://unpkg.com/monaco-editor@${MONACO_VERSION}`
+// const CDN_BASE = `https://unpkg.com/monaco-editor@${MONACO_VERSION}`
+const CDN_BASE = `https://unpkg.byted-static.com/monaco-editor/${MONACO_VERSION}`
 
 // 根据语言偏好设置 Monaco 的 locale
 function getMonacoLocale(): string | undefined {
